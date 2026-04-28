@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "826994181870",
+    "firebase_url": "https://zaria-capstone-database-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "zaria-capstone-database",
+    "storage_bucket": "zaria-capstone-database.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:826994181870:android:14bd3b3fe86b6f253095ff",
+        "android_client_info": {
+          "package_name": "com.np.zaria2026"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHY9gAa0-mceLOHCItuFCDp6QZTYmz3F8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
