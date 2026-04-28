@@ -111,3 +111,7 @@ google-services.json
 
 # Ignore large VFX textures
 Assets/3DE_STUFF/VFX_Prefabs/**/*.tga
+
+# Firebase large binaries
+Assets/Firebase/Plugins/x86_64/*.bundle
+Assets/Firebase/Plugins/x86_64/*.so
