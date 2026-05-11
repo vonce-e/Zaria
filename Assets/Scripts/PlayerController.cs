@@ -1,12 +1,13 @@
 // Made by Andrew Burke to for the players interaction system
 
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
 
-    public float playerReach = 3f;
+    public float playerReach = 5f;
     private Interactable _currentInteractable;
     
     // Update is called once per frame
@@ -17,6 +18,7 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current.eKey.wasPressedThisFrame && _currentInteractable != null)
         {
             _currentInteractable.Interact();
+            Debug.Log("E key was pressed");
         }
     }
     
