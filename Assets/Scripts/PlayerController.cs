@@ -1,0 +1,79 @@
+// Made by Andrew Burke to for the players interaction system
+
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerController : MonoBehaviour
+{
+
+    public float playerReach = 3f;
+    private Interactable _currentInteractable;
+    
+    // Update is called once per frame
+    void Update()
+    {
+        CheckInteraction();
+        
+        if (Keyboard.current.eKey.wasPressedThisFrame && _currentInteractable != null)
+        {
+            _currentInteractable.Interact();
+        }
+    }
+    
+    /// <summary>
+    /// This method casts a ray that check if the object is an interactable and allow for interaction
+    /// </summary>
+    void CheckInteraction()
+    {
+        RaycastHit hit;
+        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+
+        if (Physics.Raycast(ray, out hit, playerReach))
+        {
+            if (hit.collider.CompareTag("Interactable"))
+            {
+                Interactable newInteractable = hit.collider.GetComponent<Interactable>();
+
+                if (_currentInteractable && newInteractable != _currentInteractable)
+                {
+                    _currentInteractable.DisableOutline();
+                }
+                
+                if (newInteractable.enabled)
+                {
+                    SetNewCurrentInteractable(newInteractable);
+                }
+                else
+                {
+                    DisableCurrentInteractable();
+                }
+                
+            }
+            else
+            {
+                DisableCurrentInteractable();
+            }
+        }
+        else
+        {
+            DisableCurrentInteractable();
+        }
+    }
+
+    void SetNewCurrentInteractable(Interactable newInteractable)
+    {
+        _currentInteractable = newInteractable;
+        _currentInteractable.EnableOutline();
+        HUDController.instance.EnableInteractionText(_currentInteractable.message);
+    }
+
+    void DisableCurrentInteractable()
+    {
+        HUDController.instance.DisableInteractionText();
+        if (_currentInteractable)
+        {
+            _currentInteractable.DisableOutline();
+            _currentInteractable = null;    
+        }
+    }
+}
