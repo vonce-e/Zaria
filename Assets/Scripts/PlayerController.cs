@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
 {
 
     public float playerReach = 5f;
+    public Transform raycastPoint;
+
     private Interactable _currentInteractable;
     
     // Update is called once per frame
@@ -28,7 +30,7 @@ public class PlayerController : MonoBehaviour
     void CheckInteraction()
     {
         RaycastHit hit;
-        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+        Ray ray = new Ray(raycastPoint.position, raycastPoint.forward);
 
         if (Physics.Raycast(ray, out hit, playerReach))
         {
