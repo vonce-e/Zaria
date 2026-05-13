@@ -1,0 +1,4 @@
+internal class RoomNode : Node
+{
+    
+}
