@@ -15,7 +15,7 @@ public class MainMenuManager : MonoBehaviour
    /// </summary>
    public void PlayGame()
    {
-      SceneLoader.Instance.ChangeScene("TestScene");
+      SceneLoader.Instance.ChangeScene("MainScene");
    } 
    
    /// <summary>
