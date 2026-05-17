@@ -1,4 +1,4 @@
-// This script is made to handle the main menu screen interactions
+// This script is made to handle the main menu screen interactions by Vonce and Andrew
 using UnityEngine;
 using UnityEngine.UI;
 
