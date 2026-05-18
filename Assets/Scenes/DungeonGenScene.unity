@@ -392,8 +392,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1420098369}
+  - component: {fileID: 1420098370}
   m_Layer: 0
-  m_Name: DungeonGenerator
+  m_Name: DungeonCreator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -414,6 +415,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1420098370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1420098368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a483a6badd474601b1beb4341c8a3bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCreator
+  dungeonWidth: 100
+  dungeonLength: 100
+  roomWidthMin: 25
+  roomLengthMin: 25
+  maxIterations: 10
+  corridorWidth: 5
+  material: {fileID: 2100000, guid: 91e82071efd9b44dea3bf171e5bf69ef, type: 2}
 --- !u!1001 &5908684273228829098
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -465,6 +485,10 @@ PrefabInstance:
     - target: {fileID: 2690844073789694316, guid: 4bd5ba8d2d94d492a945bc5de29d5a36, type: 3}
       propertyPath: m_Name
       value: Room
+      objectReference: {fileID: 0}
+    - target: {fileID: 2690844073789694316, guid: 4bd5ba8d2d94d492a945bc5de29d5a36, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
