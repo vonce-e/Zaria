@@ -1,19 +1,27 @@
-// A list of every CardData asset
+// A list of every CardData asset.
 // Made by Vonce Chew
 
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// A phonebook of every card in the game.
+/// </summary>
 [CreateAssetMenu(menuName = "Zaria/Card Database")]
 public class CardDatabase : ScriptableObject
 {
+    /// Every CardData asset in the game.
     public List<CardData> allCards = new List<CardData>();
 
     private Dictionary<CardId, CardData> _lookup;
 
+    /// <summary>
+    /// Returns the CardData for the given id. Builds the lookup table the
+    /// first time it's called, then caches it for the rest of the session.
+    /// </summary>
+    /// <param name="id">The card to find.</param>
     public CardData Get(CardId id)
     {
-        // Build the lookup table the first time it's used.
         if (_lookup == null)
         {
             _lookup = new Dictionary<CardId, CardData>();

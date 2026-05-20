@@ -1583,6 +1583,56 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 662119909}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &719825920
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 719825922}
+  - component: {fileID: 719825923}
+  m_Layer: 0
+  m_Name: Systems
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &719825922
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 719825920}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.68254, y: 0, z: 7.47477}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &719825923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 719825920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afcb722edc8c04fe2a646085de525627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardRewardService
+  cardDatabase: {fileID: 11400000, guid: 959e243e0c59442d59214e1c9aa3287b, type: 2}
+  run:
+    coins: 0
+    playerLevel: 1
+    enchantSpent: 0
+    deck: []
 --- !u!1 &722749514 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8371537252954574287, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
@@ -4316,3 +4366,4 @@ SceneRoots:
   - {fileID: 880149413}
   - {fileID: 1817136753}
   - {fileID: 1268655467}
+  - {fileID: 719825922}
