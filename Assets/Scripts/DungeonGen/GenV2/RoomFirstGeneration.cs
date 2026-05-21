@@ -2,6 +2,8 @@
 // Made by Andrew
 
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,7 +14,14 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
    [SerializeField] private int dungeonWidth = 20, dungeonHeight = 20;
    [SerializeField] [Min(1)] private int corridorWidth = 1;
    [SerializeField][Range(0,10)] private int offset = 1; // Offsets the rooms gen from the boundary box
-   [SerializeField] bool randomWalkRooms = false; // Responsible to check if we want to use the random walk algorithim
+   [SerializeField] bool randomWalkRooms = false; // Responsible to check if we want to use the random walk algorithm
+   
+   // Temporary
+   [SerializeField] private GameObject cornerTileMarker;
+   [SerializeField] private GameObject innerTileMarker;
+   [SerializeField] private GameObject centerPointMarker;
+   [SerializeField] private GameObject nearWallTileMarker;
+   private float markerHeight = 0.2f;
 
    protected override void RunProceduralGeneration()
    {
@@ -24,15 +33,24 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       var roomsList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)(startPosition),
          new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
       
-      HashSet<Vector2Int> floor = new  HashSet<Vector2Int>();
-
+      HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
+      List<DungeonRoomData> generatedRooms = new List<DungeonRoomData>();
+      
       if (randomWalkRooms)
       {
          floor = CreateRoomsRandomly(roomsList);
       }
       else
       {
-         floor = CreateSimpleRooms(roomsList);
+         generatedRooms = CreateSimpleRoomData(roomsList);
+         
+         foreach (DungeonRoomData roomData in generatedRooms)
+         {
+            floor.UnionWith(roomData.FloorTiles);
+         }
+         // SpawnRoomDataMarkers(generatedRooms);
+         
+         // floor = CreateSimpleRooms(roomsList);
       }
       
       // This will contain the x,y center coordinates of each room
@@ -47,6 +65,107 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       
       // Parse in the floor tiles to create the rooms and visually paint it
       visualiser.CreateFloorTiles(floor);
+   }
+   
+   /// <summary>
+   /// This will store the rooms data, that has its bounds, center etc to help provide info to place prefabs and enemies
+   /// </summary>
+   /// <param name="roomsList">Contains the room data that has been split with the algorithm for the dungeon</param>
+   /// <returns>Returns back the data of the room</returns>
+   private List<DungeonRoomData> CreateSimpleRoomData(List<BoundsInt> roomsList)
+   {
+      List<DungeonRoomData> generatedRooms = new List<DungeonRoomData>();
+
+      foreach (var room in roomsList)
+      {
+         DungeonRoomData roomData = new DungeonRoomData();
+
+         roomData.Bounds = room;
+         roomData.CenterPoint = (Vector2Int)(Vector3Int.RoundToInt(room.center));
+
+         for (int col = 0; col < room.size.x - offset; col++) 
+         {
+            for (int row = 0; row < room.size.y - offset; row++)
+            {
+               Vector2Int position = (Vector2Int)room.min + new Vector2Int(col, row);
+               roomData.FloorTiles.Add(position);
+            }
+         }
+         AnalyzeRoomTilesData(roomData);
+         generatedRooms.Add(roomData);
+      }
+      
+      return generatedRooms;
+   }
+   
+   /// <summary>
+   /// This method will find out the tilese are wall tiles, corner tiles, inner tiles and etc to give more data for the room
+   /// for better prefab placement.
+   /// </summary>
+   /// <param name="roomData">This contains the data of the rooms made in the BSP</param>
+   private void AnalyzeRoomTilesData(DungeonRoomData roomData)
+   {
+      foreach (Vector2Int tile in roomData.FloorTiles)
+      {
+         // This defines the checks needed for if there are neighbouring tiles
+         bool hasUp = roomData.FloorTiles.Contains(tile + Vector2Int.up);
+         bool hasDown = roomData.FloorTiles.Contains(tile + Vector2Int.down);
+         bool hasLeft = roomData.FloorTiles.Contains(tile + Vector2Int.left);
+         bool hasRight = roomData.FloorTiles.Contains(tile + Vector2Int.right);
+         int missingNeighbourTileCount = 0;
+         
+         // This checks whether there are tiles nearby tile X
+         if (!hasUp) missingNeighbourTileCount++;
+         if (!hasDown) missingNeighbourTileCount++;
+         if (!hasLeft) missingNeighbourTileCount++;
+         if (!hasRight) missingNeighbourTileCount++;
+
+         if (missingNeighbourTileCount >= 2)
+         {
+            roomData.CornerTiles.Add(tile);
+         }
+         else if (missingNeighbourTileCount == 1)
+         {
+            roomData.NearWallTiles.Add(tile);
+         }
+         else
+         {
+            roomData.InnerTiles.Add(tile);
+         }
+      }
+   }
+
+   private void SpawnRoomDataMarkers(List<DungeonRoomData> roomData)
+   {
+      foreach (DungeonRoomData data in roomData)
+      {
+         foreach (Vector2Int tile in data.CornerTiles)
+         {
+            SpawnDebugMarker(cornerTileMarker, tile);
+         }
+
+         foreach (Vector2Int tile in data.NearWallTiles)
+         {
+            SpawnDebugMarker(nearWallTileMarker, tile);
+         }
+
+         foreach (Vector2Int tile in data.InnerTiles)
+         {
+            SpawnDebugMarker(innerTileMarker, tile);
+         }
+
+        SpawnDebugMarker(centerPointMarker, data.CenterPoint);
+      }
+   }
+
+   private void SpawnDebugMarker(GameObject prefab, Vector2Int tile)
+   {
+      if (prefab == null)
+         return;
+
+      Vector3 worldPosition = new Vector3(tile.x * 2f, markerHeight, tile.y * 2f);
+
+      Instantiate(prefab, worldPosition, Quaternion.identity, transform);
    }
 
    private HashSet<Vector2Int> CreateRoomsRandomly(List<BoundsInt> roomsList)

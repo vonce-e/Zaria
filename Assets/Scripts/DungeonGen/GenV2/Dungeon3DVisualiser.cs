@@ -7,6 +7,7 @@ public class Dungeon3DVisualiser : MonoBehaviour
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private Transform dungeonParent;
     [SerializeField] private float cellSize = 4f;
+    [SerializeField] private float ceilingHeight = 4f;
     [SerializeField] private float wallDistanceFromFloorCenter = 0.5f;
     
     /// <summary>
@@ -17,6 +18,7 @@ public class Dungeon3DVisualiser : MonoBehaviour
         HashSet<Vector2Int> floorPositionSet = new HashSet<Vector2Int>(floorPositions);
         PaintFloorTiles(floorPositionSet);
         PaintWallTiles(floorPositionSet);
+        PaintCeilingTiles(floorPositionSet);
     }
     
     /// <summary>
@@ -35,6 +37,26 @@ public class Dungeon3DVisualiser : MonoBehaviour
         foreach (Vector2Int position in floorPositions)
         {
             Instantiate(floorPrefab, GridToWorldPosition(position), Quaternion.identity, GetDungeonParent());
+        }
+    }
+    
+    /// <summary>
+    /// This method will generate the ceiling tiles in relation to the floor positions of the grid
+    /// </summary>
+    /// <param name="floorPositions"> x,y coordinates of where the random walk algorithm has walked over</param>
+    private void PaintCeilingTiles(IEnumerable<Vector2Int> floorPositions)
+    {
+        if (floorPrefab == null)
+        {
+            Debug.LogWarning("Dungeon3DVisualiser is missing a floor prefab.");
+            return;
+        }
+
+        foreach (Vector2Int position in floorPositions)
+        {
+            Vector3 ceilingPosition = GridToWorldPosition(position) + new Vector3(0,1,0) * ceilingHeight;
+            Quaternion ceilingRotation = Quaternion.Euler(180f, 0f, 0f);
+            Instantiate(floorPrefab, ceilingPosition, ceilingRotation, GetDungeonParent());
         }
     }
     
