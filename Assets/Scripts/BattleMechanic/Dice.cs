@@ -1,3 +1,4 @@
+// This script handles the random dice number generation.
 // Made by Vonce Chew
 using UnityEngine;
 

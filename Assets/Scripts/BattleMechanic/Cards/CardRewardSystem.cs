@@ -41,7 +41,6 @@ public class CardRewardSystem
     /// otherwise refuses. Fires OnCardOffered either way so the UI knows.
     /// </summary>
     /// <param name="id">The card to add.</param>
-    /// <returns>Whether the card was Added or refused (DeckFull).</returns>
     public AddResult AddCard(CardId id)
     {
         if (_run.deck.Count >= MaxDeckSize)

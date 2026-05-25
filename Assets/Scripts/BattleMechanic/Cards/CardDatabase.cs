@@ -1,4 +1,4 @@
-// A list of every CardData asset.
+// A list of every CardData asset
 // Made by Vonce Chew
 
 using System.Collections.Generic;

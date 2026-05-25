@@ -99,9 +99,7 @@ public class CardInstance
     public CardId definitionId;
     public int upgradeLevel;
 
-    /// <summary>
-    /// Makes a fresh, unupgraded copy of a card.
-    /// </summary>
+    // Makes a new unupgraded copy of a card
     public CardInstance(CardId id)
     {
         definitionId = id;

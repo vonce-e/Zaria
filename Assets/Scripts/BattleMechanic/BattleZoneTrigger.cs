@@ -1,4 +1,6 @@
-// This trigger will be the one that triggers the battle to start when the player walks into the zone
+// This script handles a trigger that will be the one that triggers the battle to start when the player walks into the zone
+// Made by Andrew Burke
+
 using UnityEngine;
 using System.Collections;
 
