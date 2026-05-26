@@ -17,11 +17,18 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
    [SerializeField] bool randomWalkRooms = false; // Responsible to check if we want to use the random walk algorithm
    
    // Temporary
-   [SerializeField] private GameObject cornerTileMarker;
-   [SerializeField] private GameObject innerTileMarker;
-   [SerializeField] private GameObject centerPointMarker;
-   [SerializeField] private GameObject nearWallTileMarker;
-   private float markerHeight = 0.2f;
+   // [SerializeField] private GameObject cornerTileMarker;
+   // [SerializeField] private GameObject innerTileMarker;
+   // [SerializeField] private GameObject centerPointMarker;
+   // [SerializeField] private GameObject nearWallTileMarker;
+   // private float markerHeight = 0.2f;
+   
+   [Header("Prefab spawning testing")]
+   [SerializeField] private List<GameObject> cornerProps;
+   [SerializeField] private List<GameObject> innerTileProps;
+   [SerializeField] private List<GameObject> wallProps;
+   [SerializeField] private float cellSize;
+   [SerializeField] private float propHeight;
 
    protected override void RunProceduralGeneration()
    {
@@ -48,9 +55,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          {
             floor.UnionWith(roomData.FloorTiles);
          }
-         // SpawnRoomDataMarkers(generatedRooms);
-         
-         // floor = CreateSimpleRooms(roomsList);
       }
       
       // This will contain the x,y center coordinates of each room
@@ -61,12 +65,91 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
 
       HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
+      
+      // Assign the corridors to the room data
+      AssignCorridorDataToRoom(generatedRooms, corridors);
+      
       floor.UnionWith(corridors);
       
       // Parse in the floor tiles to create the rooms and visually paint it
       visualiser.CreateFloorTiles(floor);
+      
+      // Spawns the prefabs
+      SpawnProps(generatedRooms);
    }
    
+   #region Prop spawnning LOGIC
+   private void SpawnProps(List<DungeonRoomData> generatedRooms)
+   {
+         foreach (DungeonRoomData roomData in generatedRooms)
+         {
+            // Get valid list of tiles that prefabs can be spawned on
+            List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles);
+            List<Vector2Int> validInnerTiles = GetValidTile(roomData, roomData.InnerTiles);
+            // List<Vector2Int> validWallTiles = GetValidTile(roomData, roomData.NearWallTiles);
+            
+            // Instantiate the prefabs on the given tile
+            TrySpawnPropAtTile(cornerProps, validCornerTiles, roomData);
+            TrySpawnPropAtTile(innerTileProps, validInnerTiles, roomData);
+            
+         }
+   }
+   
+   private List<Vector2Int> GetValidTile(DungeonRoomData data, HashSet<Vector2Int> givenTiles)
+   {
+      List<Vector2Int> validTiles = new List<Vector2Int>();
+
+      foreach (Vector2Int tile in givenTiles)
+      {
+         if (data.CorridorTiles.Contains(tile) == false && data.OccupiedTiles.Contains(tile) == false)
+         {
+            validTiles.Add(tile);
+         }
+      }
+      
+      return validTiles;
+   }
+
+   private void TrySpawnPropAtTile(List<GameObject> objectToSpawn,  List<Vector2Int> givenTiles, DungeonRoomData roomData)
+   {
+      if (objectToSpawn == null || objectToSpawn.Count == 0)
+      {
+         return;
+      }
+
+      if (givenTiles == null || givenTiles.Count == 0)
+      {
+         return;
+      }
+      
+      // Choosing from a random select of tiles
+      int randomTileIndex = Random.Range(0, givenTiles.Count);
+      Vector2Int tile = givenTiles[randomTileIndex];
+      
+      // Choosing from a random select of prefabs
+      int randomPrefabIndex = Random.Range(0, objectToSpawn.Count);
+      GameObject randomPrefab = objectToSpawn[randomPrefabIndex];
+
+      // Instantiate object
+      InstantiateProps(randomPrefab, tile);
+      
+      roomData.OccupiedTiles.Add(tile);
+   }
+   
+   /// <summary>
+   /// This helper method spawns the prefab at the given coordinates
+   /// </summary>
+   /// <param name="prefab"></param>
+   /// <param name="position"></param>
+   private void InstantiateProps(GameObject prefab, Vector2Int position)
+   {
+      Vector3 prefabPosition = new Vector3(position.x * cellSize, propHeight, position.y * cellSize);
+      Instantiate(prefab, prefabPosition, Quaternion.identity, transform);
+   }
+   
+   #endregion
+
+   #region Room Data
    /// <summary>
    /// This will store the rooms data, that has its bounds, center etc to help provide info to place prefabs and enemies
    /// </summary>
@@ -134,40 +217,31 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          }
       }
    }
-
-   private void SpawnRoomDataMarkers(List<DungeonRoomData> roomData)
+   
+   /// <summary>
+   /// This function analyzes the corridor tiles and adds it to the dungeon room data
+   /// </summary>
+   /// <param name="generatedRooms">contains all the generated rooms</param>
+   /// <param name="corridors">contains the generated corridors</param>
+   private void AssignCorridorDataToRoom(List<DungeonRoomData> generatedRooms, HashSet<Vector2Int> corridors)
    {
-      foreach (DungeonRoomData data in roomData)
+      // Loops through the generated rooms
+      foreach (DungeonRoomData roomData in generatedRooms)
       {
-         foreach (Vector2Int tile in data.CornerTiles)
+         // Loops through the corridor tiles
+         foreach (Vector2Int tile in corridors)
          {
-            SpawnDebugMarker(cornerTileMarker, tile);
+            // Checks to see if the room data has the corridor tile inside, if it doesn't add it. 
+            if (roomData.FloorTiles.Contains(tile))
+            {
+               roomData.CorridorTiles.Add(tile);
+            }
          }
-
-         foreach (Vector2Int tile in data.NearWallTiles)
-         {
-            SpawnDebugMarker(nearWallTileMarker, tile);
-         }
-
-         foreach (Vector2Int tile in data.InnerTiles)
-         {
-            SpawnDebugMarker(innerTileMarker, tile);
-         }
-
-        SpawnDebugMarker(centerPointMarker, data.CenterPoint);
       }
    }
-
-   private void SpawnDebugMarker(GameObject prefab, Vector2Int tile)
-   {
-      if (prefab == null)
-         return;
-
-      Vector3 worldPosition = new Vector3(tile.x * 2f, markerHeight, tile.y * 2f);
-
-      Instantiate(prefab, worldPosition, Quaternion.identity, transform);
-   }
-
+   #endregion
+   
+   #region Create Room Functions
    private HashSet<Vector2Int> CreateRoomsRandomly(List<BoundsInt> roomsList)
    {
       HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
@@ -316,22 +390,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
       return closest;
    }
-
-   private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomsList)
-   {
-      HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
-
-      foreach (var room in roomsList)
-      {
-         for (int col = 0; col < room.size.x - offset; col++)
-         {
-            for (int row = 0; row < room.size.y - offset; row++)
-            {
-               Vector2Int position = (Vector2Int)room.min + new Vector2Int(col, row);
-               floor.Add(position);
-            }
-         }
-      }
-      return floor;
-   }
+   #endregion
+   
+   
 }
