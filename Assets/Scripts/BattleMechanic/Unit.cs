@@ -1,11 +1,14 @@
-// This script handles the HP, energy, block, and a list of active status effects during combat.
+// This script handles the fighter in combat: HP, energy, block, and a list of active status effects.
 // Made by Vonce Chew
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Holds combat stats and the list of status effects currently active on the player or enemy.
+/// Holds combat stats for the player or the enemy, and
+/// the list of status effects currently active on them. Fires OnHpChanged
+/// whenever HP changes so HUDs and other listeners can react.
 /// </summary>
 public class Unit : MonoBehaviour
 {
@@ -18,14 +21,20 @@ public class Unit : MonoBehaviour
     public int maxHp;
     public int currentHp;
 
-    // Spent to play cards. Reset to a fixed amount each turn.
+    // Energy spent to play cards, resets to a fixed amount each turn
     public int energy;
 
-    // Defense that soaks damage. Resets to 0 at turn start.
+    // Defense that soaks damage, resets to 0 at start of turn
     public int block;
 
-    // Status effects currently affecting this unit.
+    // Status effects currently affecting this unit
     public List<StatusEffect> statuses = new List<StatusEffect>();
+
+    /// <summary>
+    /// Fires every time HP changes. Listeners such as HUDs, particle effects,
+    /// death triggers, subscribe to this and react. Passes the new HP value.
+    /// </summary>
+    public event Action<int> OnHpChanged;
 
     /// <summary>
     /// Apply damage. Block soaks the hit first, the rest comes off HP.
@@ -38,10 +47,7 @@ public class Unit : MonoBehaviour
         block = Mathf.Max(0, block - amount);
 
         if (afterBlock > 0)
-            currentHp -= afterBlock;
-
-        if (currentHp < 0)
-            currentHp = 0;
+            SetHp(currentHp - afterBlock);
     }
 
     /// <summary>
@@ -50,21 +56,44 @@ public class Unit : MonoBehaviour
     /// <param name="amount">Damage to deal straight to HP.</param>
     public void TakeTrueDamage(int amount)
     {
-        currentHp -= amount;
-        if (currentHp < 0)
-            currentHp = 0;
+        SetHp(currentHp - amount);
     }
 
-    // True when unit's HP has reached 0.
+    /// <summary>
+    /// Heal this unit. Cannot exceed maxHp.
+    /// </summary>
+    /// <param name="amount">Amount to heal.</param>
+    public void Heal(int amount)
+    {
+        SetHp(currentHp + amount);
+    }
+
+    /// <summary>
+    /// Internal HP setter. Clamps to [0, maxHp] and fires the event.
+    /// Every HP change goes through here so the event fires always.
+    /// </summary>
+    /// <param name="newHp">The desired new HP, clamped before being applied.</param>
+    private void SetHp(int newHp)
+    {
+        currentHp = Mathf.Clamp(newHp, 0, maxHp);
+        OnHpChanged?.Invoke(currentHp);
+    }
+
+    // True when this unit's HP has reached 
     public bool IsDead => currentHp <= 0;
 
-    // Attaches a new status effect to this unit
+    /// <summary>
+    /// Attaches a new status effect to this unit.
+    /// </summary>
     public void AddStatus(StatusEffect status)
     {
         statuses.Add(status);
     }
 
-    // True if any active status prevents this unit from taking its turn, e.g. freeze.
+    /// <summary>
+    /// True if any active status prevents this unit from taking its turn
+    /// e.g. a freeze, checked before statuses tick.
+    /// </summary>
     public bool HasBlockingStatus()
     {
         foreach (var s in statuses)
@@ -75,7 +104,7 @@ public class Unit : MonoBehaviour
 
     /// <summary>
     /// Run all status effects once, count their duration down, and remove
-    /// any that have expired. Called at the start of each turn.
+    /// any ones that have expired. This is called at the start of each turn.
     /// </summary>
     public void TickStatuses()
     {
