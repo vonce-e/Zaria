@@ -19,8 +19,6 @@ public class DungeonRoomData
     public HashSet<Vector2Int> OccupiedTiles = new HashSet<Vector2Int>();
 
     public RoomType TypeOfRoom = RoomType.Normal;
-
-
  
 }
 
