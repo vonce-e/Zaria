@@ -18,7 +18,7 @@ MonoBehaviour:
   rarity: 0
   energyCost: 2
   description: 
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: fedd910d28e604c4196dfb1b308af612, type: 3}
   baseDamage: 0
   baseDefense: 6
   upgradeTiers: []
