@@ -25,6 +25,7 @@ public class CombatTest : MonoBehaviour
         run.deck.Add(new CardInstance(CardId.Guard));
         run.deck.Add(new CardInstance(CardId.DeepCut));
         run.deck.Add(new CardInstance(CardId.TwinStrike));
+        
         for (int i = 0; i < 6; i++)
             run.deck.Add(new CardInstance(CardId.Slash));
 
@@ -51,7 +52,7 @@ public class CombatTest : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
             combatManager.EndPlayerTurn();
     }
-
+    
     /// <summary>
     /// Play the Nth card from the player's current hand. Real UI in
     /// </summary>

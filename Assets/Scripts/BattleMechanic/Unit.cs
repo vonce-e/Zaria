@@ -22,7 +22,7 @@ public class Unit : MonoBehaviour
     public int currentHp;
 
     // Energy spent to play cards, resets to a fixed amount each turn
-    public int energy;
+    [SerializeField] private int _energy;
 
     // Defense that soaks damage, resets to 0 at start of turn
     public int block;
@@ -35,6 +35,26 @@ public class Unit : MonoBehaviour
     /// death triggers, subscribe to this and react. Passes the new HP value.
     /// </summary>
     public event Action<int> OnHpChanged;
+
+    /// <summary>
+    /// Fires every time energy changes. Passes the new energy value.
+    /// </summary>
+    public event Action<int> OnEnergyChanged;
+
+    /// <summary>
+    /// Energy used to play cards. Reset each turn. Wrapped as a property so
+    /// setting it from anywhere automatically fires OnEnergyChanged.
+    /// </summary>
+    public int energy
+    {
+        get => _energy;
+        set
+        {
+            if (_energy == value) return;
+            _energy = value;
+            OnEnergyChanged?.Invoke(_energy);
+        }
+    }
 
     /// <summary>
     /// Apply damage. Block soaks the hit first, the rest comes off HP.
