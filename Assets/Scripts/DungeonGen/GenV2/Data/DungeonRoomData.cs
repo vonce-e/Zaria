@@ -17,9 +17,22 @@ public class DungeonRoomData
     public HashSet<Vector2Int> InnerTiles = new HashSet<Vector2Int>();
     public HashSet<Vector2Int> CorridorTiles = new HashSet<Vector2Int>();
     public HashSet<Vector2Int> OccupiedTiles = new HashSet<Vector2Int>();
+    public List<EntranceRoomData> EntranceTiles = new List<EntranceRoomData>();
 
     public RoomType TypeOfRoom = RoomType.Normal;
  
+}
+
+public class EntranceRoomData
+{
+    public Vector2Int Tile;
+    public Vector2Int Direction;
+
+    public EntranceRoomData(Vector2Int tile, Vector2Int direction)
+    {
+        Tile = tile;
+        Direction = direction;
+    }
 }
 
 /// <summary>
