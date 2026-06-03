@@ -116,3 +116,4 @@ Assets/3DE_STUFF/VFX_Prefabs/**/*.tga
 Assets/Firebase/Plugins/x86_64/*.bundle
 Assets/Firebase/Plugins/x86_64/*.so
 
+.DS_Store
