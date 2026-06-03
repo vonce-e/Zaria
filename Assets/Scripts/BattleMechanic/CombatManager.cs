@@ -29,6 +29,7 @@ public class CombatManager : MonoBehaviour
     private bool _combatEnded;
     private CardPiles _piles = new CardPiles();
     private List<CardId> _cardsPlayedThisTurn = new List<CardId>();
+    public event System.Action<bool> OnTurnChanged;
 
     /// <summary>
     /// Called by BattleSystem or CombatTest once everything is staged.
@@ -81,6 +82,8 @@ public class CombatManager : MonoBehaviour
             EnemyTurn();
             return;
         }
+
+        OnTurnChanged?.Invoke(true);
 
         Debug.Log($"Player turn. Dice: {dice.DiceNumber}. Energy: {_player.energy}. " +
                   $"Enemy plans to: {enemyAI.IntentLabel()}");
@@ -162,6 +165,7 @@ public class CombatManager : MonoBehaviour
         if (_combatEnded) return;
         
         _enemy.block = 0;
+        OnTurnChanged?.Invoke(false);
         Debug.Log("Enemy turn.");
 
         bool frozen = _enemy.HasBlockingStatus();
