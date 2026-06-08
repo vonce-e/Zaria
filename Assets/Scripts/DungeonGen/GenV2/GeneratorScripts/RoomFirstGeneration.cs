@@ -2,8 +2,12 @@
 // Made by Andrew
 
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.WSA;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class RoomFirstGeneration : SimpleRandomWalkGenerator
 {
@@ -35,6 +39,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
    [Header("Dungeon Items")] 
    [SerializeField] private GameObject doorPrefab;
+   [SerializeField] private GameObject bossPortalPrefab;
    
    [Header("Dungeon Enemy List")]
    
@@ -93,9 +98,10 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       
       // Spawns the door to connect the room and corridor and props
       SpawnDoors(generatedRooms);
+      SpawnBossPortal(generatedRooms);
       SpawnProps(generatedRooms);
    }
-   
+
    private void PlayerSpawn(List<DungeonRoomData> roomData)
    {
       DungeonRoomData spawnRoom = null;
@@ -244,7 +250,28 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       TrySpawnPropAtTile(propSet.innerTileProps, validInnerTiles, roomData, propSet.minInnerTileProps, propSet.maxInnerTileProps);
       TrySpawnPropAtWall(propSet.nearWallTileProps, validWallTiles, roomData, wallPropHeight,propSet.minNearWallTileProps,propSet.maxNearWallTileProps);
    }
+   
+   private void SpawnBossPortal(List<DungeonRoomData> roomData) 
+   {
+      if (bossPortalPrefab == null)
+      {
+         return;
+      }
 
+      DungeonRoomData bossRoom = GetBossRooms(roomData);
+
+      if (bossRoom == null)
+      {
+         return;
+      }
+
+      Vector2Int portalTile = BossRoomCenter(bossRoom);
+      Vector3 portalPositon = new Vector3(portalTile.x * cellSize, propHeight,  portalTile.y * cellSize);
+
+      Instantiate(bossPortalPrefab, portalPositon, Quaternion.identity, propParent);
+      bossRoom.OccupiedTiles.Add(portalTile);
+   }
+   
    private void TrySpawnDoorPrefab(DungeonRoomData roomData, GameObject prefab) 
    {
       if (prefab == null)
@@ -264,24 +291,32 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          return;
       }
       
-      // Chooses a random tile from the corridor tiles to choose from
-      int tileIndex = Random.Range(0, entranceToSpawn.Count);
-      EntranceRoomData entrance = entranceToSpawn[tileIndex];
-         
-      // Gets the tile position and tile rotation
-      Vector2Int wallDirection = entrance.Direction;
-      Vector2Int sideDirection = GetDoorSideOffSetDirection(roomData, entrance);
-      Quaternion doorRotation = GetWallRotation(wallDirection);
-      
-      Vector3 tilePosition = new Vector3(entrance.Tile.x * cellSize, propHeight, entrance.Tile.y * cellSize);
-      Vector3 doorOffset = new Vector3(wallDirection.x, 0, wallDirection.y) * (cellSize * distanceFromWall);
-      Vector3 sideDoorOffset = new Vector3(sideDirection.x, 0, sideDirection.y) * doorDistanceOffSet;
-      
-      Vector3 doorPosition = tilePosition + doorOffset + sideDoorOffset;
-      
-      // Instantiate
-      Instantiate(prefab, doorPosition, doorRotation, propParent);
-      roomData.OccupiedTiles.Add(entrance.Tile);
+      List<List<EntranceRoomData>> entranceGroups = GroupEntranceTiles(entranceToSpawn);
+
+      foreach (List<EntranceRoomData> entranceGroup in entranceGroups)
+      {
+         if (entranceGroup.Count == 0)
+         {
+            continue;
+         }
+
+         if (entranceGroup.Count > 2)
+         {
+            continue;
+         }
+
+         EntranceRoomData firstEntrance = entranceGroup[0];
+
+         Vector3 doorPosition = GetGroupDoorPosition(entranceGroup);
+         Quaternion doorRotation = GetWallRotation(firstEntrance.Direction);
+
+         Instantiate(prefab, doorPosition, doorRotation, propParent);
+
+         foreach (EntranceRoomData entranceTile in entranceGroup)
+         {
+            roomData.OccupiedTiles.Add(entranceTile.Tile);
+         }
+      }
    }
    
    /// <summary>
@@ -373,6 +408,28 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
       
    }
+   /// <summary>
+   /// This method clears the props that sit inside the PropParent in the hierachy
+   /// </summary>
+   private void PropParentChildrenCleaner()
+   {
+      if (propParent == null)
+      {
+         return;
+      }
+      
+      int noOfChildren = propParent.childCount;
+
+      for (int i = noOfChildren - 1; i >= 0; i--)
+      {
+         DestroyImmediate(propParent.GetChild(i).gameObject);
+      }
+   }
+   
+   #endregion
+
+   #region PropSpawning Helper Methods
+   // <--------- Tile validity & Direction checkers --------->
    
    /// <summary>
    /// This method will check if the given tiles are not a occupied or corridor tile
@@ -506,27 +563,113 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
       return false;
    }
-   
-   /// <summary>
-   /// This method clears the props that sit inside the PropParent in the hierachy
-   /// </summary>
-   private void PropParentChildrenCleaner()
+
+   private List<List<EntranceRoomData>> GroupEntranceTiles(List<EntranceRoomData> entranceTiles)
    {
-      if (propParent == null)
+      List<List<EntranceRoomData>> entranceGroup = new List<List<EntranceRoomData>>();
+      List<EntranceRoomData> uncheckedGroup = new List<EntranceRoomData>(entranceTiles);
+
+      while (uncheckedGroup.Count > 0)
       {
-         return;
+         EntranceRoomData firstEntranceTile = uncheckedGroup[0];
+         uncheckedGroup.RemoveAt(0);
+         
+         List<EntranceRoomData> currentEntranceTiles = new List<EntranceRoomData>();
+         Queue<EntranceRoomData> entrancesToCheck = new Queue<EntranceRoomData>();
+         
+         entrancesToCheck.Enqueue(firstEntranceTile);
+         currentEntranceTiles.Add(firstEntranceTile);
+
+         while (entrancesToCheck.Count > 0)
+         {
+            EntranceRoomData currentEntrance = entrancesToCheck.Dequeue();
+            
+            for (int i = uncheckedGroup.Count - 1; i >= 0; i--)
+            {
+               EntranceRoomData entranceToCheck = uncheckedGroup[i];
+               
+               bool sameDirection = entranceToCheck.Direction == firstEntranceTile.Direction;
+               bool besideDirection = AreEntranceTilesBesideEachother(currentEntrance, entranceToCheck);
+
+               if (sameDirection && besideDirection)
+               {
+                  currentEntranceTiles.Add(entranceToCheck);
+                  entrancesToCheck.Enqueue(entranceToCheck);
+                  uncheckedGroup.RemoveAt(i);
+               }
+            }
+         }
+         entranceGroup.Add(currentEntranceTiles);
       }
       
-      int noOfChildren = propParent.childCount;
+      
+      return entranceGroup;
+   }
 
-      for (int i = noOfChildren - 1; i >= 0; i--)
+   private bool AreEntranceTilesBesideEachother(EntranceRoomData firstEntranceTile, EntranceRoomData tileToCheck)
+   {
+      Vector2Int sideDirection = GetSideDirection(firstEntranceTile.Direction);
+      Vector2Int tileToRight = firstEntranceTile.Tile + sideDirection;
+      Vector2Int tileToLeft = firstEntranceTile.Tile - sideDirection;
+
+      if (tileToCheck.Tile == tileToRight)
       {
-         DestroyImmediate(propParent.GetChild(i).gameObject);
+         return true;
       }
+
+      if (tileToCheck.Tile == tileToLeft)
+      {
+         return true;
+      }
+      
+      return false;
+   }
+
+   private Vector3 GetGroupDoorPosition(List<EntranceRoomData> entranceGroup)
+   {
+      Vector2 entrancePosition = Vector2.zero;
+
+      foreach (EntranceRoomData entrance in entranceGroup)
+      {
+         entrancePosition += entrance.Tile;
+      }
+      
+      entrancePosition /= entranceGroup.Count;
+
+      Vector2Int doorDirection = entranceGroup[0].Direction;
+      
+      Vector3 roomPosition = new Vector3(entrancePosition.x * cellSize, propHeight, entrancePosition.y * cellSize);
+      Vector3 corridorOffset = new Vector3(doorDirection.x, 0,  doorDirection.y)  * (cellSize * 0.5f);
+      
+      return roomPosition + corridorOffset;
+   }
+   
+   // <--------- Boss room Tile checking & Veil spawning Methods --------->
+   private Vector2Int BossRoomCenter(DungeonRoomData bossRoom)
+   {
+      return bossRoom.CenterPoint;
+   }
+
+   private DungeonRoomData GetBossRooms(List<DungeonRoomData> bossRoom)
+   {
+      if (bossRoom == null)
+      {
+         return null;
+      }
+
+      foreach (DungeonRoomData roomData in bossRoom)
+      {
+         if (roomData.TypeOfRoom == RoomType.Boss)
+         {
+            return roomData;
+         }
+      }
+
+      return null;
    }
    
    #endregion
-
+   
    #region Room Data
    /// <summary>
    /// This will store the rooms data, that has its bounds, center etc to help provide info to place prefabs and enemies
@@ -638,9 +781,16 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
       
       // Assigns the room to be the boss room
+      DungeonRoomData exitRoom = FindFarthestRoomFromStart(generatedRooms);
+
+      if (exitRoom != null && exitRoom != spawnRoom)
+      {
+         exitRoom.TypeOfRoom = RoomType.Exit;
+      }
+      
       DungeonRoomData bossRoom = FindFarthestRoomFromStart(generatedRooms);
 
-      if (bossRoom != null && bossRoom != spawnRoom)
+      if (bossRoom != null && bossRoom != exitRoom && bossRoom != spawnRoom)
       {
          bossRoom.TypeOfRoom = RoomType.Boss;
       }
@@ -728,6 +878,11 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
       foreach (DungeonRoomData room in generatedRooms)
       {
+         if (room.TypeOfRoom != RoomType.Normal)
+         {
+            continue;
+         }
+         
          float distance = Vector2Int.Distance(startPosition, room.CenterPoint);
 
          if (distance > farthestDistance)

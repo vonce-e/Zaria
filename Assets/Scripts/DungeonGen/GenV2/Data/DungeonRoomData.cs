@@ -43,6 +43,7 @@ public enum RoomType
     Normal,
     Spawn,
     Treasure,
+    Shop,
     MiniBoss,
     Boss,
     Exit
