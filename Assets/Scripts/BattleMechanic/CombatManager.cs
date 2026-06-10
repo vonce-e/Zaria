@@ -22,6 +22,12 @@ public class CombatManager : MonoBehaviour
     public int rewardRare      = 25;
     public int rewardMythic    = 5;
     public int rewardLegendary = 0;
+    
+    [Header("Level-up stat growth")]
+    [Tooltip("How much max HP increases per level.")]
+    public int hpGrowthPerLevel = 5;
+    [Tooltip("Damage increases by 1 every N levels.")]
+    public int damageGrowthEveryNLevels = 2;
 
     private PlayerRunState _run;
     private Unit _player;
@@ -45,11 +51,23 @@ public class CombatManager : MonoBehaviour
         _player = player;
         _enemy = enemy;
 
+        // Subscribe to level-ups so we can apply stat growth.
+        _run.OnLeveledUp += HandleLevelUp;
+
         _piles.StartBattle(run);
         _piles.DrawCards(handSize);
 
         enemyAI.DecideNextIntent();
         StartPlayerTurn();
+    }
+
+    /// <summary>
+    /// Unsubscribe from PlayerRunState events when this manager is destroyed,
+    /// to avoid stale event handlers leaking between scene reloads.
+    /// </summary>
+    void OnDestroy()
+    {
+        if (_run != null) _run.OnLeveledUp -= HandleLevelUp;
     }
 
     /// <summary>
@@ -188,7 +206,7 @@ public class CombatManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Win flow: grant a card reward via CardRewardService,
+    /// Win flow : grant a card reward via CardRewardService,
     /// then tell BattleSystem to end the fight scene.
     /// </summary>
     private void Win()
@@ -196,6 +214,17 @@ public class CombatManager : MonoBehaviour
         if (_combatEnded) return;
         _combatEnded = true;
         Debug.Log("YOU WIN.");
+
+        // XP reward from the defeated enemy
+        EnemyXpReward xpComponent = _enemy.GetComponent<EnemyXpReward>();
+        if (xpComponent != null && _run != null)
+        {
+            int xp = xpComponent.xpReward;
+            _run.GrantXp(xp);
+            Debug.Log($"Gained {xp} XP. " +
+                    $"Now level {_run.playerLevel} ({_run.currentXp}/{_run.XpForNextLevel}).");
+        }
+
         if (CardRewardService.Instance != null)
         {
             CardRewardService.Instance.GrantCombatReward(
@@ -233,5 +262,23 @@ public class CombatManager : MonoBehaviour
             parts.Add($"[{i + 1}] {def.displayName} ({def.energyCost}e)");
         }
         return string.Join("  ", parts);
+    }
+
+    /// <summary>
+    /// Called by PlayerRunState when a level-up happens. Boosts the
+    /// player's max HP, optionally damage, and heals to full as a reward.
+    /// </summary>
+    private void HandleLevelUp(int newLevel)
+    {
+        if (_player == null) return;
+
+        _player.maxHp += hpGrowthPerLevel;
+        _player.currentHp = _player.maxHp;  // full heal on level up
+
+        if (damageGrowthEveryNLevels > 0 && newLevel % damageGrowthEveryNLevels == 0)
+            _player.damage += 1;
+
+        Debug.Log($"<color=yellow>LEVEL UP! Now level {newLevel}. " +
+                $"Max HP: {_player.maxHp}, Damage: {_player.damage}.</color>");
     }
 }

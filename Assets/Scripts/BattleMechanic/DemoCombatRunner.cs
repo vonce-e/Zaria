@@ -19,6 +19,9 @@ public class DemoCombatRunner : MonoBehaviour
     public BattleHudManager playerHUD;
     public BattleHudManager enemyHUD;
 
+    [Header("XP UI")]
+    public XpBarUI xpBarUI;
+
     [Header("Demo deck")]
     public CardId[] starterDeck = new CardId[]
     {
@@ -45,6 +48,9 @@ public class DemoCombatRunner : MonoBehaviour
         _run = new PlayerRunState { playerLevel = 1 };
         foreach (var id in starterDeck)
             _run.deck.Add(new CardInstance(id));
+
+        if (xpBarUI != null)
+            xpBarUI.Bind(_run);
 
         _currentEnemy = firstEnemy;
         combatManager.BeginCombat(_run, player, _currentEnemy);
