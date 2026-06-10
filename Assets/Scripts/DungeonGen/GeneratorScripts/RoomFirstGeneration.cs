@@ -30,10 +30,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
    [SerializeField] List<RoomTypeSpawnRule> roomTypeSpawnRules;
    
    [Header("Prop Spawn List")] 
-   [SerializeField] private RoomPropSet spawnRoomProps;
-   [SerializeField] private RoomPropSet treasureRoomProps;
-   [SerializeField] private RoomPropSet bossRoomProps;
-   [SerializeField] private RoomPropSet normalRoomProps;
+   [SerializeField] private List<RoomPropRule> roomProps;
    
    [Header("Prop spawn dimensions")]
    [SerializeField] private float cellSize;
@@ -90,7 +87,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       AssignCorridorDataToRoom(generatedRooms, corridors);
       AssignEntranceTiles(generatedRooms, corridors);
       AssignRoomType(generatedRooms);
-      DebugRoomTypeSummary(generatedRooms);
+      // DebugRoomTypeSummary(generatedRooms);
       
       // Spawns player
       PlayerSpawn(generatedRooms);
@@ -197,25 +194,189 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
    /// <param name="generatedRooms">This stores all the given rooms of the dungoen</param>
    private void SpawnProps(List<DungeonRoomData> generatedRooms)
    {
+      if (roomProps == null || roomProps.Count == 0)
+      {
+         return;
+      }
+      
       foreach (DungeonRoomData roomData in generatedRooms)
       {
-         if (roomData.TypeOfRoom == RoomType.Spawn)
+         RoomPropRule propRule = null;
+         
+         foreach (RoomPropRule rule in roomProps)
          {
-            SpawnPrefabsForSpawn(roomData, spawnRoomProps);
+            if (rule.roomType == roomData.TypeOfRoom)
+            {
+               propRule = rule;
+               break;
+            }
          }
-         else if (roomData.TypeOfRoom == RoomType.Treasure)
+
+         if (propRule == null)
          {
-            SpawnPrefabsForTreasureRoom(roomData, treasureRoomProps);
+            continue;
          }
-         else if (roomData.TypeOfRoom == RoomType.Boss)
-         {
-            SpawnPrefabsForBossRoom(roomData, bossRoomProps);
-         }
-         else
-         {
-            SpawnPrefabsForNormalRoom(roomData, normalRoomProps);
-         }
+         
+         // Check for valid tiles before spawning on category
+         List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles);
+         SpawnPropCategoryOnTile(propRule.cornerProps, validCornerTiles, roomData, propHeight);
+         
+         List<Vector2Int> validInnerTiles = GetValidTile(roomData, roomData.InnerTiles);
+         SpawnPropCategoryOnTile(propRule.innerTileProps, validInnerTiles, roomData, propHeight);
+         
+         List<Vector2Int> validNearWallTiles = GetValidTile(roomData, roomData.NearWallTiles);
+         SpawnPropCategoryNearWall(propRule.nearWallTileProps, validNearWallTiles, roomData, propHeight);
+         
+         List<Vector2Int> validWallMountedTiles = GetValidTile(roomData, roomData.NearWallTiles);
+         SpawnPropCategoryOnWall(propRule.wallMountedProps, validWallMountedTiles, roomData, wallPropHeight);
       }
+   }
+
+   private void SpawnPropCategoryOnTile(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles, DungeonRoomData roomData, float spawnHeight)
+   {
+      if (spawnRule == null || spawnRule.prefabs == null || spawnRule.prefabs.Count == 0)
+      {
+         return;
+      }
+
+      if (validTiles == null || validTiles.Count == 0)
+      {
+         return;
+      }
+      
+      int propAmount = PropsToSpawn(spawnRule);
+
+      for (int i = 0; i < propAmount; i++)
+      {
+         if (validTiles.Count == 0)
+         {
+            return;
+         }
+         
+         // Choosing from a random select of tiles
+         int randomTileIndex = Random.Range(0, validTiles.Count);
+         Vector2Int tile = validTiles[randomTileIndex];
+         
+         // Choosing from a random select of prefabs
+         int randomPrefabIndex = Random.Range(0, spawnRule.prefabs.Count);
+         GameObject randomPrefab = spawnRule.prefabs[randomPrefabIndex];
+
+         // Get tile position to spawn prefab at
+         Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
+         Instantiate(randomPrefab, tilePosition, Quaternion.identity, propParent);
+         
+         // Adds the current tile to the occupied tiles
+         roomData.OccupiedTiles.Add(tile);
+         validTiles.RemoveAt(randomTileIndex);
+      }
+   }
+
+   private void SpawnPropCategoryNearWall(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles, DungeonRoomData roomData, float spawnHeight)
+   {
+      if (spawnRule == null || spawnRule.prefabs == null || spawnRule.prefabs.Count == 0)
+      {
+         return;
+      }
+
+      if (validTiles == null || validTiles.Count == 0)
+      {
+         return;
+      }
+
+      int propAmount = PropsToSpawn(spawnRule);
+
+      for (int i = 0; i < propAmount; i++)
+      {
+         if (validTiles.Count == 0)
+         {
+            return;
+         }
+
+         // Choosing from a random select of tiles
+         int randomTileIndex = Random.Range(0, validTiles.Count);
+         Vector2Int tile = validTiles[randomTileIndex];
+         
+         // Choosing from a random select of prefabs
+         int randomPrefabIndex = Random.Range(0, spawnRule.prefabs.Count);
+         GameObject randomPrefab = spawnRule.prefabs[randomPrefabIndex];
+         
+         Vector2Int wallDirection = GetWallDirection(roomData, tile);
+         Quaternion wallRotation = GetWallRotation(wallDirection) * Quaternion.Euler(0f, 90f, 0f);
+
+         Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
+         
+         Instantiate(randomPrefab, tilePosition, wallRotation, propParent);
+         
+         // Adds the current tile to the occupied tiles
+         roomData.OccupiedTiles.Add(tile);
+         validTiles.RemoveAt(randomTileIndex);
+      }
+   }
+
+   private void SpawnPropCategoryOnWall(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles, DungeonRoomData roomData, float spawnHeight)
+   {
+      if (spawnRule == null || spawnRule.prefabs == null || spawnRule.prefabs.Count == 0)
+      {
+         return;
+      }
+
+      if (validTiles == null || validTiles.Count == 0)
+      {
+         return;
+      }
+      
+      int propAmount = PropsToSpawn(spawnRule);
+
+      for (int i = 0; i < propAmount; i++)
+      {
+         if (validTiles.Count == 0)
+         {
+            return;
+         }
+
+         // Choosing from a random select of tiles
+         int randomTileIndex = Random.Range(0, validTiles.Count);
+         Vector2Int tile = validTiles[randomTileIndex];
+         
+         // Choosing from a random select of prefabs
+         int randomPrefabIndex = Random.Range(0, spawnRule.prefabs.Count);
+         GameObject randomPrefab = spawnRule.prefabs[randomPrefabIndex];
+         
+         Vector2Int wallDirection = GetWallDirection(roomData, tile);
+         Quaternion wallRotation = GetWallRotation(wallDirection);
+
+         Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
+         Vector3 wallOffset = new Vector3(wallDirection.x, 0, wallDirection.y) * (distanceFromWall * cellSize);
+         
+         Vector3 prefabPosition = tilePosition + wallOffset;
+         
+         Instantiate(randomPrefab, prefabPosition, wallRotation, propParent);
+         
+         // Adds the current tile to the occupied tiles
+         roomData.OccupiedTiles.Add(tile);
+         validTiles.RemoveAt(randomTileIndex);
+      }
+   }
+
+   private int PropsToSpawn(PropCategorySpawnRule spawnRule)
+   {
+      int propChance = Random.Range(0, 100);
+      int propAmount = 0;
+
+      if (propChance <= spawnRule.mediumThreshold)
+      {
+         propAmount = spawnRule.lowAmount;
+      }
+      else if (propChance <= spawnRule.highThreshold)
+      {
+         propAmount = Random.Range(spawnRule.lowAmount, spawnRule.mediumAmount + 1);
+      }
+      else
+      {
+         propAmount = Random.Range(spawnRule.mediumAmount, spawnRule.highAmount + 1);
+      }
+
+      return propAmount;
    }
 
    private void SpawnDoors(List<DungeonRoomData> generatedRooms)
@@ -224,69 +385,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       {
          TrySpawnDoorPrefab(roomData, doorPrefab);
       }
-   }
-
-   private void SpawnPrefabsForSpawn(DungeonRoomData roomData, RoomPropSet propSet)
-   {
-      if (propSet == null)
-      {
-         return;
-      }
-      
-      // Get valid list of tiles that prefabs can be spawned on
-      List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles);
-      List<Vector2Int> validWallTiles = GetValidTile(roomData, roomData.NearWallTiles);
-      
-      // Instantiate the prefabs on the given tile
-      TrySpawnPropAtTile(propSet.cornerProps, validCornerTiles, roomData, propSet.minCornerProps,  propSet.maxCornerProps);
-      TrySpawnPropAtWall(propSet.nearWallTileProps, validWallTiles, roomData, wallPropHeight, propSet.minNearWallTileProps, propSet.maxNearWallTileProps);
-   }
-
-   private void SpawnPrefabsForTreasureRoom(DungeonRoomData roomData, RoomPropSet propSet)
-   {
-      if (propSet == null)
-      {
-         return;
-      }
-      
-      // Get valid list of tiles that prefabs can be spawned on
-      List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles);
-      List<Vector2Int> validInnerTiles =  GetValidTile(roomData, roomData.InnerTiles);
-      List<Vector2Int> validWallTiles = GetValidTile(roomData, roomData.NearWallTiles);
-      
-      // Instantiate the prefabs on the given tile
-      TrySpawnPropAtTile(propSet.cornerProps, validCornerTiles, roomData, propSet.minCornerProps, propSet.maxCornerProps);
-      TrySpawnPropAtTile(propSet.innerTileProps, validInnerTiles, roomData, propSet.minInnerTileProps, propSet.maxInnerTileProps);
-      TrySpawnPropAtWall(propSet.nearWallTileProps, validWallTiles, roomData, wallPropHeight,  propSet.minNearWallTileProps, propSet.maxNearWallTileProps);
-   }
-
-   private void SpawnPrefabsForBossRoom(DungeonRoomData roomData, RoomPropSet propSet)
-   {
-      if (propSet == null)
-      {
-         return;
-      }
-      
-      List<Vector2Int> validInnerTiles =  GetValidTile(roomData, roomData.InnerTiles);
-      TrySpawnPropAtTile(propSet.innerTileProps, validInnerTiles, roomData, propSet.minInnerTileProps, propSet.maxInnerTileProps);
-   }
-
-   private void SpawnPrefabsForNormalRoom(DungeonRoomData roomData, RoomPropSet propSet)
-   {
-      if (propSet == null)
-      {
-         return;
-      }
-      
-      // Get valid list of tiles that prefabs can be spawned on
-      List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles);
-      List<Vector2Int> validInnerTiles =  GetValidTile(roomData, roomData.InnerTiles);
-      List<Vector2Int> validWallTiles = GetValidTile(roomData, roomData.NearWallTiles);
-      
-      // Instantiate the prefabs on the given tile
-      TrySpawnPropAtTile(propSet.cornerProps, validCornerTiles, roomData, propSet.minCornerProps, propSet.maxCornerProps);
-      TrySpawnPropAtTile(propSet.innerTileProps, validInnerTiles, roomData, propSet.minInnerTileProps, propSet.maxInnerTileProps);
-      TrySpawnPropAtWall(propSet.nearWallTileProps, validWallTiles, roomData, wallPropHeight,propSet.minNearWallTileProps,propSet.maxNearWallTileProps);
    }
    
    private void SpawnBossPortal(List<DungeonRoomData> roomData) 
@@ -357,95 +455,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
    }
    
-   /// <summary>
-   /// This method will try to spawn a random prefab at a random tile in the dungeon in the different rooms
-   /// </summary>
-   /// <param name="objectToSpawn">Prefab to spawn</param>
-   /// <param name="givenTiles">The tiles that exist in the different dungeon rooms</param>
-   /// <param name="roomData"></param>
-   private void TrySpawnPropAtTile(List<GameObject> objectToSpawn,  List<Vector2Int> givenTiles, DungeonRoomData roomData, int minCount, int maxCount)
-   {
-      if (objectToSpawn == null || objectToSpawn.Count == 0)
-      {
-         return;
-      }
-      
-      if (givenTiles == null || givenTiles.Count == 0)
-      {
-         return;
-      }
-      
-      int maxSpawnCount = Random.Range(minCount, maxCount+1);
-
-      for (int i = 0; i < maxSpawnCount; i++)
-      {
-         if (givenTiles.Count == 0)
-         {
-            return;
-         }
-         // Choosing from a random select of tiles
-         int randomTileIndex = Random.Range(0, givenTiles.Count);
-         Vector2Int tile = givenTiles[randomTileIndex];
-         
-         // Choosing from a random select of prefabs
-         int randomPrefabIndex = Random.Range(0, objectToSpawn.Count);
-         GameObject randomPrefab = objectToSpawn[randomPrefabIndex];
-
-         // Get tile position to spawn prefab at
-         Vector3 tilePosition = new Vector3(tile.x * cellSize, propHeight, tile.y * cellSize);
-         Instantiate(randomPrefab, tilePosition, Quaternion.identity, propParent);
-         
-         // Adds the current tile to the occupied tiles
-         roomData.OccupiedTiles.Add(tile);
-         givenTiles.RemoveAt(randomTileIndex);
-      }
-   }
-
-   private void TrySpawnPropAtWall(List<GameObject> objectToSpawn, List<Vector2Int> givenTiles, DungeonRoomData roomData, float spawnHeight, int minCount, int maxCount)
-   {
-      if (objectToSpawn == null || objectToSpawn.Count == 0)
-      {
-         return;
-      }
-      
-      if (givenTiles == null || givenTiles.Count == 0)
-      {
-         return;
-      }
-      
-      int maxSpawnCount = Random.Range(minCount, maxCount+1);
-
-      for (int i = 0; i < maxSpawnCount; i++)
-      {
-         if (givenTiles.Count == 0)
-         {
-            return;
-         }
-         
-         // Choosing from a random select of tiles
-         int randomTileIndex = Random.Range(0, givenTiles.Count);
-         Vector2Int tile = givenTiles[randomTileIndex];
-         
-         // Choosing from a random select of prefabs
-         int randomPrefabIndex = Random.Range(0, objectToSpawn.Count);
-         GameObject randomPrefab = objectToSpawn[randomPrefabIndex];
-         
-         Vector2Int wallDirection = GetWallDirection(roomData, tile);
-         Quaternion wallRotation = GetWallRotation(wallDirection);
-
-         Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
-         Vector3 wallOffset = new Vector3(wallDirection.x, 0, wallDirection.y) * (distanceFromWall * cellSize);
-         
-         Vector3 prefabPosition = tilePosition + wallOffset;
-         
-         Instantiate(randomPrefab, prefabPosition, wallRotation, propParent);
-         
-         // Adds the current tile to the occupied tiles
-         roomData.OccupiedTiles.Add(tile);
-         givenTiles.RemoveAt(randomTileIndex);
-      }
-      
-   }
    /// <summary>
    /// This method clears the props that sit inside the PropParent in the hierachy
    /// </summary>
