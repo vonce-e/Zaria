@@ -1,10 +1,17 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Dungeon3DVisualiser : MonoBehaviour
-{
+{   
+    [Header("Prefab Backups")]
     [SerializeField] private GameObject floorPrefab;
     [SerializeField] private GameObject wallPrefab;
+
+    [Header("Room Visualisation Prefabs")]
+    [SerializeField] List<RoomVisualisationClass> roomVisuals;
+
+    [Header("Dungeon Properties")]
     [SerializeField] private Transform dungeonParent;
     [SerializeField] private float cellSize = 4f;
     [SerializeField] private float ceilingHeight = 4f;
@@ -20,7 +27,201 @@ public class Dungeon3DVisualiser : MonoBehaviour
         PaintWallTiles(floorPositionSet);
         PaintCeilingTiles(floorPositionSet);
     }
+
+    // Room aware create tile method
+    public void CreateTiles(IEnumerable<Vector2Int> floorPositions, List<DungeonRoomData> generatedRooms)  
+    {
+        HashSet<Vector2Int> floorPositionSet = new HashSet<Vector2Int>(floorPositions);
+        
+        PaintRoomFloorTiles(generatedRooms);
+        PaintCorridorTiles(floorPositionSet, generatedRooms);
+        PaintWallTilesNew(floorPositionSet, generatedRooms);
+        PaintCeilingTiles(floorPositionSet);
+    }
+
+    #region Room Visualisation Test
     
+    /// <summary>
+    /// This method will paint the room floors depending on what room type it is and what floor prefab it needs
+    /// </summary>
+    /// <param name="generatedRooms"></param>
+    private void PaintRoomFloorTiles(List<DungeonRoomData> generatedRooms)
+    {
+        if (generatedRooms == null || generatedRooms.Count == 0)
+        {
+            return;
+        }
+
+        foreach (DungeonRoomData room in generatedRooms)
+        {
+            GameObject selectedFloorPrefab = floorPrefab;
+            RoomVisualisationClass selectedVisualRule = null;
+
+            foreach (RoomVisualisationClass visualRule in roomVisuals)
+            {
+                if (visualRule.roomType == room.TypeOfRoom)
+                {
+                    selectedVisualRule = visualRule;
+                    break;
+                }
+            }
+
+            // Paints the floor tile based on the position of the floor tile
+            foreach (Vector2Int tile in room.FloorTiles)
+            {
+                if (selectedVisualRule != null)
+                {
+                    selectedFloorPrefab = GetRandomPrefabWeight(selectedVisualRule.floorPrefabs, floorPrefab);
+                }
+
+                Instantiate(selectedFloorPrefab, GridToWorldPosition(tile), Quaternion.identity, GetDungeonParent());
+            }
+        }
+
+    }
+
+    private void PaintWallTilesNew(HashSet<Vector2Int> floorPositions, List<DungeonRoomData> generatedRooms)
+    {
+       if(IsMissingFloorOrRoomData(floorPositions, generatedRooms))
+        {
+            return;
+        }
+
+       HashSet<Vector2Int> roomTiles = new HashSet<Vector2Int>();
+
+        foreach(DungeonRoomData room in generatedRooms)
+        {
+            GameObject selectedWallPrefab = wallPrefab;
+            RoomVisualisationClass selectedVisualRule = null;
+
+            foreach(RoomVisualisationClass visualRule in roomVisuals)
+            {
+                if (visualRule.roomType == room.TypeOfRoom)
+                {
+                    selectedVisualRule = visualRule;
+                    break;
+                }
+            }
+
+            foreach(Vector2Int floorPosition in room.FloorTiles)
+            {
+                if (selectedVisualRule != null)
+                {
+                    selectedWallPrefab  = GetRandomPrefabWeight(selectedVisualRule.wallPrefabs, wallPrefab);
+                    TryCreateWall(selectedWallPrefab, floorPositions, floorPosition, Vector2Int.up, 0f);
+                    TryCreateWall(selectedWallPrefab, floorPositions, floorPosition, Vector2Int.right, 90f);
+                    TryCreateWall(selectedWallPrefab, floorPositions, floorPosition, Vector2Int.down, 180f);
+                    TryCreateWall(selectedWallPrefab, floorPositions, floorPosition, Vector2Int.left, 270f);
+
+                    roomTiles.Add(floorPosition);
+                }
+            }
+        }
+
+        foreach (Vector2Int position in floorPositions)
+        {
+            if (roomTiles.Contains(position))
+            {
+                continue;
+            }
+
+            TryCreateWall(wallPrefab, floorPositions, position, Vector2Int.up, 0f);
+            TryCreateWall(wallPrefab, floorPositions, position, Vector2Int.right, 90f);
+            TryCreateWall(wallPrefab, floorPositions, position, Vector2Int.down, 180f);
+            TryCreateWall(wallPrefab, floorPositions, position, Vector2Int.left, 270f);
+        }
+    }
+
+    private void PaintCorridorTiles(HashSet<Vector2Int> floorPositions, List<DungeonRoomData> generatedRooms)
+    {
+        if(IsMissingFloorOrRoomData(floorPositions, generatedRooms))
+        {
+            return;
+        }
+
+        HashSet<Vector2Int> roomTiles = new HashSet<Vector2Int>();
+
+        foreach (DungeonRoomData roomData in generatedRooms)
+        {
+            roomTiles.UnionWith(roomData.FloorTiles);
+        }
+
+        foreach (Vector2Int position in floorPositions)
+        {
+            if (roomTiles.Contains(position))
+            {
+                continue;
+            }
+
+            Instantiate(floorPrefab, GridToWorldPosition(position), Quaternion.identity, GetDungeonParent());
+        }
+    }
+
+    /// <summary>
+    /// Helper method to ensure the floor positions or generated rooms are not null to avoid crashes
+    /// </summary>
+    /// <returns>True or false</returns>
+    private bool IsMissingFloorOrRoomData(HashSet<Vector2Int> floorPositions, List<DungeonRoomData> generatedRooms)
+{
+    if (floorPositions == null || floorPositions.Count == 0)
+    {
+        return true;
+    }
+
+    if (generatedRooms == null || generatedRooms.Count == 0)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+    private GameObject GetRandomPrefabWeight(List<RoomVisualisationPrefabWeight> prefabRules, GameObject fallBackPrefab)
+    {
+       if (prefabRules == null || prefabRules.Count == 0)
+        {
+            return fallBackPrefab;
+        } 
+
+        int totalWeight = 0;
+
+        foreach (RoomVisualisationPrefabWeight prefabRule in prefabRules)
+        {
+            if (prefabRule.prefab != null)
+            {
+                totalWeight += prefabRule.weight;
+            }
+        }
+
+        if (totalWeight <= 0)
+        {
+            return fallBackPrefab;
+        }
+
+        int randomWeight = UnityEngine.Random.Range(0, 100);
+        int currentWeight = 0;
+
+        foreach(RoomVisualisationPrefabWeight rule in prefabRules)
+        {
+            if (rule.prefab == null)
+            {
+                continue;
+            }
+
+            currentWeight += rule.weight;
+
+            if (randomWeight < currentWeight)
+            {
+                return rule.prefab;
+            }
+        }
+
+        return fallBackPrefab;
+    }
+
+    #endregion
+    
+    #region Room Visualisation code Old
     /// <summary>
     /// This will generate the floor tiles by taking in the floor positions that has been generated
     /// </summary>
@@ -71,15 +272,20 @@ public class Dungeon3DVisualiser : MonoBehaviour
 
         foreach (Vector2Int floorPosition in floorPositions)
         {
-            TryCreateWall(floorPositions, floorPosition, Vector2Int.up, 0f);
-            TryCreateWall(floorPositions, floorPosition, Vector2Int.right, 90f);
-            TryCreateWall(floorPositions, floorPosition, Vector2Int.down, 180f);
-            TryCreateWall(floorPositions, floorPosition, Vector2Int.left, 270f);
+            TryCreateWall(wallPrefab, floorPositions, floorPosition, Vector2Int.up, 0f);
+            TryCreateWall(wallPrefab, floorPositions, floorPosition, Vector2Int.right, 90f);
+            TryCreateWall(wallPrefab, floorPositions, floorPosition, Vector2Int.down, 180f);
+            TryCreateWall(wallPrefab, floorPositions, floorPosition, Vector2Int.left, 270f);
         }
     }
     
-    private void TryCreateWall(HashSet<Vector2Int> floorPositions, Vector2Int floorPosition, Vector2Int direction, float yRotation)
+    private void TryCreateWall(GameObject wallPrefab,HashSet<Vector2Int> floorPositions, Vector2Int floorPosition, Vector2Int direction, float yRotation)
     {
+        if(wallPrefab == null)
+        {
+            return;
+        }
+
         Vector2Int neighbourPosition = floorPosition + direction;
 
         if (floorPositions.Contains(neighbourPosition))
@@ -91,6 +297,9 @@ public class Dungeon3DVisualiser : MonoBehaviour
         Instantiate(wallPrefab, wallPosition, wallRotation, GetDungeonParent());
     }
 
+    #endregion
+
+    #region Helper Methods
     private Vector3 GridToWorldPosition(Vector2Int gridPosition)
     {
         return new Vector3(gridPosition.x * cellSize, 0f, gridPosition.y * cellSize);
@@ -115,4 +324,6 @@ public class Dungeon3DVisualiser : MonoBehaviour
                 DestroyImmediate(child.gameObject);
         }
     }
+
+    #endregion
 }

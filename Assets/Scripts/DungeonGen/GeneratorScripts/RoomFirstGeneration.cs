@@ -95,7 +95,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       floor.UnionWith(corridors);
       
       // Parse in the floor tiles to create the rooms and visually paint it
-      visualiser.CreateFloorTiles(floor);
+      visualiser.CreateTiles(floor, generatedRooms);
       
       // Spawns the door to connect the room and corridor and props
       SpawnDoors(generatedRooms);
