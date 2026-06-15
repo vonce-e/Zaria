@@ -71,27 +71,29 @@ public class EnemyAI : MonoBehaviour
     }
  
     /// <summary>
-    /// Carry out whatever was planned, against the player.
+    /// Carry out the planned move. Defend applies its own block immediately.
+    /// Attack and Signature return their damage so CombatManager can route it
+    /// through the parry/dodge bar before applying it.
     /// </summary>
     /// <param name="player">The unit being acted on.</param>
-    public void ExecuteIntent(Unit player)
+    /// <returns>Damage to be applied to the player (0 for defend).</returns>
+    public int ExecuteIntent(Unit player)
     {
         switch (CurrentIntent.type)
         {
             case EnemyActionType.Attack:
-                player.TakeDamage(unit.damage);
                 Debug.Log($"{unit.unitName} attacks for {unit.damage}.");
-                break;
- 
+                return unit.damage;
+
             case EnemyActionType.Defend:
                 unit.block += defendAmount;
                 Debug.Log($"{unit.unitName} defends (+{defendAmount} block).");
-                break;
- 
+                return 0;
+
             case EnemyActionType.Signature:
-                SignatureMove(player);
-                break;
+                return SignatureDamage(player);
         }
+        return 0;
     }
  
     /// <summary>
@@ -110,15 +112,16 @@ public class EnemyAI : MonoBehaviour
     }
  
     /// <summary>
-    /// Each enemy's unique move from the design doc. Default is a
-    /// double-damage hit. Override in a subclass (AshGuardAI, HoundAI, etc.)
-    /// to give a specific enemy its real signature.
+    /// Each enemy's unique move. Default returns double damage. Override in a
+    /// subclass to give a specific enemy its real signature. Non-damage
+    /// signatures like heals and buffs can apply their effect here and return 0.
     /// </summary>
     /// <param name="player">The unit being acted on.</param>
-    protected virtual void SignatureMove(Unit player)
+    /// <returns>Damage to route through the timing bar.</returns>
+    protected virtual int SignatureDamage(Unit player)
     {
         int dmg = unit.damage * 2;
-        player.TakeDamage(dmg);
         Debug.Log($"{unit.unitName} uses its signature for {dmg}!");
+        return dmg;
     }
 }

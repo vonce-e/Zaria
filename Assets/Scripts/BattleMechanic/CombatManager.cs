@@ -2,6 +2,7 @@
 // Made by Vonce Chew
 
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -28,6 +29,9 @@ public class CombatManager : MonoBehaviour
     public int hpGrowthPerLevel = 5;
     [Tooltip("Damage increases by 1 every N levels.")]
     public int damageGrowthEveryNLevels = 2;
+
+    [Header("Parry/Dodge")]
+    public ParryDodgeBar parryDodgeBar;
 
     private PlayerRunState _run;
     private Unit _player;
@@ -97,7 +101,7 @@ public class CombatManager : MonoBehaviour
         if (frozen)
         {
             Debug.Log("You are frozen and lose your turn!");
-            EnemyTurn();
+            StartCoroutine(EnemyTurn());
             return;
         }
 
@@ -170,18 +174,19 @@ public class CombatManager : MonoBehaviour
     /// </summary>
     public void EndPlayerTurn()
     {
-        if (_combatEnded) return;
         if (_enemy.IsDead) return;
-        EnemyTurn();
+        StartCoroutine(EnemyTurn());
     }
 
     /// <summary>
-    /// Runs the enemy's planned move, then has the AI decide its next move
+    /// Runs the enemy's planned move. Damaging moves (attack/signature) route
+    /// through the parry/dodge bar before damage lands. Then the AI decides
+    /// its next move and the player's turn begins.
     /// </summary>
-    private void EnemyTurn()
+    private IEnumerator EnemyTurn()
     {
-        if (_combatEnded) return;
-        
+        if (_combatEnded) yield break;
+
         _enemy.block = 0;
         OnTurnChanged?.Invoke(false);
         Debug.Log("Enemy turn.");
@@ -189,7 +194,7 @@ public class CombatManager : MonoBehaviour
         bool frozen = _enemy.HasBlockingStatus();
         _enemy.TickStatuses();
 
-        if (_enemy.IsDead) { Win(); return; }
+        if (_enemy.IsDead) { Win(); yield break; }
 
         if (frozen)
         {
@@ -197,12 +202,64 @@ public class CombatManager : MonoBehaviour
         }
         else
         {
-            enemyAI.ExecuteIntent(_player);
-            if (_player.IsDead) { Lose(); return; }
+            // Find out how much damage the planned move deals (0 = no damage).
+            int incoming = enemyAI.ExecuteIntent(_player);
+
+            if (incoming > 0)
+            {
+                // Damaging move, route it through the timing bar.
+                yield return StartCoroutine(ResolveAttackWithBar(incoming));
+            }
+
+            if (_player.IsDead) { Lose(); yield break; }
         }
 
         enemyAI.DecideNextIntent();
         StartPlayerTurn();
+    }
+
+    /// <summary>
+    /// Shows the parry/dodge bar for an incoming hit and applies the outcome:
+    /// Parry = no damage + 50% reflected, Dodge = no damage, Hit = full damage,
+    /// block from cards still plays out.
+    /// </summary>
+    /// <param name="incoming">The raw incoming damage before mitigation.</param>
+    private IEnumerator ResolveAttackWithBar(int incoming)
+    {
+        // If no bar is wired up, just take the hit (safe fallback).
+        if (parryDodgeBar == null)
+        {
+            _player.TakeDamage(incoming);
+            yield break;
+        }
+
+        bool done = false;
+        ParryDodgeResult result = ParryDodgeResult.Hit;
+
+        parryDodgeBar.Show(r => { result = r; done = true; });
+
+        // Wait for the player to react (or the bar to time out).
+        while (!done)
+            yield return null;
+
+        switch (result)
+        {
+            case ParryDodgeResult.Parry:
+                int reflect = Mathf.RoundToInt(incoming * 0.5f);
+                _enemy.TakeDamage(reflect);
+                Debug.Log($"<color=cyan>PARRY! Reflected {reflect} damage.</color>");
+                if (_enemy.IsDead) { Win(); yield break; }
+                break;
+
+            case ParryDodgeResult.Dodge:
+                Debug.Log("<color=green>DODGE! No damage taken.</color>");
+                break;
+
+            case ParryDodgeResult.Hit:
+                _player.TakeDamage(incoming);
+                Debug.Log($"Hit for {incoming} (after block).");
+                break;
+        }
     }
 
     /// <summary>
