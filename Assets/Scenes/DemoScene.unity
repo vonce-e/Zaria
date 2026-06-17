@@ -192,6 +192,7 @@ MonoBehaviour:
   currentHp: 45
   _energy: 0
   block: 0
+  lastDamageTaken: 0
 --- !u!114 &109699302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -272,6 +273,7 @@ MonoBehaviour:
   currentHp: 30
   _energy: 0
   block: 0
+  lastDamageTaken: 0
 --- !u!4 &154070651
 Transform:
   m_ObjectHideFlags: 0
@@ -337,7 +339,7 @@ MonoBehaviour:
   playerHUD: {fileID: 596005022}
   enemyHUD: {fileID: 2103397636}
   xpBarUI: {fileID: 511997335}
-  starterDeck: 00000000000000000000000000000000080000000800000004000000040000000100000001000000
+  starterDeck: 0100000000000000020000000300000004000000050000000600000007000000
 --- !u!1 &201348774
 GameObject:
   m_ObjectHideFlags: 0
@@ -4206,6 +4208,10 @@ PrefabInstance:
     - target: {fileID: 7604850683950248444, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
       propertyPath: m_LocalPosition.z
       value: -23.948788
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604850683950248445, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: m_Follow
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7683522346062238927, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
       propertyPath: raycastPoint

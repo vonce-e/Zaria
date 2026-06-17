@@ -21,6 +21,9 @@ public class BattleContext
     // The upgrade level of the specific card being played
     public int cardUpgradeLevel;
 
+    // Reference to the combat manager, so cards can set dice floors, repeats, etc. 
+    public CombatManager combat;
+
     // Every card already played this turn, in order
     public List<CardId> cardsPlayedThisTurn;
 }

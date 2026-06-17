@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6a1ac3326635e41548c47ec8742a264e, type: 3}
-  m_Name: Deep Cut
+  m_Name: Rolling Barrier
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  id: 4
-  displayName: Deep Cut
-  cardType: 0
+  id: 12
+  displayName: Rolling Barrier
+  cardType: 1
   rarity: 1
   energyCost: 3
-  description: Deal 4 damage, and 2 damage for the next 2 turns, if dice is even,
-    deal 4 damage for the next 2 turns instead of 2 damage. If used with Blood Slash
-    in the same turn, do 2 extra damage for the next 3 turns.
-  artwork: {fileID: 21300000, guid: 77607ad5cf1f347338a3f3cc6274d215, type: 3}
-  baseDamage: 4
-  baseDefense: 0
+  description: Gain 2 defense, multiply defense by dice value. If used with Adaptive
+    Shield in the same turn, gain immunity from all common attacks next round.
+  artwork: {fileID: 0}
+  baseDamage: 0
+  baseDefense: 2
   upgradeTiers: []

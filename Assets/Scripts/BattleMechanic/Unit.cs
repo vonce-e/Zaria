@@ -27,6 +27,9 @@ public class Unit : MonoBehaviour
     // Defense that soaks damage, resets to 0 at start of turn
     public int block;
 
+    // The most recent damage this unit took, used by Temporal Guard.
+    public int lastDamageTaken;
+
     // Status effects currently affecting this unit
     public List<StatusEffect> statuses = new List<StatusEffect>();
 
@@ -67,7 +70,10 @@ public class Unit : MonoBehaviour
         block = Mathf.Max(0, block - amount);
 
         if (afterBlock > 0)
+        {
+            lastDamageTaken = afterBlock;   // <-- add this line
             SetHp(currentHp - afterBlock);
+        }
     }
 
     /// <summary>

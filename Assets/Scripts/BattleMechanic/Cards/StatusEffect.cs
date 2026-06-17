@@ -81,3 +81,20 @@ public class SkipTurn : StatusEffect
 
     public override bool BlocksTurn => true;
 }
+
+/// <summary>
+/// Set by the Parry card. If the unit holding it is attacked while it's
+/// active, the attacker takes reflectAmount damage back. Lasts one turn.
+/// </summary>
+public class ReflectNextTurn : StatusEffect
+{
+    public int reflectAmount;
+
+    public ReflectNextTurn(int amount) : base(1)   // 1-turn duration
+    {
+        reflectAmount = amount;
+    }
+
+    // Marker status - the reflection is checked by the attack flow, not here.
+    public override void OnTurnStart(Unit owner) { }
+}

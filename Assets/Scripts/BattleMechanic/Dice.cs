@@ -23,4 +23,13 @@ public class Dice : MonoBehaviour
         DiceNumber = UnityEngine.Random.Range(1, 7);
         OnDiceRolled?.Invoke(DiceNumber);
     }
+
+    /// <summary>
+    /// Re-fire the dice event without rolling, so the UI shows a value that
+    /// was forced by a card (dice floor, re-roll, stored value).
+    /// </summary>
+    public void ForceRefreshUI()
+    {
+        OnDiceRolled?.Invoke(DiceNumber);
+    }
 }

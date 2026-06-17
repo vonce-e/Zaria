@@ -41,6 +41,11 @@ public class CombatManager : MonoBehaviour
     private List<CardId> _cardsPlayedThisTurn = new List<CardId>();
     public event System.Action<bool> OnTurnChanged;
 
+    // Dice manipulation state (set by skill cards).
+    private int _diceFloorThisTurn = 0;   // Steady Hand: minimum roll this turn
+    private int _diceFloorNextTurn = 0;   // Loaded Dice / Fate Bank: minimum next turn
+    private bool _repeatNextCard = false; // Double Down: next card plays twice
+
     /// <summary>
     /// Called by BattleSystem or CombatTest once everything is staged.
     /// Sets up the card piles, draws the opening hand, asks the enemy
@@ -87,6 +92,12 @@ public class CombatManager : MonoBehaviour
         _player.block = 0;
         _cardsPlayedThisTurn.Clear();
         dice.DiceRoll();
+
+        // Carry over any forced minimum from last turn (Loaded Dice / Fate Bank).
+        _diceFloorThisTurn = _diceFloorNextTurn;
+        _diceFloorNextTurn = 0;
+        _repeatNextCard = false;
+        ApplyDiceFloor();
 
         while (_piles.hand.Count < handSize)
         {
@@ -144,7 +155,8 @@ public class CombatManager : MonoBehaviour
             target = _enemy,
             diceValue = dice.DiceNumber,
             cardUpgradeLevel = card.upgradeLevel,
-            cardsPlayedThisTurn = _cardsPlayedThisTurn
+            cardsPlayedThisTurn = _cardsPlayedThisTurn,
+            combat = this,
         };
 
         ICardEffect effect = CardEffectRegistry.Get(card.definitionId);
@@ -152,6 +164,15 @@ public class CombatManager : MonoBehaviour
             effect.Apply(ctx, def);
         else
             Debug.LogWarning($"No effect coded for {card.definitionId} yet.");
+
+        // Double Down: if a repeat was queued, run this card's effect once more.
+        // Don't let a repeated card re-trigger another repeat.
+        if (_repeatNextCard && effect != null && card.definitionId != CardId.DoubleDown)
+        {
+            _repeatNextCard = false;
+            effect.Apply(ctx, def);
+            Debug.Log($"<color=magenta>Double Down: {def.displayName} played twice!</color>");
+        }
 
         _cardsPlayedThisTurn.Add(card.definitionId);
         _piles.PlayCard(card);
@@ -258,6 +279,17 @@ public class CombatManager : MonoBehaviour
             case ParryDodgeResult.Hit:
                 _player.TakeDamage(incoming);
                 Debug.Log($"Hit for {incoming} (after block).");
+
+                foreach (var status in _player.statuses)
+                {
+                    if (status is ReflectNextTurn reflectStatus)
+                    {
+                        _enemy.TakeDamage(reflectStatus.reflectAmount);
+                        Debug.Log($"<color=cyan>Parry card reflected {reflectStatus.reflectAmount} damage!</color>");
+                        if (_enemy.IsDead) { Win(); yield break; }
+                        break;
+                    }
+                }
                 break;
         }
     }
@@ -337,5 +369,56 @@ public class CombatManager : MonoBehaviour
 
         Debug.Log($"<color=yellow>LEVEL UP! Now level {newLevel}. " +
                 $"Max HP: {_player.maxHp}, Damage: {_player.damage}.</color>");
+    }
+
+    /// <summary>
+    /// Force a minimum dice value for the current turn (Steady Hand).
+    /// </summary>
+    public void SetDiceFloorThisTurn(int floor)
+    {
+        _diceFloorThisTurn = floor;
+        ApplyDiceFloor();
+    }
+
+    /// <summary>
+    /// Force a minimum dice value for next turn (Loaded Dice, Fate Bank).
+    /// </summary>
+    public void SetDiceFloorNextTurn(int floor)
+    {
+        if (floor > _diceFloorNextTurn) _diceFloorNextTurn = floor;
+    }
+
+    /// <summary>
+    /// Make the next card played this turn resolve twice (Double Down).
+    /// </summary>
+    public void SetRepeatNextCard()
+    {
+        _repeatNextCard = true;
+    }
+
+    /// <summary>
+    /// Re-roll the dice and keep the higher of the two (Dice Roll card).
+    /// </summary>
+    public void RollExtraDiceKeepHigher()
+    {
+        int first = dice.DiceNumber;
+        dice.DiceRoll();              // rolls again, fires the UI event
+        if (first > dice.DiceNumber)  // if the old one was better, restore it
+        {
+            dice.DiceNumber = first;
+            dice.ForceRefreshUI();    // see note below
+        }
+    }
+
+    /// <summary>
+    /// Clamp the current dice up to the active floor, if any.
+    /// </summary>
+    private void ApplyDiceFloor()
+    {
+        if (dice.DiceNumber < _diceFloorThisTurn)
+        {
+            dice.DiceNumber = _diceFloorThisTurn;
+            dice.ForceRefreshUI();
+        }
     }
 }
