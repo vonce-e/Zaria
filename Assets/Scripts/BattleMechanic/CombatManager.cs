@@ -66,6 +66,7 @@ public class CombatManager : MonoBehaviour
         _piles.StartBattle(run);
         _piles.DrawCards(handSize);
 
+        enemyAI.combat = this;
         enemyAI.DecideNextIntent();
         StartPlayerTurn();
     }
@@ -160,10 +161,16 @@ public class CombatManager : MonoBehaviour
         };
 
         ICardEffect effect = CardEffectRegistry.Get(card.definitionId);
+
+        int enemyHpBefore = _enemy.currentHp;   // measures damage dealt
+
         if (effect != null)
             effect.Apply(ctx, def);
         else
             Debug.LogWarning($"No effect coded for {card.definitionId} yet.");
+
+        int dealt = enemyHpBefore - _enemy.currentHp;
+        if (dealt > 0) enemyAI.lastPlayerAttackDamage = dealt;
 
         // Double Down: if a repeat was queued, run this card's effect once more.
         // Don't let a repeated card re-trigger another repeat.
@@ -223,6 +230,9 @@ public class CombatManager : MonoBehaviour
         }
         else
         {
+            // Passive checks
+            enemyAI.OnEnemyTurnStart();
+
             // Find out how much damage the planned move deals (0 = no damage).
             int incoming = enemyAI.ExecuteIntent(_player);
 
@@ -301,6 +311,19 @@ public class CombatManager : MonoBehaviour
     private void Win()
     {
         if (_combatEnded) return;
+
+        // On-death effect (e.g. Blazeling's explosion). May kill the player.
+        int deathDmg = enemyAI.OnDeath(_player);
+        if (deathDmg > 0)
+        {
+            _player.TakeTrueDamage(deathDmg);   // Bypasses block, not dodgeable
+            Debug.Log($"{_enemy.unitName}'s death effect deals {deathDmg} damage.");
+            if (_player.IsDead)
+            {
+                Lose();        // mutual death - player loses despite the kill
+                return;
+            }
+        }
         _combatEnded = true;
         Debug.Log("YOU WIN.");
 
@@ -420,5 +443,27 @@ public class CombatManager : MonoBehaviour
             dice.DiceNumber = _diceFloorThisTurn;
             dice.ForceRefreshUI();
         }
+    }
+
+    /// <summary>
+    /// Move up to 'count' random cards from the player's hand back into the
+    /// deck (used by Null's signature). Returns how many were actually moved.
+    /// </summary>
+    /// <param name="count">How many cards to attempt to shuffle away.</param>
+    public int ShuffleRandomCardsFromHand(int count)
+    {
+        int moved = 0;
+        for (int i = 0; i < count; i++)
+        {
+            if (_piles.hand.Count == 0) break;
+            int idx = Random.Range(0, _piles.hand.Count);
+            CardInstance card = _piles.hand[idx];
+            _piles.hand.RemoveAt(idx);
+            _piles.deck.Add(card);
+            moved++;
+        }
+        if (moved > 0)
+            Debug.Log($"{moved} card(s) shuffled from hand back into the deck.");
+        return moved;
     }
 }

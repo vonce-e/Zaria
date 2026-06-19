@@ -164,8 +164,9 @@ GameObject:
   m_Component:
   - component: {fileID: 109699303}
   - component: {fileID: 109699301}
-  - component: {fileID: 109699302}
   - component: {fileID: 109699304}
+  - component: {fileID: 109699306}
+  - component: {fileID: 109699307}
   m_Layer: 0
   m_Name: TestEnemy
   m_TagString: Untagged
@@ -187,43 +188,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Enemy
   unitLevel: 1
-  damage: 3
-  maxHp: 45
-  currentHp: 45
+  damage: 10
+  maxHp: 250
+  currentHp: 250
   _energy: 0
   block: 0
+  damageReduction: 0
   lastDamageTaken: 0
---- !u!114 &109699302
-MonoBehaviour:
+--- !u!224 &109699303
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 109699300}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df7d2b23dcb8f4a3b86faef5ae2ae27b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
-  unit: {fileID: 109699301}
-  defendChance: 0.45
-  signatureChance: 0.4
-  defendAmount: 5
---- !u!4 &109699303
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 109699300}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.68254, y: 0, z: 7.47477}
+  m_LocalPosition: {x: 0, y: 0, z: 7.47477}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -2.68254, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &109699304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,7 +226,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f06ae9576b34738a0a0efef52318a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyXpReward
-  xpReward: 30
+  xpReward: 80
+--- !u!223 &109699306
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 109699300}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!114 &109699307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 109699300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9653aa1d414ba4118b555887d8a37caf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NullAI
+  unit: {fileID: 109699301}
+  defendChance: 0.4
+  signatureChance: 0.3
+  defendAmount: 5
+  nextAttackMultiplier: 1
+  lastPlayerAttackDamage: 0
+  combat: {fileID: 0}
+  cardsToShuffle: 2
+  damagePerCard: 8
 --- !u!1 &154070649
 GameObject:
   m_ObjectHideFlags: 0
@@ -273,6 +308,7 @@ MonoBehaviour:
   currentHp: 30
   _energy: 0
   block: 0
+  damageReduction: 0
   lastDamageTaken: 0
 --- !u!4 &154070651
 Transform:
@@ -856,7 +892,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatManager
   cardDatabase: {fileID: 11400000, guid: 959e243e0c59442d59214e1c9aa3287b, type: 2}
   dice: {fileID: 541672030}
-  enemyAI: {fileID: 109699302}
+  enemyAI: {fileID: 109699307}
   handSize: 5
   energyPerTurn: 5
   rewardCommon: 70
@@ -2436,7 +2472,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9bd5b782436c42c98b3495a73c89a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTelegraphUI
-  enemyAI: {fileID: 109699302}
+  enemyAI: {fileID: 109699307}
   label: {fileID: 1175433230}
 --- !u!114 &1175433230
 MonoBehaviour:
@@ -3232,8 +3268,8 @@ MonoBehaviour:
   parryZone: {fileID: 868015476}
   sweepDuration: 1.7
   window: 1.7
-  dodgeZoneWidth: 0.3
-  parryZoneWidth: 0.1
+  dodgeZoneWidth: 0.25
+  parryZoneWidth: 0.075
 --- !u!1 &1498429898
 GameObject:
   m_ObjectHideFlags: 0

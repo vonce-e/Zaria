@@ -3,7 +3,7 @@
 // Made by Vonce Chew
 
 using UnityEngine;
- 
+
 /// <summary>
 /// The categories of move an enemy can plan.
 /// </summary>
@@ -40,7 +40,40 @@ public class EnemyAI : MonoBehaviour
     /// The current plan. Read by the hint UI and ExecuteIntent.
     /// </summary>
     public EnemyIntent CurrentIntent { get; private set; }
+
  
+    /// <summary>
+    /// Multiplier applied to the NEXT basic attack, then reset to 1. Used by
+    /// enemies like Golem whose signature buffs their following attack.
+    /// </summary>
+    [HideInInspector]
+    public int nextAttackMultiplier = 1;
+
+    /// <summary>
+    /// The player's most recent attack damage, set by CombatManager each time
+    /// the player deals damage. Read by Mirror Warden to copy it.
+    /// </summary>
+    [HideInInspector]
+    public int lastPlayerAttackDamage;
+
+    // Reference to the combat manager.
+    [HideInInspector]
+    public CombatManager combat;
+
+    /// <summary>
+    /// Called when this enemy dies. Override to deal a parting effect.
+    /// Returns damage to apply directly to the player (0 = none). Used by Blazeling.
+    /// </summary>
+    /// <param name="player">The player unit.</param>
+    /// <returns>Damage to apply to the player on death.</returns>
+    public virtual int OnDeath(Unit player) { return 0; }
+
+    /// <summary>
+    /// Called at the start of this enemy's turn, before it acts. Override for
+    /// passive per-turn behaviour. Used by Undying Priest's regeneration.
+    /// </summary>
+    public virtual void OnEnemyTurnStart() { }
+
     /// <summary>
     /// Choose the next move. Defensive bias rises when HP is low.
     /// </summary>
@@ -82,8 +115,10 @@ public class EnemyAI : MonoBehaviour
         switch (CurrentIntent.type)
         {
             case EnemyActionType.Attack:
-                Debug.Log($"{unit.unitName} attacks for {unit.damage}.");
-                return unit.damage;
+                int atk = unit.damage * nextAttackMultiplier;
+                nextAttackMultiplier = 1;  // reset after use
+                Debug.Log($"{unit.unitName} attacks for {atk}.");
+                return atk;
 
             case EnemyActionType.Defend:
                 unit.block += defendAmount;

@@ -22,10 +22,15 @@ public class Unit : MonoBehaviour
     public int currentHp;
 
     // Energy spent to play cards, resets to a fixed amount each turn
-    [SerializeField] private int _energy;
+    [SerializeField]
+    private int _energy;
 
     // Defense that soaks damage, resets to 0 at start of turn
     public int block;
+
+    // Fraction of incoming damage absorbed before block (0 = none, 0.5 = half),
+    // set by enemies like Slime.Reset by the enemy itself.
+    [Range(0f, 1f)] public float damageReduction = 0f;
 
     // The most recent damage this unit took, used by Temporal Guard.
     public int lastDamageTaken;
@@ -66,12 +71,16 @@ public class Unit : MonoBehaviour
     /// <param name="amount">Incoming damage before block.</param>
     public void TakeDamage(int amount)
     {
+        // Absorption (e.g. Slime) reduces damage before block applies.
+        if (damageReduction > 0f)
+            amount = Mathf.RoundToInt(amount * (1f - damageReduction));
+
         int afterBlock = amount - block;
         block = Mathf.Max(0, block - amount);
 
         if (afterBlock > 0)
         {
-            lastDamageTaken = afterBlock;   // <-- add this line
+            lastDamageTaken = afterBlock;
             SetHp(currentHp - afterBlock);
         }
     }
