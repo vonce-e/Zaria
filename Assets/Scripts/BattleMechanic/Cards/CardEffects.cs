@@ -23,7 +23,7 @@ public class SlashEffect : ICardEffect
     {
         int dmg = def.GetDamage(ctx.cardUpgradeLevel);
         if (ctx.diceValue >= 5) dmg += 3;
-        ctx.target.TakeDamage(dmg);
+        ctx.DealDamage(dmg);
     }
 }
 
@@ -73,7 +73,7 @@ public class DeepCutEffect : ICardEffect
 {
     public void Apply(BattleContext ctx, CardData def)
     {
-        ctx.target.TakeDamage(def.GetDamage(ctx.cardUpgradeLevel));
+        ctx.DealDamage(def.GetDamage(ctx.cardUpgradeLevel));
 
         int bleedPerTurn = (ctx.diceValue % 2 == 0) ? 4 : 2;
         ctx.target.AddStatus(new DamageOverTime(bleedPerTurn, 2));
@@ -184,7 +184,7 @@ public class BloodSlashEffect : ICardEffect
 
         int dmg = def.GetDamage(ctx.cardUpgradeLevel);
         if (ctx.diceValue >= 4) dmg += 3;
-        ctx.target.TakeDamage(dmg);
+        ctx.DealDamage(dmg);
 
         if (ctx.cardsPlayedThisTurn.Contains(CardId.DeepCut))
             ctx.target.AddStatus(new DamageOverTime(2, 3));
@@ -203,7 +203,7 @@ public class FatalCollapseEffect : ICardEffect
         int repeats = ctx.diceValue <= 2 ? 1 : ctx.diceValue;
 
         for (int i = 0; i < repeats; i++)
-            ctx.target.TakeDamage(dmg);
+            ctx.DealDamage(dmg);
     }
 }
 

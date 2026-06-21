@@ -64,6 +64,18 @@ public class Unit : MonoBehaviour
         }
     }
 
+    // Multiplier on damage this unit deals (Glass Cannon potion 2x, Recharge potion 0.67x).
+    public float outgoingDamageMultiplier = 1f;
+    
+    // Turns that the outgoing multiplier still lasts.
+    public int outgoingMultiplierTurns = 0;
+
+    // Multiplier on damage this unit takes (Glass Cannon potion : +50% next hit).
+    public float incomingDamageMultiplier = 1f;
+
+    // Turns that the incoming multiplier still lasts.
+    public int incomingMultiplierTurns = 0;
+
     /// <summary>
     /// Apply damage. Block soaks the hit first, the rest comes off HP.
     /// Block is consumed by the hit even if it fully absorbed the damage.
@@ -71,7 +83,11 @@ public class Unit : MonoBehaviour
     /// <param name="amount">Incoming damage before block.</param>
     public void TakeDamage(int amount)
     {
-        // Absorption (e.g. Slime) reduces damage before block applies.
+        // Incoming multiplier (e.g. Glass Cannon potion's downside) applies first.
+        if (incomingDamageMultiplier != 1f)
+            amount = Mathf.RoundToInt(amount * incomingDamageMultiplier);
+
+        // Absorption (e.g. Slime) reduces damage before block.
         if (damageReduction > 0f)
             amount = Mathf.RoundToInt(amount * (1f - damageReduction));
 

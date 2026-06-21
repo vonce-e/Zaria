@@ -2,6 +2,7 @@
 // Made by Vonce Chew
 
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// A bundle of "what's happening right now" passed to a card's effect when
@@ -26,4 +27,14 @@ public class BattleContext
 
     // Every card already played this turn, in order
     public List<CardId> cardsPlayedThisTurn;
+
+    /// <summary>
+    /// Deal damage to the target, applying the caster's outgoing multiplier.
+    /// </summary>
+    /// <param name="baseDmg">The card's computed damage before the multiplier.</param>
+    public void DealDamage(int baseDmg)
+    {
+        int final = Mathf.RoundToInt(baseDmg * caster.outgoingDamageMultiplier);
+        target.TakeDamage(final);
+    }
 }

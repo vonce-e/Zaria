@@ -34,6 +34,8 @@ public class DemoCombatRunner : MonoBehaviour
     private PlayerRunState _run;
     private Unit _currentEnemy;
 
+    public PotionBarDisplay potionBar;
+
     void Start()
     {
         // Make sure the cursor is usable even if other scripts tried to lock it.
@@ -52,8 +54,17 @@ public class DemoCombatRunner : MonoBehaviour
         if (xpBarUI != null)
             xpBarUI.Bind(_run);
 
+        if (potionBar != null)
+            potionBar.run = _run;
+
         _currentEnemy = firstEnemy;
         combatManager.BeginCombat(_run, player, _currentEnemy);
+
+        // starting potions for testing the bar.
+        _run.potions.Add(new PotionInstance(PotionId.PhantomGuard));
+        _run.potions.Add(new PotionInstance(PotionId.GlassCannon));
+        _run.potions.Add(new PotionInstance(PotionId.TimeWarp));
+        _run.potions.Add(new PotionInstance(PotionId.Sacrifice));
 
         // Wait one frame so HUDController.Start finishes, then show the HUDs.
         StartCoroutine(BindHudsNextFrame());

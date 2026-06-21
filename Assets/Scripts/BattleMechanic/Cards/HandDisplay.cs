@@ -54,7 +54,7 @@ public class HandDisplay : MonoBehaviour
     /// </summary>
     private void Rebuild()
     {
-        var hand = combatManager.GetHandForTesting();
+        var hand = combatManager.CurrentHand;
         if (hand == null) return;
 
         // Spawn views for cards in the hand that don't have one yet

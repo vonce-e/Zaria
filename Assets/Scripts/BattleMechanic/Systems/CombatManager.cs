@@ -41,10 +41,16 @@ public class CombatManager : MonoBehaviour
     private List<CardId> _cardsPlayedThisTurn = new List<CardId>();
     public event System.Action<bool> OnTurnChanged;
 
+    // True if the player has already used a potion this turn (for UI grey-out).
+    public bool PotionUsedThisTurn => _potionUsedThisTurn;
+    private bool _potionUsedThisTurn = false;
+
     // Dice manipulation state (set by skill cards).
     private int _diceFloorThisTurn = 0;   // Steady Hand: minimum roll this turn
     private int _diceFloorNextTurn = 0;   // Loaded Dice / Fate Bank: minimum next turn
     private bool _repeatNextCard = false; // Double Down: next card plays twice
+
+    private CardInstance _lastPlayedCard;
 
     /// <summary>
     /// Called by BattleSystem or CombatTest once everything is staged.
@@ -92,6 +98,7 @@ public class CombatManager : MonoBehaviour
         _player.energy = energyPerTurn;
         _player.block = 0;
         _cardsPlayedThisTurn.Clear();
+        _potionUsedThisTurn = false;
         dice.DiceRoll();
 
         // Carry over any forced minimum from last turn (Loaded Dice / Fate Bank).
@@ -115,6 +122,20 @@ public class CombatManager : MonoBehaviour
             Debug.Log("You are frozen and lose your turn!");
             StartCoroutine(EnemyTurn());
             return;
+        }
+
+        // Tick down potion damage multipliers (Glass Cannon, Recharge).
+        if (_player.outgoingMultiplierTurns > 0)
+        {
+            _player.outgoingMultiplierTurns--;
+            if (_player.outgoingMultiplierTurns <= 0)
+                _player.outgoingDamageMultiplier = 1f;
+        }
+        if (_player.incomingMultiplierTurns > 0)
+        {
+            _player.incomingMultiplierTurns--;
+            if (_player.incomingMultiplierTurns <= 0)
+                _player.incomingDamageMultiplier = 1f;
         }
 
         OnTurnChanged?.Invoke(true);
@@ -183,6 +204,7 @@ public class CombatManager : MonoBehaviour
 
         _cardsPlayedThisTurn.Add(card.definitionId);
         _piles.PlayCard(card);
+        _lastPlayedCard = card;
 
         Debug.Log($"Played {def.displayName}. Enemy HP: {_enemy.currentHp}. " +
                   $"Your energy: {_player.energy}.");
@@ -354,11 +376,10 @@ public class CombatManager : MonoBehaviour
         Debug.Log("YOU LOSE.");
     }
 
-    // ----- TESTING HELPERS -----
     /// <summary>
-    /// Read-only access to the player's current hand. ONLY for testing.
+    /// The player's current hand, read by HandDisplay to render cards.
     /// </summary>
-    public List<CardInstance> GetHandForTesting() => _piles.hand;
+    public List<CardInstance> CurrentHand => _piles.hand;
 
     /// <summary>
     /// Debug friendly summary of the current hand. Used in turn start log
@@ -465,5 +486,100 @@ public class CombatManager : MonoBehaviour
         if (moved > 0)
             Debug.Log($"{moved} card(s) shuffled from hand back into the deck.");
         return moved;
+    }
+
+    /// <summary>
+    /// Try to use a potion this turn. Enforces the once-per-turn rule, applies
+    /// the effect, and removes the potion from the run inventory.
+    /// </summary>
+    /// <param name="potion">The potion instance to use.</param>
+    public bool TryUsePotion(PotionInstance potion)
+    {
+        if (_combatEnded) return false;
+
+        if (_potionUsedThisTurn)
+        {
+            Debug.Log("You can only use one potion per turn.");
+            return false;
+        }
+
+        IPotionEffect effect = PotionEffectRegistry.Get(potion.definitionId);
+        if (effect == null)
+        {
+            Debug.LogWarning($"No effect coded for potion {potion.definitionId}.");
+            return false;
+        }
+
+        var ctx = new PotionContext { player = _player, enemy = _enemy, combat = this };
+        effect.Apply(ctx);
+
+        _potionUsedThisTurn = true;
+        _run.potions.Remove(potion);
+
+        // A potion might have killed the enemy (or the player).
+        if (_enemy.IsDead) { Win(); return true; }
+        if (_player.IsDead) { Lose(); return true; }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Discard the whole hand and draw a fresh one of the same size.
+    /// Used by the New Beginning potion.
+    /// </summary>
+    public void DiscardHandAndRedraw()
+    {
+        // Move every card in hand to the discard pile.
+        var current = new List<CardInstance>(_piles.hand);
+        foreach (var card in current)
+            _piles.PlayCard(card);   // PlayCard moves hand -> discard
+
+        // Draw back up to the normal hand size.
+        while (_piles.hand.Count < handSize)
+        {
+            if (_piles.DrawCard() == null) break;
+        }
+    }
+
+    /// <summary>
+    /// Move the last played card from the discard pile back into the hand.
+    /// Used by the Rewind potion. Returns true if a card was returned.
+    /// </summary>
+    public bool ReturnLastPlayedCardToHand()
+    {
+        if (_lastPlayedCard == null) return false;
+
+        if (_piles.discard.Contains(_lastPlayedCard))
+        {
+            _piles.discard.Remove(_lastPlayedCard);
+            _piles.hand.Add(_lastPlayedCard);
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Time Warp : grant an immediate bonus turn (fresh energy, dice, and a
+    /// refilled hand) without the enemy acting first, then queue a skip so the
+    /// player misses their following turn as the cost.
+    /// </summary>
+    public void GrantExtraTurn()
+    {
+        // Cost : skip the next normal player turn (enemy acts during it).
+        _player.AddStatus(new SkipTurn(1));
+
+        // Bonus turn now : fresh resources, same as a normal turn start.
+        _player.energy = energyPerTurn;
+        _player.block = 0;
+        _cardsPlayedThisTurn.Clear();
+        _potionUsedThisTurn = true;   // the potion the player just drank counts as this turn's use
+        dice.DiceRoll();
+
+        while (_piles.hand.Count < handSize)
+        {
+            if (_piles.DrawCard() == null) break;
+        }
+
+        Debug.Log("<color=orange>Time Warp: bonus turn! You'll skip your next turn.</color>");
     }
 }

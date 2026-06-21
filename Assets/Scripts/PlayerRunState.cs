@@ -25,6 +25,9 @@ public class PlayerRunState
     // The player's deck.
     public List<CardInstance> deck = new List<CardInstance>();
 
+    // Potions the player is carrying this run.
+    public List<PotionInstance> potions = new List<PotionInstance>();
+
     // Maximum upgrades allowed this run, derived from playerLevel.
     public int EnchantBudget => 5 + 5 * (playerLevel / 5);
 
