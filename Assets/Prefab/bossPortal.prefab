@@ -13,9 +13,11 @@ GameObject:
   - component: {fileID: 3256961538211916782}
   - component: {fileID: 8105207581352352173}
   - component: {fileID: 6841749234025797839}
+  - component: {fileID: 8747424591117322881}
+  - component: {fileID: 5495061189229151626}
   m_Layer: 0
   m_Name: bossPortal
-  m_TagString: Untagged
+  m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -107,7 +109,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -125,4 +127,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3666fa546ce242d0b800fd88c443aa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossRoomTrigger
-  teleportTarget: {fileID: 6433794064157941537, guid: d3fe887fd6d514b1baae83064241d46d, type: 3}
+--- !u!114 &8747424591117322881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6696831155788158758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3e5af36e6514fae8d184dcde206138, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  message: Teleport to boss room?
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6841749234025797839}
+        m_TargetAssemblyTypeName: BossRoomTrigger, Assembly-CSharp
+        m_MethodName: TeleportPlayer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: BossRoom
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &5495061189229151626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6696831155788158758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []

@@ -51,6 +51,12 @@ public class PlayerController : MonoBehaviour
                 {
                     DisableCurrentInteractable();
                 }
+
+                Debug.DrawRay(
+                    raycastPoint.position,
+                    transform.forward * playerReach,
+                    Color.green
+                );
                 
             }
             else

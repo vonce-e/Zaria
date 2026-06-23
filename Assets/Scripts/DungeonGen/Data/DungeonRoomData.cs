@@ -15,6 +15,7 @@ public class DungeonRoomData
     public HashSet<Vector2Int> CornerTiles = new HashSet<Vector2Int>();
     public HashSet<Vector2Int> NearWallTiles = new HashSet<Vector2Int>();
     public HashSet<Vector2Int> InnerTiles = new HashSet<Vector2Int>();
+    public HashSet<Vector2Int> CeilingTiles = new HashSet<Vector2Int>();
     public HashSet<Vector2Int> CorridorTiles = new HashSet<Vector2Int>();
     public HashSet<Vector2Int> OccupiedTiles = new HashSet<Vector2Int>();
     public List<EntranceRoomData> EntranceTiles = new List<EntranceRoomData>();
