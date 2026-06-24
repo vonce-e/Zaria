@@ -1002,11 +1002,16 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       
          for (int i = 0; i < roomsToSpawn; i++)
          {
-            DungeonRoomData roomData = FindRandomNormalRoom(generatedRooms);
+            DungeonRoomData roomData = FindRandomNormalRoomWithSize(generatedRooms, rule);
       
             if (roomData == null)
             {
-               return;
+               roomData = FindRandomNormalRoom(generatedRooms);
+            }
+
+            if (roomData == null)
+            {
+               break;
             }
       
             roomData.TypeOfRoom = rule.roomType;
@@ -1105,6 +1110,41 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       return farthestRoom;
    }
 
+   private DungeonRoomData FindRandomNormalRoomWithSize(List<DungeonRoomData> generatedRooms, RoomTypeSpawnRule roomRule)
+   {
+      List<DungeonRoomData> normalRoom = new List<DungeonRoomData>();
+
+      foreach (DungeonRoomData room in generatedRooms)
+      {
+         if (room.TypeOfRoom != RoomType.Normal)
+         {
+            continue;
+         }
+
+         int roomSize = room.FloorTiles.Count;
+
+         if (roomSize < roomRule.minRoomSize)
+         {
+            continue;
+         }
+
+         if (roomSize > roomRule.maxRoomSize)
+         {
+            continue;
+         }
+         
+         normalRoom.Add(room);
+      }
+
+      if (normalRoom.Count == 0)
+      {
+         return null;
+      }
+      
+      int randomRoomIndex = Random.Range(0, normalRoom.Count);
+      return normalRoom[randomRoomIndex];
+   }
+   
    private DungeonRoomData FindRandomNormalRoom(List<DungeonRoomData> generatedRooms)
    {
       List<DungeonRoomData> normalRoom = new List<DungeonRoomData>();
@@ -1123,7 +1163,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
       
       int randomRoomIndex = Random.Range(0, normalRoom.Count);
-      
       return normalRoom[randomRoomIndex];
    }
    #endregion

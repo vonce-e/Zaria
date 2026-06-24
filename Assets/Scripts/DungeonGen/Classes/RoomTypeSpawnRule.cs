@@ -6,6 +6,12 @@ using UnityEngine;
 public class RoomTypeSpawnRule
 {
     public RoomType roomType;
+    
+    [Header("Define Room Size")]
+    public int minRoomSize;
+    public int maxRoomSize;
+    
+    [Header("Define Amount of Rooms")]
     public int lowAmount;
     public int mediumAmount;
     public int highAmount;
