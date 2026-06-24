@@ -10,5 +10,6 @@ public class RoomPropRule
     public PropCategorySpawnRule innerTileProps;
     public PropCategorySpawnRule nearWallTileProps;
     public PropCategorySpawnRule wallMountedProps;
-    
+    public PropCategorySpawnRule ceilingProps;
+
 }
