@@ -1,149 +1,179 @@
-// This script is made to handle the battle in games between the player and enemy
+// This script stages the boss fight in the battle scene.
+// Made by Vonce Chew
 
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public enum BattleState
-{
-     START,
-     PLAYERTURN,
-     ENEMYTURN,
-     WON,
-     LOST
-}
+public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
+/// <summary>
+/// The battle-scene staging manager
+/// </summary>
 public class BattleSystem : MonoBehaviour
 {
-
     public static BattleSystem Instance;
 
-    [Header("Player Input")] public GameObject playerObj;
+    [Header("Player Input")]
+    public GameObject playerObj;
     public CharacterController playerCC;
     public PlayerInput playerInput;
-    public GameObject enemyPrefab;
 
     [Header("Transform points")]
     public Transform playerPoint;
     public Transform enemyPoint;
 
-    [Header("Cameras")] 
+    [Header("Cameras")]
     public GameObject battleCamera;
     public GameObject playerCamera;
 
-    [Header("User HUDS")] 
+    [Header("HUDs")]
     public BattleHudManager playerHUD;
     public BattleHudManager enemyHUD;
-    
-    
+
+    [Header("Combat")]
+    public CombatManager combatManager;
+
+    [Header("After winning")]
+    [Tooltip("Seconds to wait after a win before loading the next scene.")]
+    public float winDelay = 2f;
+    [Tooltip("Scene to load after winning. Falls back to RunManager.returnSceneName if empty.")]
+    public string nextSceneName;
+
     private Unit _playerUnit;
     private Unit _enemyUnit;
-    
     public BattleState state;
-
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
+        if (Instance == null) Instance = this;
     }
-    
-    
+
     /// <summary>
-    /// This method will set up the battle in the scene
+    /// Stage and start the boss fight.
     /// </summary>
     public IEnumerator SetupBattle()
     {
-        Debug.Log("Setting up battle..");
-        
-        // Sets the battle state
-        state = BattleState.START; 
-        
-        // Moves the existing player and spawns the enemy in the battle scene
+        state = BattleState.START;
+
+        // Stage the scene : move player in, lock them, swap to battle camera.
         TeleportPlayerToBattlePoint();
         LockPlayer();
         SetUpCamera(true);
-        
-        // Obtaining the enemy and player's information
+
+        // Player unit
         _playerUnit = playerObj.GetComponentInChildren<Unit>();
-        
-        GameObject enemyGo = Instantiate(enemyPrefab, enemyPoint.position, enemyPoint.rotation);
+
+        // Spawn the boss the dungeon queued in RunManager
+        GameObject bossPrefab = (RunManager.Instance != null)
+            ? RunManager.Instance.pendingEncounterPrefab
+            : null;
+
+        if (bossPrefab == null)
+        {
+            Debug.LogError("BattleSystem: no boss prefab in RunManager. " +
+                           "Did the dungeon call LoadBattle()?");
+            yield break;
+        }
+
+        GameObject enemyGo = Instantiate(bossPrefab, enemyPoint.position, enemyPoint.rotation);
         _enemyUnit = enemyGo.GetComponent<Unit>();
-        
-        // Set up HUDs
+        _enemyUnit.currentHp = _enemyUnit.maxHp;
+
+        // HUDs
         playerHUD.SetHUD(_playerUnit);
         enemyHUD.SetHUD(_enemyUnit);
 
-        yield return new WaitForSeconds(2f);
-        
+        // point CombatManager at this boss's AI, then start the real combat
+        combatManager.enemyAI = enemyGo.GetComponent<EnemyAI>();
+
+        yield return new WaitForSeconds(1f);  // brief beat before cards appear
+
         state = BattleState.PLAYERTURN;
-        PlayerTurn();
-    }
-    
-    /// <summary>
-    /// This will begin the players turn
-    /// </summary>
-    private void PlayerTurn()
-    {
-        Debug.Log("Player turn, choose an action..");
+        combatManager.BeginCombat(RunManager.Instance.runState, _playerUnit, _enemyUnit);
     }
 
-    private IEnumerator PlayerAttack()
-    {
-        // Attack the enemy
-        
-        yield return new WaitForSeconds(2f);
-        
-        // Check if the enemy is dead
-        
-        // Change state based off that
-    }
-    
     /// <summary>
-    /// This will teleport the player to the battle scene point 
+    /// Called by CombatManager when the fight ends. On win, transitions to
+    /// the next scene after a delay. On loss, the death loop takes
+    /// over.
+    /// </summary>
+    /// <param name="won">True if the player won.</param>
+    public void EndBattle(bool won)
+    {
+        if (won)
+        {
+            state = BattleState.WON;
+            StartCoroutine(WinThenLeave());
+        }
+        else
+        {
+            state = BattleState.LOST;
+            Debug.Log("You lost the battle. (Death loop handles this later.)");
+        }
+    }
+
+    /// <summary>
+    /// Wait a moment after winning, then load the next scene.
+    /// </summary>
+    private IEnumerator WinThenLeave()
+    {
+        yield return new WaitForSeconds(winDelay);
+
+        string target = !string.IsNullOrEmpty(nextSceneName)
+            ? nextSceneName
+            : (RunManager.Instance != null ? RunManager.Instance.returnSceneName : null);
+
+        if (!string.IsNullOrEmpty(target) && SceneLoader.Instance != null)
+            SceneLoader.Instance.ChangeScene(target);
+        else
+            Debug.LogWarning("BattleSystem: no next scene set - staying here.");
+    }
+
+    /// <summary>
+    /// Move the player to the battle spawn point
     /// </summary>
     private void TeleportPlayerToBattlePoint()
     {
         if (playerCC == null || playerPoint == null)
         {
-            Debug.LogWarning("BattleSystem is missing a player or player point reference.");
+            Debug.LogWarning("BattleSystem missing player or player point.");
             return;
         }
-
         playerCC.enabled = false;
         playerCC.transform.SetPositionAndRotation(playerPoint.position, playerPoint.rotation);
         playerCC.enabled = true;
     }
-    
+
     /// <summary>
-    /// This will lock the player's movement during the battle
+    /// Stop the player from walking during the fight.
     /// </summary>
     private void LockPlayer()
     {
         if (playerInput == null)
         {
             Debug.LogWarning("Player input is missing.");
+            return;
         }
         playerInput.enabled = false;
-        
     }
-    
+
     /// <summary>
-    /// This method will help to set up the player camera during the battle scene
+    /// Swap between the walking camera and the battle camera.
     /// </summary>
+    /// <param name="useBattleCamera">True to show the battle view.</param>
     private void SetUpCamera(bool useBattleCamera)
     {
-        Debug.Log("camera...");
         playerCamera.SetActive(!useBattleCamera);
         battleCamera.SetActive(useBattleCamera);
-        
+
         Cursor.lockState = useBattleCamera ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = useBattleCamera;
-        
-        HUDController.instance.SetCrosshair(useBattleCamera);
-        HUDController.instance.SetBattleHUD(useBattleCamera);
+
+        if (HUDController.instance != null)
+        {
+            HUDController.instance.SetCrosshair(useBattleCamera);
+            HUDController.instance.SetBattleHUD(useBattleCamera);
+        }
     }
-    
 }
