@@ -11,12 +11,17 @@ public class MainMenuManager : MonoBehaviour
    [SerializeField] private Button quitButton;
    
    /// <summary>
-   /// This method will start and begin the main game
+   /// Starts a brand-new run and loads the dungeon scene
    /// </summary>
    public void PlayGame()
    {
-      SceneLoader.Instance.ChangeScene("MainScene");
-   } 
+      if (RunManager.Instance != null)
+         RunManager.Instance.StartNewRun();
+      else
+         Debug.LogWarning("No RunManager found - run state won't persist.");
+
+      SceneLoader.Instance.ChangeScene("DungeonGenScene");
+   }
    
    /// <summary>
    /// This method will quit the game
