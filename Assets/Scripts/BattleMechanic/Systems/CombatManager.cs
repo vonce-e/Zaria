@@ -374,6 +374,9 @@ public class CombatManager : MonoBehaviour
         if (_combatEnded) return;
         _combatEnded = true;
         Debug.Log("YOU LOSE.");
+
+        if (DeathScreen.Instance != null)
+            DeathScreen.Instance.Show(); // Show death screen
     }
 
     /// <summary>
