@@ -14,26 +14,30 @@ using Vector3 = UnityEngine.Vector3;
 public class RoomFirstGeneration : SimpleRandomWalkGenerator
 {
    // This declares the boundary of how we want to generate those rooms in a certain size
-   [Header("Dungeon Dimensions")]
-   [SerializeField] private int minRoomWidth;
+   [Header("Dungeon Dimensions")] [SerializeField]
+   private int minRoomWidth;
+
    [SerializeField] private int minRoomHeight;
    [SerializeField] private int dungeonWidth = 20;
    [SerializeField] private int dungeonHeight = 20;
-   
-   [Header("Dungeon Properties")]
-   [SerializeField] [Min(1)] private int corridorWidth;
+
+   [Header("Dungeon Properties")] [SerializeField] [Min(1)]
+   private int corridorWidth;
+
    [SerializeField] [Range(0, 10)] private int offset; // Offsets the rooms gen from the boundary box
    [SerializeField] private Transform propParent;
    bool randomWalkRooms = false; // Responsible to check if we want to use the random walk algorithm
-   
-   [Header("Room spawn rules")]
-   [SerializeField] List<RoomTypeSpawnRule> roomTypeSpawnRules;
-   
+
+   [Header("Room spawn rules")] [SerializeField]
+   List<RoomTypeSpawnRule> roomTypeSpawnRules;
+
    [Header("Prop Spawn List")] 
    [SerializeField] private List<RoomPropRule> roomProps;
-   
-   [Header("Prop spawn dimensions")]
-   [SerializeField] private float cellSize;
+   [SerializeField] private CorridorPropRule corridorPropRule;
+
+   [Header("Prop spawn dimensions")] [SerializeField]
+   private float cellSize;
+
    [SerializeField] private float propHeight;
    [SerializeField] private float wallPropHeight;
    [SerializeField] private float ceilingPropHeight;
@@ -42,10 +46,11 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
    [Header("Dungeon Items")] 
    [SerializeField] private GameObject doorPrefab;
+
    [SerializeField] private GameObject bossPortalPrefab;
-   
-   [Header("Player information")] 
-   [SerializeField] private GameObject player;
+
+   [Header("Player information")] [SerializeField]
+   private GameObject player;
 
    protected override void RunProceduralGeneration()
    {
@@ -56,10 +61,10 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
    {
       var roomsList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)(startPosition),
          new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
-      
+
       HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
       List<DungeonRoomData> generatedRooms = new List<DungeonRoomData>();
-      
+
       if (randomWalkRooms)
       {
          floor = CreateRoomsRandomly(roomsList);
@@ -67,43 +72,45 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       else
       {
          generatedRooms = CreateSimpleRoomData(roomsList);
-         
+
          foreach (DungeonRoomData roomData in generatedRooms)
          {
             floor.UnionWith(roomData.FloorTiles);
          }
       }
-      
+
       // This will contain the x,y center coordinates of each room
       List<Vector2Int> roomCenters = new List<Vector2Int>();
       foreach (var room in roomsList)
       {
          roomCenters.Add((Vector2Int)(Vector3Int.RoundToInt(room.center)));
       }
+
       PropParentChildrenCleaner();
-      
+
       HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
-      
+
       // Assign the corridors to the room data
       AssignCorridorDataToRoom(generatedRooms, corridors);
       AssignEntranceTiles(generatedRooms, corridors);
       AssignRoomType(generatedRooms);
       // DebugRoomTypeSummary(generatedRooms);
-      
+
       // Spawns player
       PlayerSpawn(generatedRooms);
-      
+
       floor.UnionWith(corridors);
-      
+
       // Parse in the floor tiles to create the rooms and visually paint it
       visualiser.CreateTiles(floor, generatedRooms);
-      
+
       // Spawns the door to connect the room and corridor and props
       SpawnDoors(generatedRooms);
       SpawnBossPortal(generatedRooms);
       SpawnProps(generatedRooms);
+      SpawnCorridorProps(corridors, floor, generatedRooms);
    }
-   
+
    private void DebugRoomTypeSummary(List<DungeonRoomData> generatedRooms)
    {
       int normalCount = 0;
@@ -137,16 +144,16 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       );
    }
 
-   
+
    private void PlayerSpawn(List<DungeonRoomData> roomData)
    {
       DungeonRoomData spawnRoom = null;
-      
+
       if (player == null)
       {
          return;
       }
-      
+
       CharacterController controller = player.GetComponent<CharacterController>();
 
       if (controller == null)
@@ -172,23 +179,24 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       {
          return;
       }
-      
+
       // Room positions
       Vector2Int roomCenter = spawnRoom.CenterPoint;
       Vector3 teleportPosition = new Vector3(roomCenter.x * cellSize, 0, roomCenter.y * cellSize);
-      
+
       // Disables the player controller & teleports the player
       controller.enabled = false;
       player.transform.position = teleportPosition;
-      
+
       // Enable it again
       controller.enabled = true;
-      
+
       // Removed the spawn point from the tile list
       spawnRoom.OccupiedTiles.Add(roomCenter);
    }
-   
+
    #region Prop spawning LOGIC
+
    /// <summary>
    /// This method will spawn the props at a random tile with a random prefab that is stored in lists for corner tiles, inner tiles and near wall tiles.
    /// </summary>
@@ -199,11 +207,11 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       {
          return;
       }
-      
+
       foreach (DungeonRoomData roomData in generatedRooms)
       {
          RoomPropRule propRule = null;
-         
+
          foreach (RoomPropRule rule in roomProps)
          {
             if (rule.roomType == roomData.TypeOfRoom)
@@ -217,17 +225,17 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          {
             continue;
          }
-         
+
          // Check for valid tiles before spawning on category
          List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles);
          SpawnPropCategoryOnTile(propRule.cornerProps, validCornerTiles, roomData, propHeight);
-         
+
          List<Vector2Int> validInnerTiles = GetValidTile(roomData, roomData.InnerTiles);
          SpawnPropCategoryOnTile(propRule.innerTileProps, validInnerTiles, roomData, propHeight);
-         
+
          List<Vector2Int> validNearWallTiles = GetValidTile(roomData, roomData.NearWallTiles);
          SpawnPropCategoryNearWall(propRule.nearWallTileProps, validNearWallTiles, roomData, propHeight);
-         
+
          List<Vector2Int> validWallMountedTiles = GetValidTile(roomData, roomData.NearWallTiles);
          SpawnPropCategoryOnWall(propRule.wallMountedProps, validWallMountedTiles, roomData, wallPropHeight);
 
@@ -236,7 +244,41 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
    }
 
-   private void SpawnPropCategoryOnTile(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles, DungeonRoomData roomData, float spawnHeight)
+   private void SpawnCorridorProps(HashSet<Vector2Int> corridor, HashSet<Vector2Int> floor, List<DungeonRoomData> roomData)
+   {
+      List<Vector2Int> validCorridorTiles = new List<Vector2Int>();
+
+      foreach (Vector2Int tile in corridor)
+      {
+
+         bool tileIsInRoom = false;
+         
+         foreach (DungeonRoomData room in roomData)
+         {
+            if (room.FloorTiles.Contains(tile))
+            {
+               tileIsInRoom = true;
+               break;
+            }
+         }
+
+         if (tileIsInRoom)
+         {
+            continue;
+         }
+         
+         validCorridorTiles.Add(tile);
+      }
+      
+      HashSet<Vector2Int> occupiedCorridorTiles = new HashSet<Vector2Int>();
+      HashSet<Vector2Int> floorTiles = new HashSet<Vector2Int>(floor);
+
+      // spawn the corridor props
+      SpawnPropCategoryInCorridor(corridorPropRule.wallMountedProps, validCorridorTiles, occupiedCorridorTiles, floorTiles,wallPropHeight);
+   }
+
+   private void SpawnPropCategoryOnTile(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
+      DungeonRoomData roomData, float spawnHeight)
    {
       if (spawnRule == null || spawnRule.prefabs == null || spawnRule.prefabs.Count == 0)
       {
@@ -250,7 +292,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
       foreach (PropSpawnRule propData in spawnRule.prefabs)
       {
-         if (propData == null || propData.prefab == null )
+         if (propData == null || propData.prefab == null)
          {
             return;
          }
@@ -263,22 +305,22 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             {
                return;
             }
-            
+
             // Choosing from a random select of tiles
             int randomTileIndex = Random.Range(0, validTiles.Count);
             Vector2Int tile = validTiles[randomTileIndex];
 
-            if (IsPropNearAnother(roomData, tile))
+            if (IsPropNearAnother(roomData.OccupiedTiles, tile, 1))
             {
                continue;
             }
-            
+
             GameObject prefab = propData.prefab;
 
             // Get tile position to spawn prefab at
             Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
             Instantiate(prefab, tilePosition, Quaternion.identity, propParent);
-            
+
             // Adds the current tile to the occupied tiles
             roomData.OccupiedTiles.Add(tile);
             validTiles.RemoveAt(randomTileIndex);
@@ -286,7 +328,8 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
    }
 
-   private void SpawnPropCategoryNearWall(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles, DungeonRoomData roomData, float spawnHeight)
+   private void SpawnPropCategoryNearWall(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
+      DungeonRoomData roomData, float spawnHeight)
    {
       if (spawnRule == null || spawnRule.prefabs == null || spawnRule.prefabs.Count == 0)
       {
@@ -300,7 +343,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
       foreach (PropSpawnRule propData in spawnRule.prefabs)
       {
-         if (propData == null || propData.prefab == null )
+         if (propData == null || propData.prefab == null)
          {
             return;
          }
@@ -313,26 +356,26 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             {
                return;
             }
-            
+
             // Choosing from a random select of tiles
             int randomTileIndex = Random.Range(0, validTiles.Count);
             Vector2Int tile = validTiles[randomTileIndex];
-            
-            if (IsPropNearAnother(roomData, tile))
+
+            if (IsPropNearAnother(roomData.OccupiedTiles, tile, 2))
             {
                continue;
             }
-            
+
             // Choosing from a random select of prefabs
             GameObject prefab = propData.prefab;
-            
-            Vector2Int wallDirection = GetWallDirection(roomData, tile);
+
+            Vector2Int wallDirection = GetWallDirection(roomData.FloorTiles, tile);
             Quaternion wallRotation = GetWallRotation(wallDirection) * Quaternion.Euler(0f, 90f, 0f);
 
             Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
-            
+
             Instantiate(prefab, tilePosition, wallRotation, propParent);
-            
+
             // Adds the current tile to the occupied tiles
             roomData.OccupiedTiles.Add(tile);
             validTiles.RemoveAt(randomTileIndex);
@@ -340,7 +383,8 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
    }
 
-   private void SpawnPropCategoryOnWall(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles, DungeonRoomData roomData, float spawnHeight)
+   private void SpawnPropCategoryOnWall(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
+      DungeonRoomData roomData, float spawnHeight)
    {
       if (spawnRule == null || spawnRule.prefabs == null || spawnRule.prefabs.Count == 0)
       {
@@ -354,11 +398,11 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
       foreach (PropSpawnRule propData in spawnRule.prefabs)
       {
-         if (propData == null || propData.prefab == null )
+         if (propData == null || propData.prefab == null)
          {
             return;
          }
-         
+
          int propAmount = PropsToSpawn(propData);
          int spawnedAmt = 0;
 
@@ -368,30 +412,30 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             {
                return;
             }
-            
+
             // Choosing from a random select of tiles
             int randomTileIndex = Random.Range(0, validTiles.Count);
             Vector2Int tile = validTiles[randomTileIndex];
-            
-            if (IsPropNearAnother(roomData, tile))
+
+            if (IsPropNearAnother(roomData.OccupiedTiles, tile, 1))
             {
                validTiles.RemoveAt(randomTileIndex);
                continue;
             }
-            
+
             // Choosing from a random select of prefabs
             GameObject prefab = propData.prefab;
-            
-            Vector2Int wallDirection = GetWallDirection(roomData, tile);
+
+            Vector2Int wallDirection = GetWallDirection(roomData.FloorTiles, tile);
             Quaternion wallRotation = GetWallRotation(wallDirection);
 
             Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
             Vector3 wallOffset = new Vector3(wallDirection.x, 0, wallDirection.y) * (distanceFromWall * cellSize);
-            
+
             Vector3 prefabPosition = tilePosition + wallOffset;
-            
+
             Instantiate(prefab, prefabPosition, wallRotation, propParent);
-            
+
             // Adds the current tile to the occupied tiles
             roomData.OccupiedTiles.Add(tile);
             validTiles.RemoveAt(randomTileIndex);
@@ -401,7 +445,8 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
    }
 
-   private void SpawnCategoryOnCeiling(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles, DungeonRoomData roomData, float spawnHeight)
+   private void SpawnCategoryOnCeiling(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
+      DungeonRoomData roomData, float spawnHeight)
    {
       if (spawnRule == null || spawnRule.prefabs == null || spawnRule.prefabs.Count == 0)
       {
@@ -415,20 +460,20 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
       foreach (PropSpawnRule propData in spawnRule.prefabs)
       {
-         if (propData == null || propData.prefab == null )
+         if (propData == null || propData.prefab == null)
          {
             return;
          }
-         
+
          int propAmount = PropsToSpawn(propData);
-      
+
          for (int i = 0; i < propAmount; i++)
          {
             if (validTiles.Count == 0)
             {
                return;
             }
-            
+
             // Find the tile closest to the room center
             int closestTileIndex = 0;
             float closestDistance = float.MaxValue;
@@ -445,22 +490,91 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
                   closestTileIndex = tileIndex;
                }
             }
-            
+
             Vector2Int tile = validTiles[closestTileIndex];
-            
+
             // Choosing from a random select of prefabs
             GameObject prefab = propData.prefab;
-            
+
             // Get a position to spawn at
             Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
             Instantiate(prefab, tilePosition, Quaternion.identity, propParent);
-            
+
             // Adds the current tile to the occupied tiles
             roomData.OccupiedTiles.Add(tile);
             validTiles.RemoveAt(closestTileIndex);
          }
       }
    }
+
+   private void SpawnPropCategoryInCorridor(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
+      HashSet<Vector2Int> occupiedTiles, HashSet<Vector2Int> floorTiles, float spawnHeight)
+   {
+      if (spawnRule == null || spawnRule.prefabs == null || spawnRule.prefabs.Count == 0 )
+      {
+         return;
+      }
+
+      if (validTiles == null || validTiles.Count == 0)
+      {
+         return;
+      }
+      
+      foreach (PropSpawnRule propData in spawnRule.prefabs)
+      {
+         if (propData == null || propData.prefab == null)
+         {
+            return;
+         }
+
+         int propAmount = PropsToSpawn(propData);
+         int spawnedAmt = 0;
+
+         while (spawnedAmt < propAmount && validTiles.Count > 0 )
+         {
+            if (validTiles.Count == 0)
+            {
+               return;
+            }
+            
+            int randomTileIndex = Random.Range(0, validTiles.Count);
+            Vector2Int tile = validTiles[randomTileIndex];
+
+            if (IsPropNearAnother(occupiedTiles, tile, 4))
+            {
+               validTiles.RemoveAt(randomTileIndex);
+               continue;
+            }
+            
+            // Choose a prefab from the spawn rule
+            GameObject prefab = propData.prefab;
+
+            Vector2Int direction = GetWallDirection(floorTiles, tile);
+
+            if (direction == Vector2Int.zero)
+            {
+               validTiles.RemoveAt(randomTileIndex);
+               continue;
+            }
+            
+            Quaternion wallRotation = GetWallRotation(direction);
+            
+            Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
+            Vector3 wallOffset = new Vector3(direction.x, 0, direction.y) * (distanceFromWall * cellSize);
+            
+            Vector3 prefabPosition = tilePosition + wallOffset;
+
+            Instantiate(prefab, prefabPosition, wallRotation, propParent);
+            
+            // Add tiles to the occupied tiles
+            occupiedTiles.Add(tile);
+            validTiles.RemoveAt(randomTileIndex);
+            
+            spawnedAmt++;
+         }
+      }
+   }
+   
 
    private int PropsToSpawn(PropSpawnRule spawnRule)
    {
@@ -559,8 +673,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
    }
    
-   
-   
    /// <summary>
    /// This method clears the props that sit inside the PropParent in the hierachy
    /// </summary>
@@ -605,24 +717,24 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       return validTiles;
    }
    
-   private Vector2Int GetWallDirection(DungeonRoomData roomData, Vector2Int tile)
+   private Vector2Int GetWallDirection(HashSet<Vector2Int> floorTiles, Vector2Int tile)
    {
-      if (!roomData.FloorTiles.Contains(tile + Vector2Int.up))
+      if (!floorTiles.Contains(tile + Vector2Int.up))
       {
          return Vector2Int.up;
       }
 
-      if (!roomData.FloorTiles.Contains(tile + Vector2Int.left))
+      if (!floorTiles.Contains(tile + Vector2Int.left))
       {
          return Vector2Int.left;
       }
 
-      if (!roomData.FloorTiles.Contains(tile + Vector2Int.down))
+      if (!floorTiles.Contains(tile + Vector2Int.down))
       {
          return Vector2Int.down;
       }
 
-      if (!roomData.FloorTiles.Contains(tile + Vector2Int.right))
+      if (!floorTiles.Contains(tile + Vector2Int.right))
       {
          return Vector2Int.right;
       }
@@ -672,19 +784,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
       
       return Vector2Int.zero;
-   }
-
-   private bool CheckForEntranceTile(DungeonRoomData roomData, Vector2Int tile, Vector2Int direction)
-   {
-      foreach (EntranceRoomData room in roomData.EntranceTiles)
-      {
-         if (room.Tile == tile && room.Direction == direction)
-         {
-            return true;
-         }
-      }
-
-      return false;
    }
 
    private List<List<EntranceRoomData>> GroupEntranceTiles(List<EntranceRoomData> entranceTiles)
@@ -772,33 +871,22 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
    /// This is to avoid props spawning next to one another especially torches etc.
    /// </summary>
    /// <returns>True or false</returns>
-   private bool IsPropNearAnother(DungeonRoomData roomData, Vector2Int tile)
+   private bool IsPropNearAnother(HashSet<Vector2Int> occupiedTiles, Vector2Int tile, int distance)
    {
-      if (roomData.OccupiedTiles.Contains(tile))
-      {
-         return true;
-      }
 
-      if (roomData.OccupiedTiles.Contains(tile + Vector2Int.up))
+      for (int x = -distance; x <= distance; x++)
       {
-         return true;
+         for (int y = -distance; y <= distance; y++)
+         {
+            Vector2Int currentTile = tile + new Vector2Int(x, y);
+            
+            if (occupiedTiles.Contains(currentTile))
+            {
+               return true;
+            }
+         }
       }
-
-      if (roomData.OccupiedTiles.Contains(tile + Vector2Int.down))
-      {
-         return true;
-      }
-
-      if (roomData.OccupiedTiles.Contains(tile + Vector2Int.left))
-      {
-         return true;
-      }
-
-      if (roomData.OccupiedTiles.Contains(tile + Vector2Int.right))
-      {
-         return true;
-      }
-
+      
       return false;
    }
    
