@@ -59,43 +59,67 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
    private void CreateRooms()
    {
-      var roomsList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)(startPosition),
-         new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
-
+      
+      int maxAttempts = 20;
+      int currentAttempt = 0;
+      bool validDungeonGenerated = false;
+      
       HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
       List<DungeonRoomData> generatedRooms = new List<DungeonRoomData>();
-
-      if (randomWalkRooms)
+      HashSet<Vector2Int> corridors = new HashSet<Vector2Int>();
+      Dictionary<RoomType, int> wantedRooms = new Dictionary<RoomType, int>();
+      
+      while (currentAttempt < maxAttempts && validDungeonGenerated == false)
       {
-         floor = CreateRoomsRandomly(roomsList);
-      }
-      else
-      {
-         generatedRooms = CreateSimpleRoomData(roomsList);
+         currentAttempt++;
+         
+         Debug.Log("Dungeon Generation Attempt: " + currentAttempt);
+         
+         floor = new HashSet<Vector2Int>();
+         generatedRooms = new List<DungeonRoomData>();
+         corridors = new HashSet<Vector2Int>();
+         wantedRooms = new Dictionary<RoomType, int>();
+         
+         var roomsList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)(startPosition),
+            new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
 
-         foreach (DungeonRoomData roomData in generatedRooms)
+         if (randomWalkRooms)
          {
-            floor.UnionWith(roomData.FloorTiles);
+            floor = CreateRoomsRandomly(roomsList);
+         }
+         else
+         {
+            generatedRooms = CreateSimpleRoomData(roomsList);
+
+            foreach (DungeonRoomData roomData in generatedRooms)
+            {
+               floor.UnionWith(roomData.FloorTiles);
+            }
+         }
+
+         // This will contain the x,y center coordinates of each room
+         List<Vector2Int> roomCenters = new List<Vector2Int>();
+         foreach (var room in roomsList)
+         {
+            roomCenters.Add((Vector2Int)(Vector3Int.RoundToInt(room.center)));
+         }
+
+         PropParentChildrenCleaner();
+
+         corridors = ConnectRooms(roomCenters);
+
+         // Assign the corridors to the room data
+         AssignCorridorDataToRoom(generatedRooms, corridors);
+         AssignEntranceTiles(generatedRooms, corridors);
+         AssignRoomType(generatedRooms, wantedRooms);
+         // DebugRoomTypeSummary(generatedRooms);
+
+         if (HasRequiredRoomSizes(generatedRooms, wantedRooms))
+         {
+            validDungeonGenerated = true;
          }
       }
-
-      // This will contain the x,y center coordinates of each room
-      List<Vector2Int> roomCenters = new List<Vector2Int>();
-      foreach (var room in roomsList)
-      {
-         roomCenters.Add((Vector2Int)(Vector3Int.RoundToInt(room.center)));
-      }
-
-      PropParentChildrenCleaner();
-
-      HashSet<Vector2Int> corridors = ConnectRooms(roomCenters);
-
-      // Assign the corridors to the room data
-      AssignCorridorDataToRoom(generatedRooms, corridors);
-      AssignEntranceTiles(generatedRooms, corridors);
-      AssignRoomType(generatedRooms);
-      // DebugRoomTypeSummary(generatedRooms);
-
+      
       // Spawns player
       PlayerSpawn(generatedRooms);
 
@@ -298,8 +322,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          }
 
          int propAmount = PropsToSpawn(propData);
+         int spawnedAmt = 0;
 
-         for (int i = 0; i < propAmount; i++)
+         while (spawnedAmt < propAmount && validTiles.Count > 0)
          {
             if (validTiles.Count == 0)
             {
@@ -312,18 +337,21 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
             if (IsPropNearAnother(roomData.OccupiedTiles, tile, 1))
             {
+               validTiles.RemoveAt(randomTileIndex);
                continue;
             }
 
             GameObject prefab = propData.prefab;
 
             // Get tile position to spawn prefab at
-            Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
+            Vector3 tilePosition = new Vector3(tile.x * cellSize, propHeight, tile.y * cellSize);
             Instantiate(prefab, tilePosition, Quaternion.identity, propParent);
 
             // Adds the current tile to the occupied tiles
             roomData.OccupiedTiles.Add(tile);
             validTiles.RemoveAt(randomTileIndex);
+
+            spawnedAmt++;
          }
       }
    }
@@ -349,8 +377,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          }
 
          int propAmount = PropsToSpawn(propData);
-
-         for (int i = 0; i < propAmount; i++)
+         int spawnedAmt = 0;
+   
+         while (spawnedAmt < propAmount && validTiles.Count > 0)
          {
             if (validTiles.Count == 0)
             {
@@ -363,6 +392,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
             if (IsPropNearAnother(roomData.OccupiedTiles, tile, 2))
             {
+               validTiles.RemoveAt(randomTileIndex);
                continue;
             }
 
@@ -379,6 +409,8 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             // Adds the current tile to the occupied tiles
             roomData.OccupiedTiles.Add(tile);
             validTiles.RemoveAt(randomTileIndex);
+
+            spawnedAmt++;
          }
       }
    }
@@ -1012,7 +1044,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
    /// This will give a room its assigned type, such as spawn point, boss room etc.
    /// </summary>
    /// <param name="generatedRooms">List of generated rooms in the level</param>
-   private void AssignRoomType(List<DungeonRoomData> generatedRooms)
+   private void AssignRoomType(List<DungeonRoomData> generatedRooms, Dictionary<RoomType, int> wantedRooms)
    {
       if (generatedRooms == null || generatedRooms.Count == 0)
       {
@@ -1023,7 +1055,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       AssignMandatoryRoomTypes(generatedRooms);
       
       // Assigns the other rooms like, treasure, shop and miniboss rooms
-      AssignRoomsBasedOnRules(generatedRooms);
+      AssignRoomsBasedOnRules(generatedRooms, wantedRooms);
    }
    
    /// <summary>
@@ -1038,7 +1070,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       
       // Assigns the room to be the spawn room
       DungeonRoomData spawnRoom = FindClosestRoomToStart(generatedRooms);
-
+      
       if (spawnRoom != null)
       {
          spawnRoom.TypeOfRoom = RoomType.Spawn;
@@ -1051,19 +1083,12 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       {
          exitRoom.TypeOfRoom = RoomType.Exit;
       }
-      
-      DungeonRoomData bossRoom = FindFarthestRoomFromStart(generatedRooms);
-
-      if (bossRoom != null && bossRoom != exitRoom && bossRoom != spawnRoom)
-      {
-         bossRoom.TypeOfRoom = RoomType.Boss;
-      }
    }
    
    /// <summary>
    /// This method assigns the other rooms like shop, treasure, miniboss rooms on the probability, minimum & maximum count set
    /// </summary>
-   private void AssignRoomsBasedOnRules(List<DungeonRoomData> generatedRooms)
+   private void AssignRoomsBasedOnRules(List<DungeonRoomData> generatedRooms, Dictionary<RoomType, int> wantedRooms)
    {
       if (roomTypeSpawnRules == null || roomTypeSpawnRules.Count == 0)
       {
@@ -1087,15 +1112,19 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          {
             roomsToSpawn = Random.Range(rule.mediumAmount+1, rule.highAmount+1);
          }
+         
+         Debug.Log(
+            "Rule: " + rule.roomType +
+            " | Chance: " + randomChance +
+            " | Wants: " + roomsToSpawn +
+            " | Size Range: " + rule.minRoomSize + "-" + rule.maxRoomSize
+         );
+         
+         wantedRooms[rule.roomType] = roomsToSpawn;
       
          for (int i = 0; i < roomsToSpawn; i++)
          {
             DungeonRoomData roomData = FindRandomNormalRoomWithSize(generatedRooms, rule);
-      
-            if (roomData == null)
-            {
-               roomData = FindRandomNormalRoom(generatedRooms);
-            }
 
             if (roomData == null)
             {
@@ -1107,7 +1136,51 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
    }
    
-   
+   /// <summary>
+   /// This method will check to see if every room generated has the guaranteed must spawn rooms
+   /// and fits within the allocated min and max room size
+   /// </summary>
+   /// <param name="generatedRooms">List of generated rooms and their types</param>
+   /// <returns>True or false</returns>
+   private bool HasRequiredRoomSizes(List<DungeonRoomData> generatedRooms, Dictionary<RoomType, int> wantedRooms)
+   {
+      foreach (RoomTypeSpawnRule rule in roomTypeSpawnRules)
+      {
+         int roomsWanted = 0;
+
+         if (wantedRooms.ContainsKey(rule.roomType))
+         {
+            roomsWanted = wantedRooms[rule.roomType];
+         }
+
+         if (roomsWanted == 0)
+         {
+            continue;
+         }
+
+         int validRoomCount = 0;
+         
+         foreach (DungeonRoomData room in generatedRooms)
+         {
+            if (room.TypeOfRoom != rule.roomType)
+            {
+               continue;
+            }
+            
+            if (room.FloorTiles.Count >= rule.minRoomSize && room.FloorTiles.Count <= rule.maxRoomSize)
+            {
+               validRoomCount++;
+            }
+         }
+         
+         if (validRoomCount < roomsWanted)
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
    
    /// <summary>
    /// This function assigns the tile that connects to the room and corridor
@@ -1253,6 +1326,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       int randomRoomIndex = Random.Range(0, normalRoom.Count);
       return normalRoom[randomRoomIndex];
    }
+   
    #endregion
    
    #region Create Room Functions
