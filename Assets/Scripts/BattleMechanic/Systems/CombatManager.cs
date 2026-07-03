@@ -193,7 +193,7 @@ public class CombatManager : MonoBehaviour
         int dealt = enemyHpBefore - _enemy.currentHp;
         if (dealt > 0) enemyAI.lastPlayerAttackDamage = dealt;
 
-        // Double Down: if a repeat was queued, run this card's effect once more.
+        // Double Down : if a repeat was queued, run this card's effect once more.
         // Don't let a repeated card re-trigger another repeat.
         if (_repeatNextCard && effect != null && card.definitionId != CardId.DoubleDown)
         {
@@ -204,6 +204,7 @@ public class CombatManager : MonoBehaviour
 
         _cardsPlayedThisTurn.Add(card.definitionId);
         _piles.PlayCard(card);
+        AudioManager.Instance.CardPlay();
         _lastPlayedCard = card;
 
         Debug.Log($"Played {def.displayName}. Enemy HP: {_enemy.currentHp}. " +
@@ -300,16 +301,19 @@ public class CombatManager : MonoBehaviour
             case ParryDodgeResult.Parry:
                 int reflect = Mathf.RoundToInt(incoming * 0.5f);
                 _enemy.TakeDamage(reflect);
+                AudioManager.Instance.ParrySuccess();
                 Debug.Log($"<color=cyan>PARRY! Reflected {reflect} damage.</color>");
                 if (_enemy.IsDead) { Win(); yield break; }
                 break;
 
             case ParryDodgeResult.Dodge:
+                AudioManager.Instance.DodgeSuccess();
                 Debug.Log("<color=green>DODGE! No damage taken.</color>");
                 break;
 
             case ParryDodgeResult.Hit:
                 _player.TakeDamage(incoming);
+                AudioManager.Instance.AttackHit();
                 Debug.Log($"Hit for {incoming} (after block).");
 
                 foreach (var status in _player.statuses)
@@ -336,6 +340,8 @@ public class CombatManager : MonoBehaviour
 
         // On-death effect (e.g. Blazeling's explosion). May kill the player.
         int deathDmg = enemyAI.OnDeath(_player);
+        AudioManager.Instance.EnemyDeath();
+
         if (deathDmg > 0)
         {
             _player.TakeTrueDamage(deathDmg);   // Bypasses block, not dodgeable
@@ -347,6 +353,7 @@ public class CombatManager : MonoBehaviour
             }
         }
         _combatEnded = true;
+        AudioManager.Instance.Victory();
         Debug.Log("YOU WIN.");
 
         // XP reward from the defeated enemy
@@ -373,6 +380,7 @@ public class CombatManager : MonoBehaviour
     {
         if (_combatEnded) return;
         _combatEnded = true;
+        AudioManager.Instance.Defeat();
         Debug.Log("YOU LOSE.");
 
         if (DeathScreen.Instance != null)
@@ -410,6 +418,7 @@ public class CombatManager : MonoBehaviour
 
         _player.maxHp += hpGrowthPerLevel;
         _player.currentHp = _player.maxHp;  // full heal on level up
+        AudioManager.Instance.LevelUp();
 
         if (damageGrowthEveryNLevels > 0 && newLevel % damageGrowthEveryNLevels == 0)
             _player.damage += 1;
@@ -517,6 +526,7 @@ public class CombatManager : MonoBehaviour
         effect.Apply(ctx);
 
         _potionUsedThisTurn = true;
+        AudioManager.Instance.PotionDrink();
         _run.potions.Remove(potion);
 
         // A potion might have killed the enemy (or the player).

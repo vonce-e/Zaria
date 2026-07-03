@@ -22,6 +22,7 @@ public class Dice : MonoBehaviour
     {
         DiceNumber = UnityEngine.Random.Range(1, 7);
         OnDiceRolled?.Invoke(DiceNumber);
+        AudioManager.Instance.DiceRoll();
     }
 
     /// <summary>
