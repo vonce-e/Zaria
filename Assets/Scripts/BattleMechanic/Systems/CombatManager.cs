@@ -354,6 +354,7 @@ public class CombatManager : MonoBehaviour
         }
         _combatEnded = true;
         AudioManager.Instance.Victory();
+        // change scene
         Debug.Log("YOU WIN.");
 
         // XP reward from the defeated enemy
@@ -381,6 +382,7 @@ public class CombatManager : MonoBehaviour
         if (_combatEnded) return;
         _combatEnded = true;
         AudioManager.Instance.Defeat();
+        // change scene
         Debug.Log("YOU LOSE.");
 
         if (DeathScreen.Instance != null)
