@@ -135,40 +135,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       SpawnCorridorProps(corridors, floor, generatedRooms);
    }
 
-   private void DebugRoomTypeSummary(List<DungeonRoomData> generatedRooms)
-   {
-      int normalCount = 0;
-      int spawnCount = 0;
-      int treasureCount = 0;
-      int shopCount = 0;
-      int miniBossCount = 0;
-      int bossCount = 0;
-      int exitCount = 0;
-
-      foreach (DungeonRoomData room in generatedRooms)
-      {
-         if (room.TypeOfRoom == RoomType.Normal) normalCount++;
-         else if (room.TypeOfRoom == RoomType.Spawn) spawnCount++;
-         else if (room.TypeOfRoom == RoomType.Treasure) treasureCount++;
-         else if (room.TypeOfRoom == RoomType.Shop) shopCount++;
-         else if (room.TypeOfRoom == RoomType.MiniBoss) miniBossCount++;
-         else if (room.TypeOfRoom == RoomType.Boss) bossCount++;
-         else if (room.TypeOfRoom == RoomType.Exit) exitCount++;
-      }
-
-      Debug.Log(
-         "Room Type Summary | " +
-         "Normal: " + normalCount +
-         " Spawn: " + spawnCount +
-         " Treasure: " + treasureCount +
-         " Shop: " + shopCount +
-         " MiniBoss: " + miniBossCount +
-         " Boss: " + bossCount +
-         " Exit: " + exitCount
-      );
-   }
-
-
    private void PlayerSpawn(List<DungeonRoomData> roomData)
    {
       DungeonRoomData spawnRoom = null;
@@ -1212,7 +1178,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          roomData.EntranceTiles.Add(new EntranceRoomData(tile, direction));
       }
    }
-
+   
    private List<EntranceRoomData> AnalyzeDoorCandidateTiles(DungeonRoomData roomData)
    {
       List<EntranceRoomData> candidateDoorTiles = new List<EntranceRoomData>();
@@ -1228,6 +1194,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       return candidateDoorTiles;
    } 
    
+   /// <summary>
+   /// This method will try to find the closest room to the beginning boundary of the dungeon (0,0)
+   /// </summary>
    private DungeonRoomData FindClosestRoomToStart(List<DungeonRoomData> generatedRooms)
    {
       DungeonRoomData closestRoom = null;
@@ -1247,6 +1216,11 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       return closestRoom;
    }
    
+   /// <summary>
+   /// This method will find the furthest possible room from the beginning boundary of the dungeon (0,0)
+   /// </summary>
+   /// <param name="generatedRooms"></param>
+   /// <returns></returns>
    private DungeonRoomData FindFarthestRoomFromStart(List<DungeonRoomData> generatedRooms)
    {
       DungeonRoomData farthestRoom = null;
@@ -1271,6 +1245,12 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       return farthestRoom;
    }
 
+
+   /// <summary>
+   /// This method will find any room that meets the size criteria of the room its trying to find,
+   /// such as a treasure, shop or miniboss room.
+   /// </summary>
+   /// <returns>Returns the room that fits the size criteria</returns>
    private DungeonRoomData FindRandomNormalRoomWithSize(List<DungeonRoomData> generatedRooms, RoomTypeSpawnRule roomRule)
    {
       List<DungeonRoomData> normalRoom = new List<DungeonRoomData>();
@@ -1295,27 +1275,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          }
          
          normalRoom.Add(room);
-      }
-
-      if (normalRoom.Count == 0)
-      {
-         return null;
-      }
-      
-      int randomRoomIndex = Random.Range(0, normalRoom.Count);
-      return normalRoom[randomRoomIndex];
-   }
-   
-   private DungeonRoomData FindRandomNormalRoom(List<DungeonRoomData> generatedRooms)
-   {
-      List<DungeonRoomData> normalRoom = new List<DungeonRoomData>();
-
-      foreach (DungeonRoomData room in generatedRooms)
-      {
-         if (room.TypeOfRoom == RoomType.Normal)
-         {
-            normalRoom.Add(room);
-         }
       }
 
       if (normalRoom.Count == 0)

@@ -45,6 +45,7 @@ public enum RoomType
     Spawn,
     Treasure,
     Shop,
+    Blacksmith,
     MiniBoss,
     Boss,
     Exit
