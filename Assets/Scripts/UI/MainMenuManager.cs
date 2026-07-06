@@ -10,6 +10,15 @@ public class MainMenuManager : MonoBehaviour
    [SerializeField] private Button logOutButton;
    [SerializeField] private Button quitButton;
    
+   void Update()
+   {
+      if (Cursor.lockState != CursorLockMode.None)
+      {
+         Cursor.lockState = CursorLockMode.None;
+         Cursor.visible = true;
+      }
+   }
+
    /// <summary>
    /// Starts a brand-new run and loads the dungeon scene
    /// </summary>

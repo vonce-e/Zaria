@@ -136,9 +136,15 @@ namespace StarterAssets
 			{
 				//Don't multiply mouse input by Time.deltaTime
 				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
-				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+
+				// Apply the player's sensitivity setting.
+				float sensitivity = global::Settings.mouseSensitivity;
+
+				// Invert Y flips the pitch direction.
+				float pitchInput = global::Settings.invertY ? -_input.look.y : _input.look.y;
+
+				_cinemachineTargetPitch += pitchInput * RotationSpeed * deltaTimeMultiplier * sensitivity;
+				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier * sensitivity;
 
 				// clamp our pitch rotation
 				_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
