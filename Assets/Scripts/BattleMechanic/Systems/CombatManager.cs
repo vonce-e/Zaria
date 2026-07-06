@@ -372,6 +372,8 @@ public class CombatManager : MonoBehaviour
             CardRewardService.Instance.GrantCombatReward(
                 rewardCommon, rewardRare, rewardMythic, rewardLegendary);
         }
+        if (BattleSystem.Instance != null)
+            BattleSystem.Instance.EndBattle(true);
     }
 
     /// <summary>
@@ -387,6 +389,9 @@ public class CombatManager : MonoBehaviour
 
         if (DeathScreen.Instance != null)
             DeathScreen.Instance.Show(); // Show death screen
+            
+        if (BattleSystem.Instance != null)
+            BattleSystem.Instance.EndBattle(false);
     }
 
     /// <summary>

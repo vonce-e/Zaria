@@ -21,7 +21,8 @@ public class HUDController : MonoBehaviour
         battleHUD.SetActive(false);
     }
 
-    [SerializeField] private TMP_Text interactionText;
+    [SerializeField]
+    private TMP_Text interactionText;
 
     public void SetCrosshair(bool useCrosshair)
     {

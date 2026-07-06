@@ -40,13 +40,23 @@ public class BattleSystem : MonoBehaviour
     [Tooltip("Scene to load after winning. Falls back to RunManager.returnSceneName if empty.")]
     public string nextSceneName;
 
+    [Header("Combat UI")]
+    public GameObject combatUIRoot;
+
+    [Header("Run-dependent UI")]
+    public PotionBarDisplay potionBar;
+    public XpBarUI xpBar;
+
     private Unit _playerUnit;
     private Unit _enemyUnit;
     public BattleState state;
+    public EnemyTelegraphUI enemyTelegraph;
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
+        if (combatUIRoot != null) combatUIRoot.SetActive(false);
+        
     }
 
     /// <summary>
@@ -84,19 +94,25 @@ public class BattleSystem : MonoBehaviour
         playerHUD.SetHUD(_playerUnit);
         enemyHUD.SetHUD(_enemyUnit);
 
-        // point CombatManager at this boss's AI, then start the real combat
+        // point CombatManager at boss's AI, then start combat
         combatManager.enemyAI = enemyGo.GetComponent<EnemyAI>();
 
+        if (enemyTelegraph != null)
+            enemyTelegraph.enemyAI = enemyGo.GetComponent<EnemyAI>();
+        
         yield return new WaitForSeconds(1f);  // brief beat before cards appear
 
         state = BattleState.PLAYERTURN;
+        if (combatUIRoot != null) combatUIRoot.SetActive(true);
         combatManager.BeginCombat(RunManager.Instance.runState, _playerUnit, _enemyUnit);
+
+        // Wires the UI that needs run state
+        if (potionBar != null) potionBar.run = RunManager.Instance.runState;
+        if (xpBar != null) xpBar.Bind(RunManager.Instance.runState);
     }
 
     /// <summary>
-    /// Called by CombatManager when the fight ends. On win, transitions to
-    /// the next scene after a delay. On loss, the death loop takes
-    /// over.
+    /// Called by CombatManager when the fight ends.
     /// </summary>
     /// <param name="won">True if the player won.</param>
     public void EndBattle(bool won)
@@ -173,7 +189,6 @@ public class BattleSystem : MonoBehaviour
         if (HUDController.instance != null)
         {
             HUDController.instance.SetCrosshair(useBattleCamera);
-            HUDController.instance.SetBattleHUD(useBattleCamera);
         }
     }
 }
