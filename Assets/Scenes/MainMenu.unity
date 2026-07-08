@@ -417,7 +417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7666,11 +7666,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8297a1e15c9c42144b3cb77945d05949, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
-  settingsPanel: {fileID: 0}
-  shopPanel: {fileID: 0}
-  blacksmithPanel: {fileID: 0}
-  enchantPanel: {fileID: 0}
-  discardPanel: {fileID: 0}
 --- !u!4 &1627685088
 Transform:
   m_ObjectHideFlags: 0

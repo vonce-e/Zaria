@@ -50,6 +50,10 @@ public class ShopUI : MonoBehaviour
     {
         run = runState;
         if (panelRoot != null) panelRoot.SetActive(true);
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         shop.GenerateStock();
         SetMessage("");
         RebuildSlots();
@@ -62,6 +66,9 @@ public class ShopUI : MonoBehaviour
     public void Close()
     {
         if (panelRoot != null) panelRoot.SetActive(false);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     /// <summary>

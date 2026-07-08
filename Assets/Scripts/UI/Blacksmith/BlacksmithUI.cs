@@ -59,6 +59,11 @@ public class BlacksmithUI : MonoBehaviour
         run = runState;
         _selected = null;
         if (panelRoot != null) panelRoot.SetActive(true);
+
+        // Free the cursor so the player can click cards and buttons.
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         SetMessage("");
         RebuildGrid();
         RefreshInfo();
@@ -71,6 +76,10 @@ public class BlacksmithUI : MonoBehaviour
     public void Close()
     {
         if (panelRoot != null) panelRoot.SetActive(false);
+
+        // Re-lock the cursor
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     /// <summary>
