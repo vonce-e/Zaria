@@ -15,9 +15,16 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Don't process interactions while a UI panel is open.
+        if (UIState.IsPanelOpen)
+        {
+            DisableCurrentInteractable();   // clears the "(E)" text
+            return;
+        }
+        
         CheckInteraction();
         
-        if (Keyboard.current.eKey.wasPressedThisFrame && _currentInteractable != null)
+        if (Keyboard.current[Settings.interactKey].wasPressedThisFrame && _currentInteractable != null)
         {
             _currentInteractable.Interact();
             Debug.Log("E key was pressed");

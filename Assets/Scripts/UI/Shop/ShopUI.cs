@@ -53,11 +53,16 @@ public class ShopUI : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        
+        // Stop StarterAssetsInputs from re-locking the cursor while the shop is open.
+        var inputs = FindObjectOfType<StarterAssets.StarterAssetsInputs>();
+        if (inputs != null) inputs.cursorLocked = false;
 
         shop.GenerateStock();
         SetMessage("");
         RebuildSlots();
         RefreshInfo();
+        UIState.PanelOpened();
     }
 
     /// <summary>
@@ -69,6 +74,11 @@ public class ShopUI : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        var inputs = FindObjectOfType<StarterAssets.StarterAssetsInputs>();
+        if (inputs != null) inputs.cursorLocked = true;
+
+        UIState.PanelClosed();
     }
 
     /// <summary>

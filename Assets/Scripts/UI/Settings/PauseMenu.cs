@@ -30,8 +30,9 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void Toggle()
     {
-        if (_isOpen) Close();
-        else Open();
+        if (_isOpen) { Close(); return; }
+        if (UIState.IsPanelOpen) return;   // don't open settings over shop/blacksmith
+        Open();
     }
 
     /// <summary>
@@ -42,9 +43,11 @@ public class PauseMenu : MonoBehaviour
         _isOpen = true;
         if (settingsPanel != null) settingsPanel.SetActive(true);
 
-        Time.timeScale = 0f;                    // pause the game
+        Time.timeScale = 0f; // pause the game
         Cursor.lockState = CursorLockMode.None; // free the cursor
         Cursor.visible = true;
+
+        UIState.PanelOpened();
     }
 
     /// <summary>
@@ -55,8 +58,10 @@ public class PauseMenu : MonoBehaviour
         _isOpen = false;
         if (settingsPanel != null) settingsPanel.SetActive(false);
 
-        Time.timeScale = 1f;                      // resume the game
+        Time.timeScale = 1f; // resume the game
         Cursor.lockState = CursorLockMode.Locked; // re-lock for first-person
         Cursor.visible = false;
+
+        UIState.PanelClosed();
     }
 }

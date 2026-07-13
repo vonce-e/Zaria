@@ -68,6 +68,7 @@ public class BlacksmithUI : MonoBehaviour
         RebuildGrid();
         RefreshInfo();
         RefreshButtons();
+        UIState.PanelOpened();
     }
 
     /// <summary>
@@ -80,6 +81,8 @@ public class BlacksmithUI : MonoBehaviour
         // Re-lock the cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
+        UIState.PanelClosed();
     }
 
     /// <summary>
