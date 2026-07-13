@@ -19,7 +19,7 @@ MonoBehaviour:
   energyCost: 5
   description: Gain defense equal to last damage taken, if dice >= 4, gain immunity
     from damage next round.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: 1665067b78bd94d5cbbb0e84c5225b7d, type: 3}
   baseDamage: 0
   baseDefense: 0
   upgradeTiers: []

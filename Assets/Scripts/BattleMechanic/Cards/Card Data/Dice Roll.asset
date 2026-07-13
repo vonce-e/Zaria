@@ -18,7 +18,7 @@ MonoBehaviour:
   rarity: 0
   energyCost: 2
   description: Roll an extra dice, use the dice with the higher result.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: 9b0db5b887a1a4b72995aa1882d2b1c7, type: 3}
   baseDamage: 0
   baseDefense: 0
   upgradeTiers: []

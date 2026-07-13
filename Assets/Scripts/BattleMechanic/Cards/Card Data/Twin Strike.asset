@@ -19,7 +19,7 @@ MonoBehaviour:
   energyCost: 2
   description: Deal 3 damage twice, if dice >= 3, hit 3 times. If used with Execution
     Strike in the same turn, deal double damage.
-  artwork: {fileID: 21300000, guid: dbeac4d78bcb04b37a00107b9f1788f6, type: 3}
+  artwork: {fileID: 21300000, guid: 50f52d805e7a14d12a4527b3e8cb2ec7, type: 3}
   baseDamage: 3
   baseDefense: 0
   upgradeTiers: []

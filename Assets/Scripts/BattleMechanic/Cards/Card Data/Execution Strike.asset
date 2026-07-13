@@ -19,7 +19,7 @@ MonoBehaviour:
   energyCost: 3
   description: Deal 6 damage, if dice >= 4 and enemy HP < 50%, deal 10 extra damage.
     If used with Twin Strike in the same turn, deal double damage.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: 2de1b1b3e747342ceaf8434f6a68962e, type: 3}
   baseDamage: 6
   baseDefense: 0
   upgradeTiers: []

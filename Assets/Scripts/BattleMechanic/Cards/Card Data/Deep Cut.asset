@@ -20,7 +20,7 @@ MonoBehaviour:
   description: Deal 4 damage, and 2 damage for the next 2 turns, if dice is even,
     deal 4 damage for the next 2 turns instead of 2 damage. If used with Blood Slash
     in the same turn, do 2 extra damage for the next 3 turns.
-  artwork: {fileID: 21300000, guid: 77607ad5cf1f347338a3f3cc6274d215, type: 3}
+  artwork: {fileID: 21300000, guid: 0f9992582d50c4e39816d725f81dfeb0, type: 3}
   baseDamage: 4
   baseDefense: 0
   upgradeTiers: []

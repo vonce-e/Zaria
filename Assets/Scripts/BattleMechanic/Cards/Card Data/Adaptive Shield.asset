@@ -18,7 +18,7 @@ MonoBehaviour:
   rarity: 1
   energyCost: 3
   description: Gain 6 defense, if dice is even, gain double defense.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: 8982f7c7eedfd4ed2a9b6ebe8b389bc0, type: 3}
   baseDamage: 0
   baseDefense: 6
   upgradeTiers: []

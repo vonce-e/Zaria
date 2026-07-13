@@ -20,7 +20,7 @@ MonoBehaviour:
   description: Lose 3 healthpoints upon use, deal 10 damage, if dice >= 4, deal 13
     damage. If used with Deep Cut in the same turn, do 2 extra damage for the next
     3 turns.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: 9cfdbc448a24144baa06c45df14de288, type: 3}
   baseDamage: 10
   baseDefense: 0
   upgradeTiers: []

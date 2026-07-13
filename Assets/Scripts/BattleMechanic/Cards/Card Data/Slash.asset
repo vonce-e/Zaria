@@ -18,7 +18,7 @@ MonoBehaviour:
   rarity: 0
   energyCost: 2
   description: Deal 6 damage, if dice >= 5, deal 3 extra damage.
-  artwork: {fileID: 21300000, guid: 2413f5a443b664a188bf9e886a6c068f, type: 3}
+  artwork: {fileID: 21300000, guid: 46e584ca331e34e73956ce5f9a6fc8c9, type: 3}
   baseDamage: 6
   baseDefense: 0
   upgradeTiers: []

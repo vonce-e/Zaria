@@ -19,7 +19,7 @@ MonoBehaviour:
   energyCost: 5
   description: Deal 10 damage, repeat attack equal to dice value, if dice is <=2,
     no repeat attack.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: ceb8c178a21044faab624574007faecc, type: 3}
   baseDamage: 10
   baseDefense: 0
   upgradeTiers: []

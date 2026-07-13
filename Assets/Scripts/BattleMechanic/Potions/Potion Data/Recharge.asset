@@ -15,4 +15,4 @@ MonoBehaviour:
   id: 7
   displayName: Recharge
   description: Gain 5 energy now, but deal 33% less damage for 2 turns.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: d14cc73cf1e7f4f34ba46d626be5e96b, type: 3}

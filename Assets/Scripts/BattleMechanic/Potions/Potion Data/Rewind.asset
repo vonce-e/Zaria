@@ -15,4 +15,4 @@ MonoBehaviour:
   id: 5
   displayName: Rewind
   description: Return your last played card to your hand.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: 3d3ca604f41f9429dab4e377b7ffa4e1, type: 3}

@@ -18,7 +18,7 @@ MonoBehaviour:
   rarity: 2
   energyCost: 4
   description: Your dice has to roll a minimum of 4 next turn.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: cc78ff8a81eea4cf6ac690c375be40b4, type: 3}
   baseDamage: 0
   baseDefense: 0
   upgradeTiers: []

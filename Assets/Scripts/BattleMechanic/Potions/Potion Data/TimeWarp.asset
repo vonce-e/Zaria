@@ -15,4 +15,4 @@ MonoBehaviour:
   id: 0
   displayName: Time Warp
   description: Take an extra turn immediately, but skip your next turn.
-  artwork: {fileID: 21300000, guid: 77607ad5cf1f347338a3f3cc6274d215, type: 3}
+  artwork: {fileID: 21300000, guid: a906a2835526c446a973cb5b3dab7038, type: 3}

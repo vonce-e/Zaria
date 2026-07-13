@@ -18,7 +18,7 @@ MonoBehaviour:
   rarity: 0
   energyCost: 2
   description: Your dice has to roll a minimum of 3 this turn.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: 26efe6cea5f504e469c87d43130f324f, type: 3}
   baseDamage: 0
   baseDefense: 0
   upgradeTiers: []

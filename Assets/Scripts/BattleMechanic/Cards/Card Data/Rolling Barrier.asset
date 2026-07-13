@@ -19,7 +19,7 @@ MonoBehaviour:
   energyCost: 3
   description: Gain 2 defense, multiply defense by dice value. If used with Adaptive
     Shield in the same turn, gain immunity from all common attacks next round.
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: a4a8edd6c2fd64f45acfa4fcf83905b9, type: 3}
   baseDamage: 0
   baseDefense: 2
   upgradeTiers: []

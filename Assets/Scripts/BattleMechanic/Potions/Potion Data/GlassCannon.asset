@@ -16,4 +16,4 @@ MonoBehaviour:
   displayName: Glass Cannon
   description: Double your attack damage this turn, but take 50% more damage next
     turn.
-  artwork: {fileID: 21300000, guid: 77607ad5cf1f347338a3f3cc6274d215, type: 3}
+  artwork: {fileID: 21300000, guid: d9fb8a77ea3674a7e9cda56cb5d2c3b0, type: 3}
