@@ -52,6 +52,11 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
    [Header("Player information")] [SerializeField]
    private GameObject player;
 
+   private void Start()
+   {
+      GenerateDungeon();
+   }
+
    protected override void RunProceduralGeneration()
    {
       CreateRooms();
