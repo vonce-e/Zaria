@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.WSA;
 using Quaternion = UnityEngine.Quaternion;
@@ -221,14 +222,27 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             continue;
          }
 
+          // Default room layout
+         RoomLayoutPattern roomLayoutPattern = null;
+
+         // Assigns a room layout
+         if (propRule.layoutPatterns != null && propRule.layoutPatterns.Count > 0)
+         {  
+            int randomIndex = Random.Range(0, propRule.layoutPatterns.Count);
+            roomLayoutPattern = propRule.layoutPatterns[randomIndex];
+         }
+
          // Check for valid tiles before spawning on category
          List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles);
+         validCornerTiles = LayoutOptionDecider(roomData, roomLayoutPattern, validCornerTiles);
          SpawnPropCategoryOnTile(propRule.cornerProps, validCornerTiles, roomData, propHeight);
 
          List<Vector2Int> validInnerTiles = GetValidTile(roomData, roomData.InnerTiles);
+         validInnerTiles = LayoutOptionDecider(roomData, roomLayoutPattern, validInnerTiles);
          SpawnPropCategoryOnTile(propRule.innerTileProps, validInnerTiles, roomData, propHeight);
 
          List<Vector2Int> validNearWallTiles = GetValidTile(roomData, roomData.NearWallTiles);
+         validNearWallTiles = LayoutOptionDecider(roomData, roomLayoutPattern, validNearWallTiles);
          SpawnPropCategoryNearWall(propRule.nearWallTileProps, validNearWallTiles, roomData, propHeight);
 
          List<Vector2Int> validWallMountedTiles = GetValidTile(roomData, roomData.NearWallTiles);
@@ -718,6 +732,77 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
       }
       
       return validTiles;
+   }
+
+   private List<Vector2Int> LayoutOptionDecider(DungeonRoomData roomData, RoomLayoutPattern layoutOption, List<Vector2Int> validTiles)
+   {
+      List<Vector2Int> layoutTileCandidates = new List<Vector2Int>();
+
+      if (layoutOption == null || layoutOption.layoutOption == RoomLayoutOption.Random)
+      {
+         return new List<Vector2Int>(validTiles);
+      }
+
+      foreach (Vector2Int tile in validTiles)
+      {
+         float distanceFromCenter = Vector2Int.Distance(tile, roomData.CenterPoint);
+
+         bool tilesMatchLayout = false;
+
+         if (layoutOption.layoutOption == RoomLayoutOption.Perimeter)
+         {
+            if (roomData.NearWallTiles.Contains(tile) || roomData.CornerTiles.Contains(tile))
+            {
+               tilesMatchLayout = true;
+            }
+         }
+
+         else if (layoutOption.layoutOption == RoomLayoutOption.OpenCenter)
+         {
+            if (distanceFromCenter > layoutOption.centerRadius)
+            {
+               tilesMatchLayout = true;
+            }
+         }
+
+         else if (layoutOption.layoutOption == RoomLayoutOption.CenterFocused)
+         {
+            if (distanceFromCenter <= layoutOption.centerRadius)
+            {
+               tilesMatchLayout = true;
+            }
+         }
+
+         if (tilesMatchLayout == true)
+         {
+            layoutTileCandidates.Add(tile);
+         }
+      }
+
+      List<Vector2Int> selectedTiles = new List<Vector2Int>();
+
+      foreach (Vector2Int candidateTile in layoutTileCandidates)
+      {
+         bool isCandidateTooClose = false;
+
+         foreach (Vector2Int selectedTile in selectedTiles)
+         {
+            float distance = Vector2Int.Distance(candidateTile, selectedTile);
+
+            if (distance < layoutOption.minimumSpacing)
+            {
+               isCandidateTooClose = true;
+               break;
+            }
+         }
+
+         if (isCandidateTooClose == false)
+         {
+            selectedTiles.Add(candidateTile);
+         }
+      }
+
+      return selectedTiles;
    }
    
    private Vector2Int GetWallDirection(HashSet<Vector2Int> floorTiles, Vector2Int tile)

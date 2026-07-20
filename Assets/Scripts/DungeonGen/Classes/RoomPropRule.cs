@@ -5,11 +5,11 @@ using UnityEngine;
 public class RoomPropRule
 {
     public RoomType roomType;
-    
     public PropCategorySpawnRule cornerProps;
     public PropCategorySpawnRule innerTileProps;
     public PropCategorySpawnRule nearWallTileProps;
     public PropCategorySpawnRule wallMountedProps;
     public PropCategorySpawnRule ceilingProps;
+    public List<RoomLayoutPattern> layoutPatterns;
 
 }
