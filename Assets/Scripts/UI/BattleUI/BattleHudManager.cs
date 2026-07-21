@@ -34,7 +34,10 @@ public class BattleHudManager : MonoBehaviour
         _trackedUnit = unit;
 
         nameText.text = unit.unitName;
-        levelText.text = "Lvl " + unit.unitLevel;
+
+        if (levelText != null)
+            levelText.text = "Lvl " + unit.unitLevel; // Null check for enemy level text
+
         healthSlider.maxValue = unit.maxHp;
         healthSlider.value = unit.currentHp;
 

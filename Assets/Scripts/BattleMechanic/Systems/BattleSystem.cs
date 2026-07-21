@@ -64,6 +64,10 @@ public class BattleSystem : MonoBehaviour
     /// </summary>
     public IEnumerator SetupBattle()
     {
+        // Spawn room model
+        if (RunManager.Instance != null && RunManager.Instance.pendingRoomPrefab != null)
+            Instantiate(RunManager.Instance.pendingRoomPrefab);
+
         state = BattleState.START;
 
         // Stage the scene : move player in, lock them, swap to battle camera.
@@ -89,6 +93,9 @@ public class BattleSystem : MonoBehaviour
         GameObject enemyGo = Instantiate(bossPrefab, enemyPoint.position, enemyPoint.rotation);
         _enemyUnit = enemyGo.GetComponent<Unit>();
         _enemyUnit.currentHp = _enemyUnit.maxHp;
+
+        if (RunManager.Instance != null)
+            _playerUnit.unitLevel = RunManager.Instance.runState.playerLevel;
 
         // HUDs
         playerHUD.SetHUD(_playerUnit);

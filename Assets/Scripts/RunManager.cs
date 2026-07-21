@@ -10,19 +10,15 @@ public class RunManager : MonoBehaviour
 {
     public static RunManager Instance { get; private set; }
 
-    /// <summary>
-    /// The one run state shared by every scene this run.
-    /// </summary>
+    // The one run state shared by every scene this run
     public PlayerRunState runState = new PlayerRunState();
 
-    /// <summary>
-    /// The enemy/boss prefab the next battle scene should spawn.
-    /// </summary>
+    // The enemy/boss prefab the next battle scene should spawn
     public GameObject pendingEncounterPrefab;
 
-    /// <summary>
-    /// The scene to return to after a battle (the dungeon/next level).
-    /// </summary>
+    public GameObject pendingRoomPrefab;
+
+    // The scene to return to after a battle (the dungeon/next level)
     public string returnSceneName;
 
     private void Awake()
@@ -65,9 +61,10 @@ public class RunManager : MonoBehaviour
     /// <param name="encounterPrefab">The enemy/boss prefab to fight.</param>
     /// <param name="battleSceneName">The battle scene to load.</param>
     /// <param name="returnScene">Scene to come back to after winning.</param>
-    public void LoadBattle(GameObject encounterPrefab, string battleSceneName, string returnScene)
+    public void LoadBattle(GameObject encounterPrefab, GameObject roomPrefab, string battleSceneName, string returnScene)
     {
         pendingEncounterPrefab = encounterPrefab;
+        pendingRoomPrefab = roomPrefab;
         returnSceneName = returnScene;
 
         if (SceneLoader.Instance != null)

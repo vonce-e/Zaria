@@ -13,6 +13,7 @@ public class BossRoomTrigger : MonoBehaviour
 
     [Tooltip("Name of the dungeon scene to return to after winning.")]
     public string returnSceneName;
+    public GameObject roomPrefab;   // boss room model
 
     public void TeleportPlayer()
     {
@@ -21,6 +22,7 @@ public class BossRoomTrigger : MonoBehaviour
             Debug.LogWarning("BossRoomTrigger : no RunManager.");
             return;
         }
-        RunManager.Instance.LoadBattle(bossPrefab, battleSceneName, returnSceneName);
+
+        RunManager.Instance.LoadBattle(bossPrefab, roomPrefab, battleSceneName, returnSceneName);
     }
 }
