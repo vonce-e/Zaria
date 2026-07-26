@@ -6,6 +6,7 @@ using UnityEngine;
 public class RoomTypeSpawnRule
 {
     public RoomType roomType;
+    public InternalRoomSettings internalRoomSettings = new InternalRoomSettings();
     
     [Header("Define Room Size")]
     public int minRoomSize;
@@ -18,4 +19,22 @@ public class RoomTypeSpawnRule
     
     [Range(0, 100)] public int mediumThreshold;
     [Range(0, 100)] public int highThreshold;
+}
+
+[System.Serializable]
+public class InternalRoomSettings
+{
+    public bool enabled;
+
+    [Range(0,100)]
+    public int generationChance = 100;
+
+    [Min(2)]
+    public int minimumSectionWidth = 3;
+
+    [Min(2)]
+    public int minimumSectionHeight = 3;
+
+    [Min(1)]
+    public int doorwayWidth = 2;
 }
