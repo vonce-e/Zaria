@@ -1046,7 +1046,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     }
 
     /// <summary>
-    /// This method will find which rooms are responsible to add in inner rooms
+    /// This method will add inner rooms into rooms that have inner room generation enabled
     /// </summary>
     private void CreateInternalRoomSections(List<DungeonRoomData> generatedRooms)
     {
@@ -1128,53 +1128,123 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
          InternalRoomSettings settings = spawnRule.internalRoomSettings;
 
          // Checks to see if the room width & height is wide enough to cut into sections
-         bool canSplitVertically = 
+         bool fitsVerticalSplit = 
          roomWidth >= settings.minimumSectionWidth * 2 && 
          roomHeight >= settings.minimumSectionHeight &&
          roomHeight >= settings.doorwayWidth + 2;
          
-         bool canSplitHorizontally = 
+         bool fitsHorizontalSplit = 
          roomHeight >= settings.minimumSectionHeight * 2 && 
          roomWidth >= settings.minimumSectionWidth &&
          roomWidth >= settings.doorwayWidth + 2;
 
+         List<int> validVerticalSplits = new List<int>();
+         List<int> validHorizontalSplits = new List<int>();
+
+         if (fitsVerticalSplit)
+         {
+            int minSplitX = minX + settings.minimumSectionWidth;
+            int maxSplitX = maxX - settings.minimumSectionWidth + 1;
+
+            for (int possibleSplitX = minSplitX; possibleSplitX <= maxSplitX; possibleSplitX++)
+            {
+               int possibleWallX = possibleSplitX - 1;
+               bool blocksEntrance = false;
+
+               foreach (EntranceRoomData entrance in room.EntranceTiles)
+               {
+                  bool entranceIsTopOrBottom = 
+                  entrance.Direction == Vector2Int.up ||
+                  entrance.Direction == Vector2Int.down;
+
+                  bool dividerTouchesEntrance = 
+                  entrance.Tile.x == possibleWallX ||
+                  entrance.Tile.x == possibleSplitX;
+
+                  if (entranceIsTopOrBottom && dividerTouchesEntrance)
+                  {
+                     blocksEntrance = true;
+                     break;
+                  }
+               }
+
+               if (blocksEntrance == false)
+               {
+                  validVerticalSplits.Add(possibleSplitX);
+               }
+            }
+         }
+
+         if (fitsHorizontalSplit)
+         {
+             // Defines the range of the right section of the room
+            int minSplitY = minY + settings.minimumSectionHeight;
+            int maxSplitY = maxY - settings.minimumSectionHeight + 1;
+
+            for (int possibleSplitY = minSplitY; 
+            possibleSplitY <= maxSplitY; 
+            possibleSplitY++)
+            {
+               int possibleWallY = possibleSplitY - 1;
+               bool blocksEntrance = false;
+
+               foreach (EntranceRoomData entrance in room.EntranceTiles)
+               {
+                  bool entranceIsRightOrLeft = 
+                  entrance.Direction == Vector2Int.left ||
+                  entrance.Direction == Vector2Int.right;
+
+                  bool dividerTouchesEntrance = 
+                  entrance.Tile.y == possibleWallY ||
+                  entrance.Tile.y == possibleSplitY;
+
+                  if (entranceIsRightOrLeft && dividerTouchesEntrance)
+                  {
+                     blocksEntrance = true;
+                     break;
+                  }
+               }
+
+               if (blocksEntrance == false)
+               {
+                  validHorizontalSplits.Add(possibleSplitY);
+               }
+            }
+         }
+         
+         bool canVerticallySplit = validVerticalSplits.Count > 0;
+         bool canHorizontallySplit = validHorizontalSplits.Count > 0;
+
          // If can't split vertically or horizontally skip the room
-         if (!canSplitHorizontally && !canSplitVertically)
+         if (!canVerticallySplit && !canHorizontallySplit)
          {
             continue;
          }
 
          // This methods determine whether to split it vertically or horizontally
-         bool splitVertically = false;
+         bool splitVertically;
 
-         if (canSplitHorizontally && canSplitVertically)
+         if (canVerticallySplit && canHorizontallySplit)
          {
             splitVertically = Random.value < 0.5f;
          }
-         // See which direction is possible if only one is possible
-         else if (canSplitVertically)
-         {
-            splitVertically = true;
-         }
          else
          {
-            splitVertically = false;
+            splitVertically = canVerticallySplit;
          }
 
          // Holds the tile information of both sections after the cut 
          RoomSectionData roomSectionA = new RoomSectionData();
          RoomSectionData roomSectionB = new RoomSectionData();
 
-         
+         // <----- CUTS THE ROOM VERTICALLY ----->
          if (splitVertically)
          {
-            // Defines the range of the right section of the room
-            int minSplitX = minX + settings.minimumSectionWidth;
-            int maxSplitX = maxX - settings.minimumSectionWidth + 1;
+            // Select a random split 
+            int randomSplitIndex = Random.Range(0, validVerticalSplits.Count);
+            int splitX = validVerticalSplits[randomSplitIndex];
 
-            // Chooses where the split will begin
-            int splitX = Random.Range(minSplitX, maxSplitX + 1);
-
+            // Group the tiles that are in Section A of the room ( Left ) and Section B of the room ( Right )
             foreach (Vector2Int tile in room.FloorTiles)
             {
                if (tile.x < splitX)
@@ -1193,23 +1263,47 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
             // Door position & direction
             int minDoorY = minY + 1;
-            int maxDoorStartY = maxY - settings.minimumSectionWidth;
+            int maxDoorStartY = maxY - settings.doorwayWidth;
             int doorStartY = Random.Range(minDoorY, maxDoorStartY+1);
 
             InnerDoorWayData doorway = new InnerDoorWayData();
             doorway.Direction = wallDirection;
+
+            // Checks if its a wall or a doorway gap
+            for (int y = minY; y <= maxY; y++)
+            {
+               Vector2Int wallTile = new Vector2Int(wallX, y);
+
+               bool isDoorwayTile = 
+               y >= doorStartY && 
+               y < doorStartY + settings.doorwayWidth;
+
+               if (isDoorwayTile)
+               {
+                  // Adds doorway tile to the doorway data tiles
+                  doorway.Tiles.Add(wallTile);
+
+                  // Stops props from spawning on the doorway section
+                  room.OccupiedTiles.Add(wallTile);
+                  room.OccupiedTiles.Add(wallTile + wallDirection);
+               }
+               else
+               {
+                  room.InnerWalls.Add(new InnerWallData(wallTile, wallDirection));
+               }
+            }
+
+            room.InnerDoors.Add(doorway);
          }
 
-         // Horizontal Cut
+         // <----- CUTS THE ROOM HORIZONTALLY ----->
          else
          {
-            // Defines the range of the right section of the room
-            int minSplitY = minY + settings.minimumSectionHeight;
-            int maxSplitY = maxY - settings.minimumSectionHeight + 1;
+            // Select a random split from the list of available ones
+            int randomSplitIndex = Random.Range(0, validHorizontalSplits.Count);
+            int splitY = validHorizontalSplits[randomSplitIndex];
 
-            // Chooses where the split will begin
-            int splitY = Random.Range(minSplitY, maxSplitY + 1);
-
+            // Group the tiles that are in Section A of the room ( bottom ) and Section B of the room ( up )
             foreach (Vector2Int tile in room.FloorTiles)
             {
                if (tile.y < splitY)
@@ -1221,19 +1315,67 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
                   roomSectionB.FloorTiles.Add(tile);
                }
             }
+
+             // Calculate the wall position & direction
+            int wallY = splitY - 1;
+            Vector2Int wallDirection = Vector2Int.up;
+
+            // Door position & direction
+            int minDoorX = minX + 1;
+            int maxDoorStartX = maxX - settings.doorwayWidth;
+            int doorStartX = Random.Range(minDoorX, maxDoorStartX+1);
+
+            InnerDoorWayData doorway = new InnerDoorWayData();
+            doorway.Direction = wallDirection;
+
+            // Checks if its a wall or a doorway gap
+            for (int x = minX; x <= maxX; x++)
+            {
+               Vector2Int wallTile = new Vector2Int(x, wallY);
+
+               bool isDoorwayTile = 
+               x >= doorStartX && 
+               x < doorStartX + settings.doorwayWidth;
+
+               if (isDoorwayTile)
+               {
+                  // Adds doorway tile to the doorway data tiles
+                  doorway.Tiles.Add(wallTile);
+
+                  // Stops props from spawning on the doorway section
+                  room.OccupiedTiles.Add(wallTile);
+                  room.OccupiedTiles.Add(wallTile + wallDirection);
+               }
+               else
+               {
+                  room.InnerWalls.Add(new InnerWallData(wallTile, wallDirection));
+               }
+            }
+
+            room.InnerDoors.Add(doorway);
          }
 
+         // Adds the tiles to the room section data for room A ( Left if vertical / Down if horizontal )
+         // And adds the tiles to the room section data for room B ( Right if vertical / Up if horizontal )
          room.RoomSections.Add(roomSectionA);
          room.RoomSections.Add(roomSectionB);
 
-
          Debug.Log(
-            room.TypeOfRoom +
-            " | Parent: " + room.FloorTiles.Count +
-            " | Section A: " + roomSectionA.FloorTiles.Count +
-            " | Section B: " + roomSectionB.FloorTiles.Count +
-            " | Split: " + (splitVertically ? "Vertical" : "Horizontal")
+            "Safe vertical splits: " + validVerticalSplits.Count +
+            " | Safe horizontal splits: " + validHorizontalSplits.Count +
+            " | Chosen: " + (splitVertically ? "Vertical" : "Horizontal")
          );
+
+         // Debug.Log(
+         //    room.TypeOfRoom +
+         //    " | Parent: " + room.FloorTiles.Count +
+         //    " | Section A: " + roomSectionA.FloorTiles.Count +
+         //    " | Section B: " + roomSectionB.FloorTiles.Count +
+         //    " | Split: " + (splitVertically ? "Vertical" : "Horizontal") +
+         //    " | Walls: " + room.InnerWalls.Count +
+         //    " | Doors: " + room.InnerDoors.Count +
+         //    " | Door width: " + room.InnerDoors[0].Tiles.Count
+         // );
       }
     }
 

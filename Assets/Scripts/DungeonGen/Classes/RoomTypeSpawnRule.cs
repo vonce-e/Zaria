@@ -1,5 +1,6 @@
 // This will determine the probability for certain rooms to spawn, with minimum and max counts.
 // Made by andrew
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -37,4 +38,9 @@ public class InternalRoomSettings
 
     [Min(1)]
     public int doorwayWidth = 2;
+
+    public List<GameObject> passagePrefabs;
+
+    [Range(0,100)]
+    public int passgeGenerationChance = 0;
 }

@@ -116,6 +116,44 @@ public class Dungeon3DVisualiser : MonoBehaviour
                     roomTiles.Add(floorPosition);
                 }   
             }
+
+            foreach (InnerWallData innerWall in room.InnerWalls)
+            {
+                GameObject innerWallPrefab = wallPrefab;
+
+                if (selectedVisualRule != null)
+                {
+                    innerWallPrefab = GetRandomPrefabWeight(selectedVisualRule.wallPrefabs, wallPrefab);
+                }
+
+                if (innerWallPrefab == null)
+                {
+                    continue;
+                }
+
+                Vector3 wallPos = GridToWorldPosition(innerWall.Tile) +
+                new Vector3(innerWall.Direction.x, 0f, innerWall.Direction.y) *
+                wallDistanceFromFloorCenter * cellSize;
+
+                float wallRotation = 0f;
+
+                if (innerWall.Direction == Vector2Int.right)
+                {
+                    wallRotation = 90f;
+                }
+                else if (innerWall.Direction == Vector2Int.down)
+                {
+                    wallRotation = 180f;
+                }
+
+                else if (innerWall.Direction == Vector2Int.left)
+                {
+                    wallRotation = 270f;
+                }
+
+                Quaternion rotation = Quaternion.Euler(0f, wallRotation, 0f);
+                Instantiate(innerWallPrefab, wallPos, rotation, GetDungeonParent());
+            }
         }
 
         foreach (Vector2Int position in floorPositions)
