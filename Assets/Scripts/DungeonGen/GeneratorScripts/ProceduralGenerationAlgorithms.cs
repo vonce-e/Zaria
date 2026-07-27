@@ -1,8 +1,14 @@
+// Provides reusable random walk, corridor, direction, and binary space partitioning algorithms.
+// Written by Andrew Burke.
+
 using UnityEngine;
 using System.Collections.Generic;
 
 public static class ProceduralGenerationAlgorithms
 {
+    /// <summary>
+    /// Creates a path by repeatedly moving from the previous position in a random cardinal direction.
+    /// </summary>
     public static HashSet<Vector2Int> SimpleRandomWalk(Vector2Int startPosition, int walkLength)
     {
         HashSet<Vector2Int> path = new HashSet<Vector2Int>();
@@ -19,6 +25,9 @@ public static class ProceduralGenerationAlgorithms
         return path;
     }
 
+    /// <summary>
+    /// Creates a straight corridor from a start position in one randomly selected cardinal direction.
+    /// </summary>
     public static List<Vector2Int> RandomWalkCorridor(Vector2Int startPosition, int corridorLength)
     {
         List<Vector2Int> corridor = new List<Vector2Int>();
@@ -34,6 +43,9 @@ public static class ProceduralGenerationAlgorithms
         return corridor;
     }
 
+    /// <summary>
+    /// Recursively divides a bounded space into rooms that satisfy the configured minimum dimensions.
+    /// </summary>
     public static List<BoundsInt> BinarySpacePartitioning(BoundsInt spaceToSplit, int minWidth, int minHeight)
     {
         Queue<BoundsInt> roomsQueue = new Queue<BoundsInt>();
@@ -89,6 +101,9 @@ public static class ProceduralGenerationAlgorithms
         return roomsList;
     }
 
+    /// <summary>
+    /// Splits a room along the X axis and queues both resulting bounds for further processing.
+    /// </summary>
     private static void SplitVertically(int minWidth, Queue<BoundsInt> roomsQueue, BoundsInt room)
     {
         // Starts the room 1 unit from the min point from the border, with the room's x value
@@ -104,6 +119,9 @@ public static class ProceduralGenerationAlgorithms
         roomsQueue.Enqueue(room2);
     }
 
+    /// <summary>
+    /// Splits a room along the Y axis and queues both resulting bounds for further processing.
+    /// </summary>
     private static void SplitHorizontally(int minHeight, Queue<BoundsInt> roomsQueue, BoundsInt room)
     {
         // Starts the room from 1 unit from the min point from the border, with the room's y value
@@ -131,6 +149,9 @@ public static class Direction2D
         new Vector2Int(-1, 0) // LEFT
     };
 
+    /// <summary>
+    /// Returns one randomly selected cardinal direction.
+    /// </summary>
     public static Vector2Int GetRandomCardinalDirection()
     {
         return CardinalDirectionsList[Random.Range(0, CardinalDirectionsList.Count)];

@@ -1,6 +1,12 @@
+// Defines a prop prefab and the probability thresholds that control its spawn amount.
+// Written by Andrew Burke.
+
 using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// Defines a prop prefab and the probability thresholds that determine how many instances spawn.
+/// </summary>
 [System.Serializable]
 public class PropSpawnRule
 {

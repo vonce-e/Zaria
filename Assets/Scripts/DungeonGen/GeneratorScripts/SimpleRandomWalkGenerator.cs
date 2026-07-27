@@ -1,3 +1,6 @@
+// Generates dungeon floor positions by combining repeated simple random walks.
+// Written by Andrew Burke.
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -5,7 +8,10 @@ using UnityEngine;
 public class SimpleRandomWalkGenerator : AbstractDungeonGenerator
 {
     [SerializeField] protected SimpleRandomWalkData randomWalkParameters;
-    
+
+    /// <summary>
+    /// Generates floor positions with the configured random walk and sends them to the visualiser.
+    /// </summary>
     protected override void RunProceduralGeneration()
     {
         // Iterate through how many positions to walk over to generate the map tiles
@@ -21,6 +27,9 @@ public class SimpleRandomWalkGenerator : AbstractDungeonGenerator
         visualiser.CreateFloorTiles(floorPositions);
     }
 
+    /// <summary>
+    /// Combines repeated simple random walks into one set of unique floor positions.
+    /// </summary>
     protected HashSet<Vector2Int> RunRandomWalk(SimpleRandomWalkData parameters, Vector2Int position)
     {
         var currentPosition = position;

@@ -1,8 +1,12 @@
-// This will determine the probability for certain rooms to spawn, with minimum and max counts.
-// Made by andrew
+// Defines room type size, quantity, probability, and internal-section generation settings.
+// Written by Andrew Burke.
+
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Configures the size, quantity, probability, and internal-room settings for a room type.
+/// </summary>
 [System.Serializable]
 public class RoomTypeSpawnRule
 {
@@ -22,6 +26,9 @@ public class RoomTypeSpawnRule
     [Range(0, 100)] public int highThreshold;
 }
 
+/// <summary>
+/// Configures whether and how a generated room can be divided into internal sections.
+/// </summary>
 [System.Serializable]
 public class InternalRoomSettings
 {

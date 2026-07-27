@@ -1,8 +1,11 @@
-using UnityEngine;
-// This class is to allow the user to determine how common a prefab like wall or floor should spawn
-// in the visualisation of the dungeon
-// Made by andrew
+// Associates a dungeon visual prefab with the weight used when selecting a variation.
+// Written by Andrew Burke.
 
+using UnityEngine;
+
+/// <summary>
+/// Associates a visual prefab with its weighted chance of being selected.
+/// </summary>
 [System.Serializable]
 public class RoomVisualisationPrefabWeight
 {

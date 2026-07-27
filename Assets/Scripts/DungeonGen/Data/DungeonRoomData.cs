@@ -1,5 +1,5 @@
-// This class defines what information a generated room contains
-// Made by andrew
+// Stores the boundaries, tile categories, entrances, and internal sections of a generated room.
+// Written by Andrew Burke.
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -37,6 +37,9 @@ public class EntranceRoomData
     public Vector2Int Tile;
     public Vector2Int Direction;
 
+    /// <summary>
+    /// Creates entrance data for a room tile and the direction leading into its corridor.
+    /// </summary>
     public EntranceRoomData(Vector2Int tile, Vector2Int direction)
     {
         Tile = tile;
@@ -62,6 +65,9 @@ public class InnerWallData
     public Vector2Int Tile;
     public Vector2Int Direction;
 
+    /// <summary>
+    /// Creates internal wall data from a supporting floor tile and the direction the wall faces.
+    /// </summary>
     public InnerWallData(Vector2Int tile, Vector2Int direction)
     {
         Tile = tile;

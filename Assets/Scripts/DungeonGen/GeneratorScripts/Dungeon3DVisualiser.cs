@@ -1,3 +1,6 @@
+// Converts generated dungeon tile data into floor, wall, ceiling, and internal-wall GameObjects.
+// Written by Andrew Burke.
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,7 +31,9 @@ public class Dungeon3DVisualiser : MonoBehaviour
         PaintCeilingTiles(floorPositionSet);
     }
 
-    // Room aware create tile method
+    /// <summary>
+    /// Creates room-aware floors, corridor floors, walls, internal walls, and ceilings.
+    /// </summary>
     public void CreateTiles(IEnumerable<Vector2Int> floorPositions, List<DungeonRoomData> generatedRooms)  
     {
         HashSet<Vector2Int> floorPositionSet = new HashSet<Vector2Int>(floorPositions);
@@ -80,6 +85,9 @@ public class Dungeon3DVisualiser : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Paints exterior and internal walls with visual variations selected for each room type.
+    /// </summary>
     private void PaintWallTilesNew(HashSet<Vector2Int> floorPositions, List<DungeonRoomData> generatedRooms)
     {
        if(IsMissingFloorOrRoomData(floorPositions, generatedRooms))
@@ -170,6 +178,9 @@ public class Dungeon3DVisualiser : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Paints floor tiles that belong to corridors rather than generated rooms.
+    /// </summary>
     private void PaintCorridorTiles(HashSet<Vector2Int> floorPositions, List<DungeonRoomData> generatedRooms)
     {
         if(IsMissingFloorOrRoomData(floorPositions, generatedRooms))
@@ -214,6 +225,9 @@ public class Dungeon3DVisualiser : MonoBehaviour
     return false;
 }
 
+    /// <summary>
+    /// Selects a valid prefab using the configured weights or returns the fallback prefab.
+    /// </summary>
     private GameObject GetRandomPrefabWeight(List<RoomVisualisationPrefabWeight> prefabRules, GameObject fallBackPrefab)
     {
        if (prefabRules == null || prefabRules.Count == 0)
@@ -317,6 +331,9 @@ public class Dungeon3DVisualiser : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Creates an exterior wall when the neighbouring position in the requested direction has no floor.
+    /// </summary>
     private void TryCreateWall(GameObject wallPrefab,HashSet<Vector2Int> floorPositions, Vector2Int floorPosition, Vector2Int direction, float yRotation)
     {
         if(wallPrefab == null)
@@ -338,16 +355,25 @@ public class Dungeon3DVisualiser : MonoBehaviour
     #endregion
 
     #region Helper Methods
+    /// <summary>
+    /// Converts a dungeon grid coordinate into its corresponding world-space position.
+    /// </summary>
     private Vector3 GridToWorldPosition(Vector2Int gridPosition)
     {
         return new Vector3(gridPosition.x * cellSize, 0f, gridPosition.y * cellSize);
     }
 
+    /// <summary>
+    /// Returns the configured dungeon parent or this visualiser's transform as a fallback.
+    /// </summary>
     private Transform GetDungeonParent()
     {
         return dungeonParent == null ? transform : dungeonParent;
     }
 
+    /// <summary>
+    /// Removes all previously generated visual objects from the dungeon parent.
+    /// </summary>
     public void Clear()
     {
         Transform parent = GetDungeonParent();

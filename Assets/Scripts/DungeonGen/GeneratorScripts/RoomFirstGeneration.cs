@@ -1,5 +1,5 @@
-// This script was made to generate the rooms using ProceduralGenerationAlgorithm.cs to use binary space partionining to split the rooms
-// Made by Andrew
+// Generates a room-first dungeon with BSP rooms, corridors, room types, internal sections, doors, and props.
+// Written by Andrew Burke.
 
 using System;
 using System.Collections.Generic;
@@ -60,16 +60,25 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     [SerializeField]
     private GameObject player;
 
+    /// <summary>
+    /// Generates a dungeon automatically when the scene starts.
+    /// </summary>
     private void Start()
     {
         GenerateDungeon();
     }
 
+    /// <summary>
+    /// Runs the room-first generation pipeline.
+    /// </summary>
     protected override void RunProceduralGeneration()
     {
         CreateRooms();
     }
 
+    /// <summary>
+    /// Generates and validates rooms, connects them with corridors, visualises the dungeon, and spawns its contents.
+    /// </summary>
     private void CreateRooms()
     {
 
@@ -150,6 +159,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         SpawnCorridorProps(corridors, floor, generatedRooms);
     }
 
+    /// <summary>
+    /// Moves the player to the centre of the generated spawn room and reserves that tile.
+    /// </summary>
     private void PlayerSpawn(List<DungeonRoomData> roomData)
     {
         DungeonRoomData spawnRoom = null;
@@ -262,6 +274,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         }
     }
 
+    /// <summary>
+    /// Filters corridor-only tiles and spawns corridor props without placing them inside rooms.
+    /// </summary>
     private void SpawnCorridorProps(HashSet<Vector2Int> corridor, HashSet<Vector2Int> floor, List<DungeonRoomData> roomData)
     {
         List<Vector2Int> validCorridorTiles = new List<Vector2Int>();
@@ -295,6 +310,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         SpawnPropCategoryInCorridor(corridorPropRule.wallMountedProps, validCorridorTiles, occupiedCorridorTiles, floorTiles, wallPropHeight);
     }
 
+    /// <summary>
+    /// Spawns floor props on available tiles while respecting configured amounts and occupied-tile spacing.
+    /// </summary>
     private void SpawnPropCategoryOnTile(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
        DungeonRoomData roomData, float spawnHeight)
     {
@@ -350,6 +368,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         }
     }
 
+    /// <summary>
+    /// Spawns floor props near room walls and rotates them to face the detected wall direction.
+    /// </summary>
     private void SpawnPropCategoryNearWall(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
        DungeonRoomData roomData, float spawnHeight)
     {
@@ -409,6 +430,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         }
     }
 
+    /// <summary>
+    /// Spawns wall-mounted props with the position offset and rotation of the nearest wall.
+    /// </summary>
     private void SpawnPropCategoryOnWall(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
        DungeonRoomData roomData, float spawnHeight)
     {
@@ -471,6 +495,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         }
     }
 
+    /// <summary>
+    /// Spawns ceiling props on available tiles, prioritising positions nearest the room centre.
+    /// </summary>
     private void SpawnCategoryOnCeiling(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
        DungeonRoomData roomData, float spawnHeight)
     {
@@ -533,6 +560,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         }
     }
 
+    /// <summary>
+    /// Spawns wall-mounted props along corridor tiles while enforcing corridor-specific spacing.
+    /// </summary>
     private void SpawnPropCategoryInCorridor(PropCategorySpawnRule spawnRule, List<Vector2Int> validTiles,
        HashSet<Vector2Int> occupiedTiles, HashSet<Vector2Int> floorTiles, float spawnHeight)
     {
@@ -602,6 +632,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     }
 
 
+    /// <summary>
+    /// Calculates a prop count from the rule's low, medium, and high probability thresholds.
+    /// </summary>
     private int PropsToSpawn(PropSpawnRule spawnRule)
     {
         int propChance = Random.Range(0, 100);
@@ -623,6 +656,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return propAmount;
     }
 
+    /// <summary>
+    /// Attempts to spawn doorway prefabs at the entrances of every generated room.
+    /// </summary>
     private void SpawnDoors(List<DungeonRoomData> generatedRooms)
     {
         foreach (DungeonRoomData roomData in generatedRooms)
@@ -631,6 +667,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         }
     }
 
+    /// <summary>
+    /// Spawns the boss portal at the boss room's centre and reserves its floor tile.
+    /// </summary>
     private void SpawnBossPortal(List<DungeonRoomData> roomData)
     {
         if (bossPortalPrefab == null)
@@ -652,6 +691,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         bossRoom.OccupiedTiles.Add(portalTile);
     }
 
+    /// <summary>
+    /// Groups valid entrance tiles and spawns a correctly positioned and rotated door for each usable group.
+    /// </summary>
     private void TrySpawnDoorPrefab(DungeonRoomData roomData, GameObject prefab)
     {
         if (prefab == null)
@@ -743,6 +785,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return validTiles;
     }
 
+    /// <summary>
+    /// Filters valid prop tiles according to the selected room layout and its minimum spacing.
+    /// </summary>
     private List<Vector2Int> LayoutOptionDecider(DungeonRoomData roomData, RoomLayoutPattern layoutOption, List<Vector2Int> validTiles)
     {
         List<Vector2Int> layoutTileCandidates = new List<Vector2Int>();
@@ -814,6 +859,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return selectedTiles;
     }
 
+    /// <summary>
+    /// Returns the cardinal direction of the first missing floor neighbour around a tile.
+    /// </summary>
     private Vector2Int GetWallDirection(HashSet<Vector2Int> floorTiles, Vector2Int tile)
     {
         if (!floorTiles.Contains(tile + Vector2Int.up))
@@ -838,6 +886,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return Vector2Int.zero;
     }
 
+    /// <summary>
+    /// Converts a cardinal wall direction into the corresponding prefab rotation.
+    /// </summary>
     private Quaternion GetWallRotation(Vector2Int tileRotation)
     {
         if (tileRotation == Vector2Int.up)
@@ -883,6 +934,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return Vector2Int.zero;
     }
 
+    /// <summary>
+    /// Groups adjacent entrance tiles that face the same direction into individual doorway openings.
+    /// </summary>
     private List<List<EntranceRoomData>> GroupEntranceTiles(List<EntranceRoomData> entranceTiles)
     {
         List<List<EntranceRoomData>> entranceGroup = new List<List<EntranceRoomData>>();
@@ -925,6 +979,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return entranceGroup;
     }
 
+    /// <summary>
+    /// Checks whether two entrance tiles sit beside one another along the doorway width direction.
+    /// </summary>
     private bool AreEntranceTilesBesideEachother(EntranceRoomData firstEntranceTile, EntranceRoomData tileToCheck)
     {
         Vector2Int sideDirection = GetSideDirection(firstEntranceTile.Direction);
@@ -944,6 +1001,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return false;
     }
 
+    /// <summary>
+    /// Calculates the centred world-space position of a grouped doorway opening.
+    /// </summary>
     private Vector3 GetGroupDoorPosition(List<EntranceRoomData> entranceGroup)
     {
         Vector2 entrancePosition = Vector2.zero;
@@ -988,11 +1048,17 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     }
 
     // <--------- Boss room Tile checking & Veil spawning Methods --------->
+    /// <summary>
+    /// Returns the centre tile used to position the boss portal.
+    /// </summary>
     private Vector2Int BossRoomCenter(DungeonRoomData bossRoom)
     {
         return bossRoom.CenterPoint;
     }
 
+    /// <summary>
+    /// Finds and returns the generated room assigned the boss room type.
+    /// </summary>
     private DungeonRoomData GetBossRooms(List<DungeonRoomData> bossRoom)
     {
         if (bossRoom == null)
@@ -1598,6 +1664,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         }
     }
 
+    /// <summary>
+    /// Records a room entrance when the neighbouring tile is a corridor outside the room floor.
+    /// </summary>
     private void CheckForEntranceDirection(DungeonRoomData roomData, HashSet<Vector2Int> corridors, Vector2Int tile, Vector2Int direction)
     {
         // Points to the corresponding tile
@@ -1612,6 +1681,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         }
     }
 
+    /// <summary>
+    /// Returns room entrances whose floor tiles have not already been occupied.
+    /// </summary>
     private List<EntranceRoomData> AnalyzeDoorCandidateTiles(DungeonRoomData roomData)
     {
         List<EntranceRoomData> candidateDoorTiles = new List<EntranceRoomData>();
@@ -1722,6 +1794,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     #endregion
 
     #region Create Room Functions
+    /// <summary>
+    /// Creates random-walk room floors constrained to their assigned BSP bounds.
+    /// </summary>
     private HashSet<Vector2Int> CreateRoomsRandomly(List<BoundsInt> roomsList)
     {
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
@@ -1743,6 +1818,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return floor;
     }
 
+    /// <summary>
+    /// Connects room centres sequentially to their nearest remaining centre with widened corridors.
+    /// </summary>
     private HashSet<Vector2Int> ConnectRooms(List<Vector2Int> roomCenters)
     {
         HashSet<Vector2Int> corridors = new HashSet<Vector2Int>();
@@ -1764,6 +1842,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return corridors;
     }
 
+    /// <summary>
+    /// Creates an L-shaped corridor from one room centre to another and applies the configured width.
+    /// </summary>
     private HashSet<Vector2Int> CreateCorridor(Vector2Int currentRoomCenter, Vector2Int destination)
     {
         List<Vector2Int> corridor = new List<Vector2Int>();
@@ -1837,6 +1918,9 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         return wideCorridor;
     }
 
+    /// <summary>
+    /// Adds tiles perpendicular to a corridor position until the configured corridor width is reached.
+    /// </summary>
     private void AddWidth(HashSet<Vector2Int> wideCorridor, Vector2Int position, Vector2Int direction)
     {
         Vector2Int perpendicularDirection = new Vector2Int(-direction.y, direction.x);
