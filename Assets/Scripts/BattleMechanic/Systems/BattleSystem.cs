@@ -127,6 +127,11 @@ public class BattleSystem : MonoBehaviour
         if (won)
         {
             state = BattleState.WON;
+
+            // If this was a boss, advance to the next map's depth.
+            if (RunManager.Instance != null && RunManager.Instance.pendingIsBoss)
+                RunManager.Instance.AdvanceDepth();
+
             StartCoroutine(WinThenLeave());
         }
         else

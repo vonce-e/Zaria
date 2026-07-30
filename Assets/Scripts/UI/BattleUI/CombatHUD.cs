@@ -57,7 +57,7 @@ public class CombatHUD : MonoBehaviour
     private void HandleEnergyChanged(int newEnergy)
     {
         if (energyText != null)
-            energyText.text = $"Energy: {newEnergy}/{combatManager.energyPerTurn}";
+            energyText.text = $"{newEnergy}/{combatManager.energyPerTurn}";
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class CombatHUD : MonoBehaviour
     private void HandleDiceRolled(int newValue)
     {
         if (diceText != null)
-            diceText.text = newValue > 0 ? $"Dice: {newValue}" : "Dice: -";
+            diceText.text = newValue > 0 ? $"{newValue}" : "-";
     }
 
     /// <summary>

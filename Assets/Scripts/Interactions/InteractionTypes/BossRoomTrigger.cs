@@ -3,17 +3,22 @@
 
 using UnityEngine;
 
+/// <summary>
+/// Starts a boss battle.
+/// </summary>
 public class BossRoomTrigger : MonoBehaviour
 {
-    [Tooltip("The boss prefab to fight.")]
-    public GameObject bossPrefab;
+    [Tooltip("The shared pool of enemy/boss prefabs.")]
+    public EnemyPool enemyPool;
+
+    [Tooltip("The boss room geometry (fill once room prefabs exist).")]
+    public GameObject roomPrefab;   // boss room model
 
     [Tooltip("Name of the battle scene to load.")]
     public string battleSceneName = "BattleScene";
 
     [Tooltip("Name of the dungeon scene to return to after winning.")]
     public string returnSceneName;
-    public GameObject roomPrefab;   // boss room model
 
     public void TeleportPlayer()
     {
@@ -23,6 +28,17 @@ public class BossRoomTrigger : MonoBehaviour
             return;
         }
 
-        RunManager.Instance.LoadBattle(bossPrefab, roomPrefab, battleSceneName, returnSceneName);
+        if (enemyPool == null)
+        {
+            Debug.LogWarning("BossRoomTrigger : no EnemyPool assigned.");
+            return;
+        }
+
+        // Pick a random boss for the current depth.
+        int depth = RunManager.Instance.currentDepth;
+        GameObject boss = enemyPool.GetRandomBoss(depth);
+        if (boss == null) return;
+
+        RunManager.Instance.LoadBattle(boss, roomPrefab, battleSceneName, returnSceneName, true);
     }
 }

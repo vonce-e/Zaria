@@ -22,16 +22,10 @@ public class ShopInteraction : MonoBehaviour
     /// </summary>
     public void OpenShop()
     {
-        if (shopUI == null)
-        {
-            Debug.LogWarning("ShopInteraction: no ShopUI found in scene.");
-            return;
-        }
-        if (RunManager.Instance == null)
-        {
-            Debug.LogWarning("ShopInteraction: no RunManager - is a run active?");
-            return;
-        }
-        shopUI.Open(RunManager.Instance.runState);
+        ShopUI shopUI = FindObjectOfType<ShopUI>();
+        if (shopUI != null && RunManager.Instance != null)
+            shopUI.Open(RunManager.Instance.runState);
+        else
+            Debug.LogWarning("ShopUI or RunManager not found in scene.");
     }
 }

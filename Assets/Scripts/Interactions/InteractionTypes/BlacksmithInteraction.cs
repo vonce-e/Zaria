@@ -22,16 +22,10 @@ public class BlacksmithInteraction : MonoBehaviour
     /// </summary>
     public void OpenBlacksmith()
     {
-        if (blacksmithUI == null)
-        {
-            Debug.LogWarning("BlacksmithInteraction: no BlacksmithUI found in scene.");
-            return;
-        }
-        if (RunManager.Instance == null)
-        {
-            Debug.LogWarning("BlacksmithInteraction: no RunManager - is a run active?");
-            return;
-        }
-        blacksmithUI.Open(RunManager.Instance.runState);
+        BlacksmithUI blacksmithUI = FindObjectOfType<BlacksmithUI>();
+        if (blacksmithUI != null && RunManager.Instance != null)
+            blacksmithUI.Open(RunManager.Instance.runState);
+        else
+            Debug.LogWarning("BlacksmithUI or RunManager not found in scene.");
     }
 }

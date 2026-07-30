@@ -21,6 +21,12 @@ public class RunManager : MonoBehaviour
     // The scene to return to after a battle (the dungeon/next level)
     public string returnSceneName;
 
+    [Tooltip("How deep into the run (1 = first map). Increments per map.")]
+    public int currentDepth = 1;
+
+    [Tooltip("True if the pending battle is a boss fight (used to advance depth on win).")]
+    public bool pendingIsBoss;
+
     private void Awake()
     {
         // Singleton
@@ -56,16 +62,27 @@ public class RunManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Advance to the next map's depth
+    /// </summary>
+    public void AdvanceDepth()
+    {
+        currentDepth++;
+        Debug.Log($"Advanced to depth {currentDepth}.");
+    }
+
+    /// <summary>
     /// Queue an encounter and load the battle scene.
     /// </summary>
     /// <param name="encounterPrefab">The enemy/boss prefab to fight.</param>
     /// <param name="battleSceneName">The battle scene to load.</param>
     /// <param name="returnScene">Scene to come back to after winning.</param>
-    public void LoadBattle(GameObject encounterPrefab, GameObject roomPrefab, string battleSceneName, string returnScene)
+    public void LoadBattle(GameObject encounterPrefab, GameObject roomPrefab,
+                        string battleSceneName, string returnScene, bool isBoss)
     {
         pendingEncounterPrefab = encounterPrefab;
         pendingRoomPrefab = roomPrefab;
         returnSceneName = returnScene;
+        pendingIsBoss = isBoss;          // <-- new
 
         if (SceneLoader.Instance != null)
             SceneLoader.Instance.ChangeScene(battleSceneName);

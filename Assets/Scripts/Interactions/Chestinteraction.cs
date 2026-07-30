@@ -8,11 +8,18 @@ using UnityEngine;
 /// </summary>
 public class ChestInteraction : MonoBehaviour
 {
-    [Header("Loot")]
-    [Tooltip("How many cards the chest gives.")]
-    public int cardCount = 1;
-    [Tooltip("How many coins the chest gives.")]
-    public int coinReward = 30;
+    [Header("Cards (randomized each open)")]
+    [Tooltip("Fewest cards the chest can give.")]
+    public int minCards = 1;
+    [Tooltip("Most cards the chest can give.")]
+    public int maxCards = 3;
+
+    [Header("Coins (scales with depth of run.)")]
+    [Tooltip("Base coins at depth 1.")]
+    public int baseCoins = 30;
+
+    [Tooltip("Extra coins added per depth level.")]
+    public int coinsPerDepth = 15;
 
     private bool _opened = false;
 
@@ -34,10 +41,16 @@ public class ChestInteraction : MonoBehaviour
             return;
         }
 
-        // coins straight to the run
+        // Current depth (1 = first map). Falls back to 1 if not set.
+        int depth = RunManager.Instance.currentDepth;
+        if (depth < 1) depth = 1;
+
+        // Coins scale with depth: base + (depth-1) * perDepth.
+        int coinReward = baseCoins + (depth - 1) * coinsPerDepth;
         RunManager.Instance.runState.coins += coinReward;
 
-        // cards via the existing reward service
+        // Card count is random within the range (inclusive).
+        int cardCount = Random.Range(minCards, maxCards + 1);
         if (CardRewardService.Instance != null)
         {
             for (int i = 0; i < cardCount; i++)
@@ -45,7 +58,7 @@ public class ChestInteraction : MonoBehaviour
         }
 
         _opened = true;
-        Debug.Log($"Chest opened: +{coinReward} coins, +{cardCount} card(s).");
+        Debug.Log($"Chest opened (depth {depth}): +{coinReward} coins, +{cardCount} card(s).");
 
         // empty the chest so it can't be reused
         gameObject.SetActive(false);
