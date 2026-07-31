@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 1558038741049915525}
   m_Layer: 0
   m_Name: ChestAnim
-  m_TagString: Untagged
+  m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -160,8 +160,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ced20da853f2641578a47b0212992486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChestInteraction
-  cardCount: 1
-  coinReward: 30
+  minCards: 1
+  maxCards: 3
+  baseCoins: 30
+  coinsPerDepth: 15
 --- !u!114 &1558038741049915525
 MonoBehaviour:
   m_ObjectHideFlags: 0

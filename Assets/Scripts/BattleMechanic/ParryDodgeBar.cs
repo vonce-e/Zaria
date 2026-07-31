@@ -40,8 +40,16 @@ public class ParryDodgeBar : MonoBehaviour
     [Range(0.05f, 0.9f)] public float dodgeZoneWidth = 0.30f;
     [Range(0.02f, 0.5f)] public float parryZoneWidth = 0.10f;
 
+    [Header("Randomized zone position")]
+    [Tooltip("If on, the zone appears at a random spot each time instead of the centre.")]
+    public bool randomizeZonePosition = true;
+    [Range(0f, 0.4f)] public float maxCentreOffset = 0.25f;
+
     private bool _resolved;
     private ParryDodgeResult _result;
+
+    // Where the zone centre sits this attempt (0-1).
+    private float _zoneCentre = 0.5f;
 
     void Awake()
     {
@@ -65,6 +73,11 @@ public class ParryDodgeBar : MonoBehaviour
     {
         _resolved = false;
         _result = ParryDodgeResult.Hit;  // default if they never press
+
+        if (randomizeZonePosition)
+            _zoneCentre = 0.5f + UnityEngine.Random.Range(-maxCentreOffset, maxCentreOffset);
+        else
+            _zoneCentre = 0.5f;
 
         LayoutZones();
 
@@ -106,7 +119,7 @@ public class ParryDodgeBar : MonoBehaviour
     private ParryDodgeResult EvaluatePress(float markerT)
     {
         // Both zones are centred on the track (0.5). Compare distance.
-        float distFromCentre = Mathf.Abs(markerT - 0.5f);
+        float distFromCentre = Mathf.Abs(markerT - _zoneCentre);
 
         if (distFromCentre <= parryZoneWidth * 0.5f)
             return ParryDodgeResult.Parry;
@@ -122,17 +135,18 @@ public class ParryDodgeBar : MonoBehaviour
     private void LayoutZones()
     {
         float trackWidth = track.rect.width;
+        float centreX = (_zoneCentre - 0.5f) * trackWidth;
 
         if (dodgeZone != null)
         {
             dodgeZone.sizeDelta = new Vector2(trackWidth * dodgeZoneWidth, dodgeZone.sizeDelta.y);
-            dodgeZone.anchoredPosition = new Vector2(0f, dodgeZone.anchoredPosition.y);
+            dodgeZone.anchoredPosition = new Vector2(centreX, dodgeZone.anchoredPosition.y);
         }
 
         if (parryZone != null)
         {
             parryZone.sizeDelta = new Vector2(trackWidth * parryZoneWidth, parryZone.sizeDelta.y);
-            parryZone.anchoredPosition = new Vector2(0f, parryZone.anchoredPosition.y);
+            parryZone.anchoredPosition = new Vector2(centreX, parryZone.anchoredPosition.y);
         }
     }
 }

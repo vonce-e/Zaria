@@ -16,6 +16,14 @@ public class HandDisplay : MonoBehaviour
     public GameObject cardPrefab; // Prefab with CardView on it
     public Transform handRow; // Parent transform for the row
 
+    [Header("Arc Layout")]
+    [Tooltip("Horizontal distance between card centers.")]
+    public float cardSpacing = 120f;
+    [Tooltip("How high the middle of the fan lifts (bigger = more curve).")]
+    public float arcHeight = 40f;
+    [Tooltip("How much each card tilts at the edges of the fan, in degrees.")]
+    public float maxTiltAngle = 8f;
+
     /// <summary>
     /// The player whose energy this display tracks (for greying out unaffordable cards).
     /// </summary>
@@ -82,8 +90,9 @@ public class HandDisplay : MonoBehaviour
             }
             _visible.Remove(card);
         }
-
+ 
         RefreshAffordability();
+        ArrangeArc();
     }
 
     /// <summary>
@@ -138,6 +147,41 @@ public class HandDisplay : MonoBehaviour
             CardData data = pair.Value.CardData;
             bool canAfford = player.energy >= data.energyCost;
             pair.Value.SetInteractable(canAfford);
+        }
+    }
+
+    /// <summary>
+    /// Fans the cards into an arc
+    /// </summary>
+    private void ArrangeArc()
+    {
+        // Get the cards in the order they sit under handRow.
+        int count = handRow.childCount;
+        if (count == 0) return;
+ 
+        // Centers the card fan
+        float middle = (count - 1) / 2f;
+ 
+        for (int i = 0; i < count; i++)
+        {
+            RectTransform card = handRow.GetChild(i) as RectTransform;
+            if (card == null) continue;
+ 
+            // How far this card is from the middle
+            float offset = i - middle;
+ 
+            // Horizontal spread.
+            float x = offset * cardSpacing;
+ 
+            // A simple curve : 1 at center, 0 at the far edges.
+            float t = (middle == 0) ? 0f : offset / middle;
+            float y = arcHeight * (1f - t * t);
+
+            // Tilt : edges rotate outward, middle stays upright.
+            float tilt = -t * maxTiltAngle;
+ 
+            card.anchoredPosition = new Vector2(x, y);
+            card.localRotation = Quaternion.Euler(0f, 0f, tilt);
         }
     }
 }
