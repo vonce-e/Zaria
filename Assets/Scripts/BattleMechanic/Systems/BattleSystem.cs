@@ -128,16 +128,31 @@ public class BattleSystem : MonoBehaviour
         {
             state = BattleState.WON;
 
-            // If this was a boss, advance to the next map's depth.
-            if (RunManager.Instance != null && RunManager.Instance.pendingIsBoss)
+            bool wasBoss = RunManager.Instance != null && RunManager.Instance.pendingIsBoss;
+
+            // If this was a boss, advance depth.
+            if (wasBoss)
                 RunManager.Instance.AdvanceDepth();
 
+            // Award coins for the win, scaled by depth. Bosses pay a bonus.
+            int coinsWon = 0;
+            if (RunManager.Instance != null)
+            {
+                int depth = RunManager.Instance.currentDepth;
+                int baseCoins = wasBoss ? 60 : 20; // bosses worth more
+                int perDepth  = wasBoss ? 25 : 10; // and scale faster
+                coinsWon = baseCoins + (depth - 1) * perDepth;
+                RunManager.Instance.runState.coins += coinsWon;
+            }
+
+            // Show the reward message.
+            if (RewardPopup.Instance != null)
+            {
+                string label = wasBoss ? "Boss defeated!" : "Victory!";
+                RewardPopup.Instance.Show($"{label} +{coinsWon} coins");
+            }
+
             StartCoroutine(WinThenLeave());
-        }
-        else
-        {
-            state = BattleState.LOST;
-            Debug.Log("You lost the battle. (Death loop handles this later.)");
         }
     }
 

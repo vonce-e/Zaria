@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7537200062239543717}
   - component: {fileID: 8961272130371631505}
   - component: {fileID: 3596755908520441967}
+  - component: {fileID: 4946139140884410447}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Untagged
@@ -93,6 +94,21 @@ MonoBehaviour:
   lastPlayerAttackDamage: 0
   combat: {fileID: 0}
   absorbFraction: 0.5
+--- !u!114 &4946139140884410447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5524024946768645980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb8e58bb88dec45de95f654103933b40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitFlash
+  modelRoot: {fileID: 5206501367478331438}
+  flashMaterial: {fileID: 2100000, guid: 40bc58b417bca448dbcfaedf3e70a729, type: 2}
+  flashDuration: 0.1
 --- !u!1001 &5749843375077248965
 PrefabInstance:
   m_ObjectHideFlags: 0

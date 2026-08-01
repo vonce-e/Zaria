@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7537200062239543717}
   - component: {fileID: 8961272130371631505}
   - component: {fileID: -3915371733055153477}
+  - component: {fileID: 3694866721216857286}
   m_Layer: 0
   m_Name: Suppressor
   m_TagString: Untagged
@@ -92,6 +93,21 @@ MonoBehaviour:
   nextAttackMultiplier: 1
   lastPlayerAttackDamage: 0
   combat: {fileID: 0}
+--- !u!114 &3694866721216857286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5524024946768645980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb8e58bb88dec45de95f654103933b40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitFlash
+  modelRoot: {fileID: 8896228140019651142}
+  flashMaterial: {fileID: 2100000, guid: 40bc58b417bca448dbcfaedf3e70a729, type: 2}
+  flashDuration: 0.1
 --- !u!1001 &9007050986296571309
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -102,15 +118,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 6b53147c2297c431f9bf043aaa1d877d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6b53147c2297c431f9bf043aaa1d877d, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6b53147c2297c431f9bf043aaa1d877d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6b53147c2297c431f9bf043aaa1d877d, type: 3}
       propertyPath: m_LocalPosition.x

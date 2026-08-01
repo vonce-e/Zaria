@@ -57,6 +57,9 @@ public class ChestInteraction : MonoBehaviour
                 CardRewardService.Instance.OpenChest();  // grants a random card
         }
 
+        if (RewardPopup.Instance != null)
+            RewardPopup.Instance.Show($"Got {cardCount} card(s) and {coinReward} coins!");
+
         _opened = true;
         Debug.Log($"Chest opened (depth {depth}): +{coinReward} coins, +{cardCount} card(s).");
 

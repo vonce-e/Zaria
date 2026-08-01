@@ -126,7 +126,25 @@ public class Unit : MonoBehaviour
     /// <param name="newHp">The desired new HP, clamped before being applied.</param>
     private void SetHp(int newHp)
     {
-        currentHp = Mathf.Clamp(newHp, 0, maxHp);
+        int clamped = Mathf.Clamp(newHp, 0, maxHp);
+
+        if (clamped < currentHp)
+        {
+            int damageTaken = currentHp - clamped;
+
+            // Screen shake
+            if (CameraShake.Instance != null)
+            {
+                float magnitude = Mathf.Min(0.1f + damageTaken * 0.01f, 0.4f);
+                CameraShake.Instance.Shake(magnitude, 0.2f);
+            }
+
+            // Hit flash on unit's model
+            HitFlash flash = GetComponent<HitFlash>();
+            if (flash != null) flash.Flash();
+        }
+
+        currentHp = clamped;
         OnHpChanged?.Invoke(currentHp);
     }
 
