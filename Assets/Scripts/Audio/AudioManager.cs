@@ -37,8 +37,13 @@ public class AudioManager : MonoBehaviour
     public AudioClip victory;
     public AudioClip defeat;
 
-    private AudioSource _sfxSource;    // for one-shot effects
-    private AudioSource _musicSource;  // for looping music
+    private AudioSource _sfxSource; // for one-shot effects
+    private AudioSource _musicSource; // for looping music
+
+    [Header("Music")]
+    public AudioClip menuMusic;
+    public AudioClip dungeonMusic;
+    public AudioClip battleMusic;
 
     private void Awake()
     {
@@ -90,20 +95,24 @@ public class AudioManager : MonoBehaviour
         if (_musicSource != null) _musicSource.Stop();
     }
 
-    public void CardPlay()      => PlaySfx(cardPlay);
-    public void AttackHit()     => PlaySfx(attackHit);
-    public void DiceRoll()      => PlaySfx(diceRoll);
-    public void BlockGain()     => PlaySfx(blockGain);
-    public void ParrySuccess()  => PlaySfx(parrySuccess);
-    public void DodgeSuccess()  => PlaySfx(dodgeSuccess);
-    public void EnemyHit()      => PlaySfx(enemyHit);
-    public void EnemyDeath()    => PlaySfx(enemyDeath);
-    public void ButtonClick()   => PlaySfx(buttonClick);
-    public void Purchase()      => PlaySfx(purchase);
-    public void ChestOpen()     => PlaySfx(chestOpen);
-    public void PotionDrink()   => PlaySfx(potionDrink);
-    public void LevelUp()       => PlaySfx(levelUp);
-    public void CardAcquired()  => PlaySfx(cardAcquired);
-    public void Victory()       => PlaySfx(victory);
-    public void Defeat()        => PlaySfx(defeat);
+    public void CardPlay() => PlaySfx(cardPlay);
+    public void AttackHit() => PlaySfx(attackHit);
+    public void DiceRoll() => PlaySfx(diceRoll);
+    public void BlockGain() => PlaySfx(blockGain);
+    public void ParrySuccess() => PlaySfx(parrySuccess);
+    public void DodgeSuccess() => PlaySfx(dodgeSuccess);
+    public void EnemyHit() => PlaySfx(enemyHit);
+    public void EnemyDeath() => PlaySfx(enemyDeath);
+    public void ButtonClick() => PlaySfx(buttonClick);
+    public void Purchase() => PlaySfx(purchase);
+    public void ChestOpen() => PlaySfx(chestOpen);
+    public void PotionDrink() => PlaySfx(potionDrink);
+    public void LevelUp() => PlaySfx(levelUp);
+    public void CardAcquired() => PlaySfx(cardAcquired);
+    public void Victory() => PlaySfx(victory);
+    public void Defeat() => PlaySfx(defeat);
+
+    public void PlayMenuMusic() => PlayMusic(menuMusic);
+    public void PlayDungeonMusic() => PlayMusic(dungeonMusic);
+    public void PlayBattleMusic() => PlayMusic(battleMusic);
 }

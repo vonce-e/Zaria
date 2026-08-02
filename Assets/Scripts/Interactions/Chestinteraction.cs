@@ -63,6 +63,9 @@ public class ChestInteraction : MonoBehaviour
         _opened = true;
         Debug.Log($"Chest opened (depth {depth}): +{coinReward} coins, +{cardCount} card(s).");
 
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.ChestOpen(); // Chest Opened Audio
+
         // empty the chest so it can't be reused
         gameObject.SetActive(false);
     }

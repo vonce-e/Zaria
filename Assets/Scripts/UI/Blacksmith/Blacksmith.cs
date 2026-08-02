@@ -43,6 +43,10 @@ public class Blacksmith : MonoBehaviour
 
         card.upgradeLevel++;
         run.enchantSpent++;
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.CardAcquired(); // Upgrade Audio
+
         return Result.Success;
     }
 
@@ -60,6 +64,10 @@ public class Blacksmith : MonoBehaviour
         CardData def = cardDatabase.Get(card.definitionId);
         run.deck.Remove(card);
         run.coins += CoinValue(def.rarity);
+        
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.ButtonClick(); // Button Click Audio
+
         return Result.Success;
     }
 

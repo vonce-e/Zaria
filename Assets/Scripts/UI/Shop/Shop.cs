@@ -58,7 +58,7 @@ public class Shop : MonoBehaviour
     }
 
     /// <summary>
-    /// Build the card/potion pools once (Common + Rare cards, all potions).
+    /// Build the card/potion pools (Common + Rare cards, all potions)
     /// </summary>
     private void BuildPools()
     {
@@ -82,7 +82,7 @@ public class Shop : MonoBehaviour
     }
 
     /// <summary>
-    /// Make one random item : 50/50 card-or-potion, priced by rarity.
+    /// Make one random item : 50/50 card-or-potion, priced by rarity
     /// </summary>
     private ShopItem MakeRandomItem()
     {
@@ -108,8 +108,7 @@ public class Shop : MonoBehaviour
     }
 
     /// <summary>
-    /// Attempt to buy an item. On success, deducts coins, grants the card
-    /// or potion, and marks the slot sold.
+    /// Buys an item
     /// </summary>
     /// <param name="run">The player's run state.</param>
     /// <param name="item">The shop item to buy.</param>
@@ -130,12 +129,15 @@ public class Shop : MonoBehaviour
 
         run.coins -= item.price;
         item.sold = true;
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.Purchase(); // Purchase Audio
+
         return BuyResult.Success;
     }
 
     /// <summary>
-    /// Reroll the stock for a coin cost. Returns false if the player can't
-    /// afford the refresh.
+    /// Reroll the stock
     /// </summary>
     /// <param name="run">The player's run state.</param>
     public bool Refresh(PlayerRunState run)
@@ -143,6 +145,10 @@ public class Shop : MonoBehaviour
         if (run.coins < refreshCost) return false;
         run.coins -= refreshCost;
         GenerateStock();
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.ButtonClick(); // Upgrade Audio
+
         return true;
     }
 }
