@@ -111,6 +111,10 @@ public class BattleSystem : MonoBehaviour
 
         state = BattleState.PLAYERTURN;
         if (combatUIRoot != null) combatUIRoot.SetActive(true);
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayBattleMusic(); // Plays battle music
+
         combatManager.BeginCombat(RunManager.Instance.runState, _playerUnit, _enemyUnit);
 
         // Wires the UI that needs run state
