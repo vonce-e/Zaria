@@ -11,9 +11,6 @@ public class BossRoomTrigger : MonoBehaviour
     [Tooltip("The shared pool of enemy/boss prefabs.")]
     public EnemyPool enemyPool;
 
-    [Tooltip("The boss room geometry (fill once room prefabs exist).")]
-    public GameObject roomPrefab;   // boss room model
-
     [Tooltip("Name of the battle scene to load.")]
     public string battleSceneName = "BattleScene";
 
@@ -39,6 +36,6 @@ public class BossRoomTrigger : MonoBehaviour
         GameObject boss = enemyPool.GetRandomBoss(depth);
         if (boss == null) return;
 
-        RunManager.Instance.LoadBattle(boss, roomPrefab, battleSceneName, returnSceneName, true);
+        RunManager.Instance.LoadBattle(boss, battleSceneName, returnSceneName, true);
     }
 }

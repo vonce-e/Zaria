@@ -16,8 +16,6 @@ public class RunManager : MonoBehaviour
     // The enemy/boss prefab the next battle scene should spawn
     public GameObject pendingEncounterPrefab;
 
-    public GameObject pendingRoomPrefab;
-
     // The scene to return to after a battle (the dungeon/next level)
     public string returnSceneName;
 
@@ -76,13 +74,11 @@ public class RunManager : MonoBehaviour
     /// <param name="encounterPrefab">The enemy/boss prefab to fight.</param>
     /// <param name="battleSceneName">The battle scene to load.</param>
     /// <param name="returnScene">Scene to come back to after winning.</param>
-    public void LoadBattle(GameObject encounterPrefab, GameObject roomPrefab,
-                        string battleSceneName, string returnScene, bool isBoss)
+    public void LoadBattle(GameObject encounterPrefab, string battleSceneName, string returnScene, bool isBoss)
     {
         pendingEncounterPrefab = encounterPrefab;
-        pendingRoomPrefab = roomPrefab;
         returnSceneName = returnScene;
-        pendingIsBoss = isBoss;          // <-- new
+        pendingIsBoss = isBoss;
 
         if (SceneLoader.Instance != null)
             SceneLoader.Instance.ChangeScene(battleSceneName);

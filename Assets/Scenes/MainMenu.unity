@@ -3838,7 +3838,7 @@ MonoBehaviour:
   levelUp: {fileID: 8300000, guid: c8d5e6bc2c6054673997572c8461b3f2, type: 3}
   cardAcquired: {fileID: 8300000, guid: 9c6358cb357514c7baee86b1ffe578a7, type: 3}
   victory: {fileID: 0}
-  defeat: {fileID: 0}
+  defeat: {fileID: 8300000, guid: f34385319b1d84d42b8370f391da5918, type: 3}
   menuMusic: {fileID: 8300000, guid: 9eff275142c414c5eaefdc60cba2b9df, type: 3}
   dungeonMusic: {fileID: 8300000, guid: dfeba9948336d4b0b9fc4bdda9e6d5a3, type: 3}
   battleMusic: {fileID: 8300000, guid: 15c87e41b90b94a5282bb63f059e8246, type: 3}

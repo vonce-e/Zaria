@@ -22,4 +22,19 @@ MonoBehaviour:
   artwork: {fileID: 21300000, guid: a4a8edd6c2fd64f45acfa4fcf83905b9, type: 3}
   baseDamage: 0
   baseDefense: 2
-  upgradeTiers: []
+  upgradeTiers:
+  - bonusDamage: 0
+    bonusDefense: 4
+    upgradeDescription: Additional 4 defense.
+  - bonusDamage: 0
+    bonusDefense: 8
+    upgradeDescription: Additional 8 defense.
+  - bonusDamage: 0
+    bonusDefense: 12
+    upgradeDescription: Additional 12 defense.
+  - bonusDamage: 0
+    bonusDefense: 17
+    upgradeDescription: Additional 17 defense.
+  - bonusDamage: 0
+    bonusDefense: 22
+    upgradeDescription: Additional 22 defense.

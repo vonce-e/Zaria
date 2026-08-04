@@ -64,9 +64,6 @@ public class BattleSystem : MonoBehaviour
     /// </summary>
     public IEnumerator SetupBattle()
     {
-        // Spawn room model
-        if (RunManager.Instance != null && RunManager.Instance.pendingRoomPrefab != null)
-            Instantiate(RunManager.Instance.pendingRoomPrefab);
 
         state = BattleState.START;
 
@@ -96,6 +93,7 @@ public class BattleSystem : MonoBehaviour
 
         if (RunManager.Instance != null)
             _playerUnit.unitLevel = RunManager.Instance.runState.playerLevel;
+            EnemyScaling.Apply(_enemyUnit, RunManager.Instance.currentDepth); // Scales enemies based off of depth of run
 
         // HUDs
         playerHUD.SetHUD(_playerUnit);
@@ -132,29 +130,9 @@ public class BattleSystem : MonoBehaviour
         {
             state = BattleState.WON;
 
-            bool wasBoss = RunManager.Instance != null && RunManager.Instance.pendingIsBoss;
-
             // If this was a boss, advance depth.
-            if (wasBoss)
+            if (RunManager.Instance != null && RunManager.Instance.pendingIsBoss)
                 RunManager.Instance.AdvanceDepth();
-
-            // Award coins for the win, scaled by depth. Bosses pay a bonus.
-            int coinsWon = 0;
-            if (RunManager.Instance != null)
-            {
-                int depth = RunManager.Instance.currentDepth;
-                int baseCoins = wasBoss ? 60 : 20; // bosses worth more
-                int perDepth  = wasBoss ? 25 : 10; // and scale faster
-                coinsWon = baseCoins + (depth - 1) * perDepth;
-                RunManager.Instance.runState.coins += coinsWon;
-            }
-
-            // Show the reward message.
-            if (RewardPopup.Instance != null)
-            {
-                string label = wasBoss ? "Boss defeated!" : "Victory!";
-                RewardPopup.Instance.Show($"{label} +{coinsWon} coins");
-            }
 
             StartCoroutine(WinThenLeave());
         }

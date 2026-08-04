@@ -40,6 +40,6 @@ public class EnemyPortal : MonoBehaviour
         string returnScene = UnityEngine.SceneManagement
             .SceneManager.GetActiveScene().name;
 
-        RunManager.Instance.LoadBattle(enemy, roomPrefab, battleSceneName, returnScene, false);
+        RunManager.Instance.LoadBattle(enemy, battleSceneName, returnScene, false);
     }
 }

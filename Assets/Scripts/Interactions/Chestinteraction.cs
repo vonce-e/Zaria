@@ -51,14 +51,30 @@ public class ChestInteraction : MonoBehaviour
 
         // Card count is random within the range (inclusive).
         int cardCount = Random.Range(minCards, maxCards + 1);
+
+        // Grant cards and collect their names for the message.
+        System.Collections.Generic.List<string> cardNames =
+            new System.Collections.Generic.List<string>();
+
         if (CardRewardService.Instance != null)
         {
             for (int i = 0; i < cardCount; i++)
-                CardRewardService.Instance.OpenChest();  // grants a random card
+            {
+                CardRewardService.Instance.OpenChest();
+
+                // Capture the card that was just granted.
+                CardData granted = CardRewardService.Instance.LastGrantedCard;
+                if (granted != null) cardNames.Add(granted.displayName);
+            }
         }
 
         if (RewardPopup.Instance != null)
-            RewardPopup.Instance.Show($"Got {cardCount} card(s) and {coinReward} coins!");
+        {
+            string cardList = cardNames.Count > 0
+                ? string.Join(", ", cardNames)
+                : "no cards (deck full)";
+            RewardPopup.Instance.Show($"Chest opened! {cardList} +{coinReward} coins");
+        }
 
         _opened = true;
         Debug.Log($"Chest opened (depth {depth}): +{coinReward} coins, +{cardCount} card(s).");

@@ -367,11 +367,33 @@ public class CombatManager : MonoBehaviour
                     $"Now level {_run.playerLevel} ({_run.currentXp}/{_run.XpForNextLevel}).");
         }
 
+        // Card reward
+        string cardPart = "";
         if (CardRewardService.Instance != null)
         {
             CardRewardService.Instance.GrantCombatReward(
                 rewardCommon, rewardRare, rewardMythic, rewardLegendary);
+
+            CardData won = CardRewardService.Instance.LastGrantedCard;
+            if (won != null) cardPart = $"Got {won.displayName}! ";
         }
+
+        // Coins (depth-scaled, boss bonus)
+        int coinsWon = 0;
+        string title = "Victory!";
+        if (RunManager.Instance != null)
+        {
+            bool wasBoss = RunManager.Instance.pendingIsBoss;
+            int depth = RunManager.Instance.currentDepth;
+            coinsWon = (wasBoss ? 60 : 20) + (depth - 1) * (wasBoss ? 25 : 10);
+            RunManager.Instance.runState.coins += coinsWon;
+            if (wasBoss) title = "Boss defeated!";
+        }
+
+        // Reward message
+        if (RewardPopup.Instance != null)
+            RewardPopup.Instance.Show($"{title} {cardPart}+{coinsWon} coins");
+
         if (BattleSystem.Instance != null)
             BattleSystem.Instance.EndBattle(true);
     }

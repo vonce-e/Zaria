@@ -15,6 +15,9 @@ public class CardRewardService : MonoBehaviour
 
     private CardRewardSystem _system;
 
+    /// Most recent card granted, for reward message.
+    public CardData LastGrantedCard { get; private set; }
+
     /// <summary>
     /// Builds the system and wires up a simple Console-log popup.
     /// </summary>
@@ -28,8 +31,13 @@ public class CardRewardService : MonoBehaviour
         _system.OnCardOffered += (def, result) =>
         {
             if (result == CardRewardSystem.AddResult.Added)
+            {
+                LastGrantedCard = def;
                 Debug.Log($"<color=lime>+ {def.displayName} added to deck!</color>");
+            }
+            
             else
+                LastGrantedCard = null;
                 Debug.Log($"<color=orange>Deck is full - {def.displayName} refused.</color>");
         };
     }
