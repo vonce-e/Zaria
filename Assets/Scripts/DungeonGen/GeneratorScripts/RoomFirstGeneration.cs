@@ -7,6 +7,7 @@ using System.Data;
 using System.Numerics;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityEngine.WSA;
 using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
@@ -254,19 +255,19 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             }
 
             // Check for valid tiles before spawning on category
-            List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles);
-            validCornerTiles = LayoutOptionDecider(roomData, roomLayoutPattern, validCornerTiles);
-            SpawnPropCategoryOnTile(propRule.cornerProps, validCornerTiles, roomData, propHeight);
+            List<Vector2Int> validNearWallTiles = GetValidTile(roomData, roomData.NearWallTiles, true);
+            validNearWallTiles = LayoutOptionDecider(roomData, roomLayoutPattern, validNearWallTiles);
+            SpawnPropCategoryNearWall(propRule.nearWallTileProps, validNearWallTiles, roomData, propHeight);
 
             List<Vector2Int> validInnerTiles = GetValidTile(roomData, roomData.InnerTiles);
             validInnerTiles = LayoutOptionDecider(roomData, roomLayoutPattern, validInnerTiles);
             SpawnPropCategoryOnTile(propRule.innerTileProps, validInnerTiles, roomData, propHeight);
 
-            List<Vector2Int> validNearWallTiles = GetValidTile(roomData, roomData.NearWallTiles);
-            validNearWallTiles = LayoutOptionDecider(roomData, roomLayoutPattern, validNearWallTiles);
-            SpawnPropCategoryNearWall(propRule.nearWallTileProps, validNearWallTiles, roomData, propHeight);
+            List<Vector2Int> validCornerTiles = GetValidTile(roomData, roomData.CornerTiles, false);
+            validCornerTiles = LayoutOptionDecider(roomData, roomLayoutPattern, validCornerTiles);
+            SpawnPropCategoryOnTile(propRule.cornerProps, validCornerTiles, roomData, propHeight);
 
-            List<Vector2Int> validWallMountedTiles = GetValidTile(roomData, roomData.NearWallTiles);
+            List<Vector2Int> validWallMountedTiles = GetValidTile(roomData, roomData.NearWallTiles, false);
             SpawnPropCategoryOnWall(propRule.wallMountedProps, validWallMountedTiles, roomData, wallPropHeight);
 
             List<Vector2Int> validCeilingTiles = GetValidTile(roomData, roomData.CeilingTiles);
@@ -347,7 +348,13 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
                 int randomTileIndex = Random.Range(0, validTiles.Count);
                 Vector2Int tile = validTiles[randomTileIndex];
 
-                if (IsPropNearAnother(roomData.OccupiedTiles, tile, 1))
+                // if (IsPropNearAnother(roomData.OccupiedTiles, tile, 1))
+                // {
+                //     validTiles.RemoveAt(randomTileIndex);
+                //     continue;
+                // }
+
+                if (!TryGetPropFootPrint(propData, tile, roomData, out List<Vector2Int> footprintTiles, false))
                 {
                     validTiles.RemoveAt(randomTileIndex);
                     continue;
@@ -356,12 +363,15 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
                 GameObject prefab = propData.prefab;
 
                 // Get tile position to spawn prefab at
-                Vector3 tilePosition = new Vector3(tile.x * cellSize, propHeight, tile.y * cellSize);
+                Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
                 Instantiate(prefab, tilePosition, Quaternion.identity, propParent);
 
                 // Adds the current tile to the occupied tiles
-                roomData.OccupiedTiles.Add(tile);
-                validTiles.RemoveAt(randomTileIndex);
+                foreach (Vector2Int footprintTile in footprintTiles)
+                {
+                    roomData.OccupiedTiles.Add(footprintTile);
+                    validTiles.Remove(footprintTile);
+                }
 
                 spawnedAmt++;
             }
@@ -379,7 +389,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             return;
         }
 
-        if (validTiles == null || validTiles.Count == 0)
+        if (validTiles == null)
         {
             return;
         }
@@ -388,44 +398,68 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         {
             if (propData == null || propData.prefab == null)
             {
-                return;
+                continue;
             }
 
             int propAmount = PropsToSpawn(propData);
             int spawnedAmt = 0;
 
-            while (spawnedAmt < propAmount && validTiles.Count > 0)
+            int numberOfPasses = propData.mustSpawn ? 2 : 1;
+
+            for (int pass = 0; pass < numberOfPasses && spawnedAmt < propAmount; pass++)
             {
-                if (validTiles.Count == 0)
+                bool allowCorridorOverlap = pass == 1;
+
+                List<Vector2Int> candidateTiles = new List<Vector2Int>(validTiles);
+
+                while (spawnedAmt < propAmount && candidateTiles.Count > 0)
                 {
-                    return;
-                }
+                    // Choose a cnadidate from the list
+                    int randomTileIndex = Random.Range(0, candidateTiles.Count);
 
-                // Choosing from a random select of tiles
-                int randomTileIndex = Random.Range(0, validTiles.Count);
-                Vector2Int tile = validTiles[randomTileIndex];
+                    Vector2Int tile = candidateTiles[randomTileIndex];
 
-                if (IsPropNearAnother(roomData.OccupiedTiles, tile, 2))
-                {
-                    validTiles.RemoveAt(randomTileIndex);
-                    continue;
-                }
+                    Vector2Int wallDirection = GetWallDirection(roomData.FloorTiles, tile);
 
-                // Choosing from a random select of prefabs
-                GameObject prefab = propData.prefab;
+                    if (wallDirection == Vector2Int.zero)
+                    {
+                        candidateTiles.RemoveAt(randomTileIndex);
+                        continue;
+                    }
 
-                Vector2Int wallDirection = GetWallDirection(roomData.FloorTiles, tile);
-                Quaternion wallRotation = GetWallRotation(wallDirection) * Quaternion.Euler(0f, 90f, 0f);
+                    Vector2Int footprintcenter = GetNearWallFootprintCenter(tile,
+                    wallDirection,
+                    propData);
 
-                Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
+                    if (!TryGetPropFootPrint(propData,
+                    footprintcenter,
+                    roomData,
+                    out List<Vector2Int> footprintTiles,
+                    allowCorridorOverlap))
+                    {
+                        candidateTiles.RemoveAt(randomTileIndex);
+                        continue;
+                    }
+                    
+                    // Choosing from a random select of prefabs
+                    GameObject prefab = propData.prefab;
 
-                Instantiate(prefab, tilePosition, wallRotation, propParent);
+                    Quaternion wallRotation = GetWallRotation(wallDirection) * Quaternion.Euler(0f, 90f, 0f);
 
-                // Adds the current tile to the occupied tiles
-                roomData.OccupiedTiles.Add(tile);
-                validTiles.RemoveAt(randomTileIndex);
+                    Vector3 tilePosition = new Vector3(tile.x * cellSize, spawnHeight, tile.y * cellSize);
 
-                spawnedAmt++;
+                    Instantiate(prefab, tilePosition, wallRotation, propParent);
+
+                    // Adds the current tile to the occupied tiles
+                    foreach (Vector2Int footprintTile in footprintTiles)
+                    {
+                        roomData.OccupiedTiles.Add(footprintTile);
+                        validTiles.Remove(footprintTile);
+                        candidateTiles.Remove(footprintTile);
+                    }
+
+                    spawnedAmt++;
+                    }   
             }
         }
     }
@@ -653,6 +687,11 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             propAmount = Random.Range(spawnRule.mediumAmount, spawnRule.highAmount + 1);
         }
 
+        if (spawnRule.mustSpawn && propAmount < 1)
+        {
+            propAmount = 1;
+        }
+
         return propAmount;
     }
 
@@ -770,19 +809,162 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     /// <param name="data"></param>
     /// <param name="givenTiles"></param>
     /// <returns></returns>
-    private List<Vector2Int> GetValidTile(DungeonRoomData data, HashSet<Vector2Int> givenTiles)
+    private List<Vector2Int> GetValidTile(DungeonRoomData data, HashSet<Vector2Int> givenTiles, bool includeCorridorTiles = false)
     {
         List<Vector2Int> validTiles = new List<Vector2Int>();
 
         foreach (Vector2Int tile in givenTiles)
         {
-            if (data.CorridorTiles.Contains(tile) == false && data.OccupiedTiles.Contains(tile) == false)
+            bool isOccupied = data.OccupiedTiles.Contains(tile);
+            bool corridorAllowed = includeCorridorTiles || !data.CorridorTiles.Contains(tile);
+
+            if (!isOccupied && corridorAllowed)
             {
                 validTiles.Add(tile);
             }
         }
 
         return validTiles;
+    }
+
+    /// <summary>
+    /// Checks the tiles that a prefab takes up
+    /// </summary>
+    /// <param name="rule"></param>
+    /// <param name="centerTile"></param>
+    /// <param name="roomData"></param>
+    /// <returns></returns>
+    private bool TryGetPropFootPrint(PropSpawnRule propData, 
+    Vector2Int centerTile, 
+    DungeonRoomData roomData, 
+    out List<Vector2Int> footprintTiles,
+    bool allowCorridorOverlap)
+    {
+        footprintTiles = new List<Vector2Int>();
+        
+        // Checks if it has even proportions, returns false if it is
+        if (propData.footprintWidth % 2 == 0 || propData.footprintDepth % 2 == 0)
+        {
+            return false;
+        }
+
+        int halfWidth = propData.footprintWidth / 2;
+        int halfDepth = propData.footprintDepth / 2;
+
+        // Checks against the room walls to avoid spawning props that spawn near each other or against walls
+        for (int x = -halfWidth; x <= halfWidth; x++)
+        {
+            for (int y = -halfDepth; y <= halfDepth; y++)
+            {
+                Vector2Int footprintTile = centerTile + new Vector2Int(x, y);
+
+                if (!roomData.FloorTiles.Contains(footprintTile))
+                {
+                    return false;
+                }
+
+                if (!allowCorridorOverlap && roomData.CorridorTiles.Contains(footprintTile))
+                {
+                    return false;
+                }
+
+                if (roomData.OccupiedTiles.Contains(footprintTile))
+                {
+                    return false;
+                }
+
+                footprintTiles.Add(footprintTile);
+            }
+        }
+
+        // Validates against inner walls to avoid prefabs that phase through walls
+        foreach(InnerWallData innerWall in roomData.InnerWalls)
+        {
+            Vector2Int firstSide = innerWall.Tile;
+            Vector2Int secondSide = innerWall.Tile + innerWall.Direction;
+
+            bool coversFirstSide = footprintTiles.Contains(firstSide);
+            bool coversSecondSide = footprintTiles.Contains(secondSide);
+            
+            // Checks to see if the prefab phases through the wall
+            if (coversFirstSide && coversSecondSide)
+            {
+                return false;
+            }
+
+            if (propData.wallClearance <= 0)
+            {
+                continue;
+            }
+
+            foreach (Vector2Int footprintTile in footprintTiles)
+            {
+                int firstSideDistance = Mathf.Max(
+                    Mathf.Abs(footprintTile.x - firstSide.x),
+                    Mathf.Abs(footprintTile.y - firstSide.y));
+
+                int secondSideDistance = Mathf.Max(
+                    Mathf.Abs(footprintTile.x - secondSide.x),
+                    Mathf.Abs(footprintTile.y - secondSide.y));
+
+                if (firstSideDistance < propData.wallClearance || secondSideDistance < propData.wallClearance)
+                    {
+                        return false;
+                    }
+            }
+
+        }
+
+        List<Vector2Int> doorwayTiles = new List<Vector2Int>();
+
+        // Adds every entrance tile into a list
+        foreach(EntranceRoomData entrance in roomData.EntranceTiles)
+        {
+            doorwayTiles.Add(entrance.Tile);    
+        }
+
+        // Adds all the doorway tiles into the list
+        foreach (InnerDoorWayData innerDoor in roomData.InnerDoors)
+        {
+            foreach (Vector2Int doorTile in innerDoor.Tiles)
+            {
+                doorwayTiles.Add(doorTile);
+            }
+        }
+
+        foreach (Vector2Int footprintTile in footprintTiles)
+        {
+            foreach (Vector2Int doorwayTile in doorwayTiles)
+            {
+                int distance = Mathf.Max(
+                    Mathf.Abs(footprintTile.x - doorwayTile.x),
+                    Mathf.Abs(footprintTile.y - doorwayTile.y));
+
+                if (distance <= propData.doorWayClearance)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private Vector2Int GetNearWallFootprintCenter(Vector2Int tile, Vector2Int wallDirection, PropSpawnRule propData)
+    {
+        int footprintOffset;
+
+        if (wallDirection == Vector2Int.up ||
+            wallDirection == Vector2Int.down)
+        {
+            footprintOffset = propData.footprintDepth / 2;
+        }
+        else
+        {
+            footprintOffset = propData.footprintWidth / 2;
+        }
+
+        return tile - wallDirection * footprintOffset;
     }
 
     /// <summary>
