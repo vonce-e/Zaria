@@ -155,7 +155,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
         // Spawns the door to connect the room and corridor and props
         SpawnDoors(generatedRooms);
-        SpawnBossPortal(generatedRooms);
         SpawnProps(generatedRooms);
         SpawnCorridorProps(corridors, floor, generatedRooms);
     }
@@ -700,40 +699,18 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     /// </summary>
     private void SpawnDoors(List<DungeonRoomData> generatedRooms)
     {
+        HashSet<Vector2Int> spawnedDoorTiles = new HashSet<Vector2Int>();
+
         foreach (DungeonRoomData roomData in generatedRooms)
         {
-            TrySpawnDoorPrefab(roomData, doorPrefab);
+            TrySpawnDoorPrefab(roomData, doorPrefab, spawnedDoorTiles);
         }
-    }
-
-    /// <summary>
-    /// Spawns the boss portal at the boss room's centre and reserves its floor tile.
-    /// </summary>
-    private void SpawnBossPortal(List<DungeonRoomData> roomData)
-    {
-        if (bossPortalPrefab == null)
-        {
-            return;
-        }
-
-        DungeonRoomData bossRoom = GetBossRooms(roomData);
-
-        if (bossRoom == null)
-        {
-            return;
-        }
-
-        Vector2Int portalTile = BossRoomCenter(bossRoom);
-        Vector3 portalPositon = new Vector3(portalTile.x * cellSize, propHeight, portalTile.y * cellSize);
-
-        Instantiate(bossPortalPrefab, portalPositon, Quaternion.identity, propParent);
-        bossRoom.OccupiedTiles.Add(portalTile);
     }
 
     /// <summary>
     /// Groups valid entrance tiles and spawns a correctly positioned and rotated door for each usable group.
     /// </summary>
-    private void TrySpawnDoorPrefab(DungeonRoomData roomData, GameObject prefab)
+    private void TrySpawnDoorPrefab(DungeonRoomData roomData, GameObject prefab, HashSet<Vector2Int> spawnedDoorTiles)
     {
         if (prefab == null)
         {
@@ -756,7 +733,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
         foreach (List<EntranceRoomData> entranceGroup in entranceGroups)
         {
-            if (entranceGroup.Count == 0)
+            if (entranceGroup.Count <= 1)
             {
                 continue;
             }
@@ -764,6 +741,22 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             if (entranceGroup.Count > 2)
             {
                 break;
+            }
+
+            bool doorIsTooClose = false;
+
+            foreach (EntranceRoomData entranceTile in entranceGroup)
+            {
+                if (IsPropNearAnother(spawnedDoorTiles, entranceTile.Tile, 1))
+                    {
+                        doorIsTooClose = true;
+                        break;
+                    }
+            }
+
+            if (doorIsTooClose)
+            {
+                continue;
             }
 
             EntranceRoomData firstEntrance = entranceGroup[0];
@@ -776,6 +769,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             foreach (EntranceRoomData entranceTile in entranceGroup)
             {
                 roomData.OccupiedTiles.Add(entranceTile.Tile);
+                spawnedDoorTiles.Add(entranceTile.Tile);
             }
         }
     }
