@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Quick Jab
   cardType: 0
   rarity: 0
-  energyCost: 2
+  energyCost: 1
   description: 'Deal 5 damage, if dice is odd, gain 1 extra energy.
 
     Execution

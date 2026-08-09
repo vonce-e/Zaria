@@ -51,9 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Suppressor
   unitLevel: 0
-  damage: 7
-  maxHp: 65
-  currentHp: 65
+  damage: 14
+  maxHp: 100
+  currentHp: 100
   _energy: 0
   block: 0
   damageReduction: 0
@@ -90,7 +90,7 @@ MonoBehaviour:
   unit: {fileID: 7537200062239543717}
   defendChance: 0.3
   signatureChance: 0.25
-  defendAmount: 6
+  defendAmount: 5
   nextAttackMultiplier: 1
   lastPlayerAttackDamage: 0
   combat: {fileID: 0}

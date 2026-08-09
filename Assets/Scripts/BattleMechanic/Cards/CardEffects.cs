@@ -1,6 +1,7 @@
 // This script handles the behaviour of each card.
 // Made by Vonce Chew
 
+using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
@@ -145,7 +146,9 @@ public class EnergizeEffect : ICardEffect
     public void Apply(BattleContext ctx, CardData def)
     {
         if (ctx.diceValue >= 3)
-            ctx.caster.energy += 2;
+            ctx.caster.energy = Mathf.Min(
+            ctx.caster.energy + 2,
+            ctx.combat.energyPerTurn);
     }
 }
 

@@ -52,9 +52,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Leech
   unitLevel: 0
-  damage: 9
-  maxHp: 45
-  currentHp: 45
+  damage: 14
+  maxHp: 90
+  currentHp: 90
   _energy: 0
   block: 0
   damageReduction: 0
@@ -123,7 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e40cd62f2c1b2492b932d96edcb8e083, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
-  animator: {fileID: 0}
+  animator: {fileID: 5296485475996272053}
 --- !u!95 &5296485475996272053
 Animator:
   serializedVersion: 7

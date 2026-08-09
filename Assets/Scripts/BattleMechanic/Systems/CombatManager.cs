@@ -17,6 +17,7 @@ public class CombatManager : MonoBehaviour
     public EnemyAI enemyAI;
     public int handSize = 5;
     public int energyPerTurn = 5;
+    public int energyRecoveredPerTurn = 5;
 
     [Header("Reward weights for this encounter")]
     public int rewardCommon    = 70;
@@ -66,6 +67,9 @@ public class CombatManager : MonoBehaviour
         _player = player;
         _enemy = enemy;
 
+        // set energy
+        _player.energy = energyPerTurn;
+
         // Subscribe to level-ups so we can apply stat growth.
         _run.OnLeveledUp += HandleLevelUp;
 
@@ -94,8 +98,12 @@ public class CombatManager : MonoBehaviour
     private void StartPlayerTurn()
     {
         if (_combatEnded) return;
+        
+        // Recovers energy by 3
+        _player.energy = Mathf.Min(
+            _player.energy + energyRecoveredPerTurn,
+            energyPerTurn);
 
-        _player.energy = energyPerTurn;
         _player.block = 0;
         _cardsPlayedThisTurn.Clear();
         _potionUsedThisTurn = false;
@@ -299,15 +307,25 @@ public class CombatManager : MonoBehaviour
         switch (result)
         {
             case ParryDodgeResult.Parry:
-                int reflect = Mathf.RoundToInt(incoming * 0.5f);
+                // Decides how much is reflected
+                float reflectionPercentage = UnityEngine.Random.Range(0.25f, 0.5f);
+                
+                // Calculates damage reflected
+                int reflect = Mathf.RoundToInt(reflectionPercentage * incoming);
                 _enemy.TakeDamage(reflect);
+                
                 AudioManager.Instance.ParrySuccess();
+                
                 Debug.Log($"<color=cyan>PARRY! Reflected {reflect} damage.</color>");
                 if (_enemy.IsDead) { Win(); yield break; }
                 break;
 
             case ParryDodgeResult.Dodge:
+                int reducedDmg = Mathf.RoundToInt(incoming *0.5f);
+                _player.TakeDamage(reducedDmg);
+                
                 AudioManager.Instance.DodgeSuccess();
+                
                 Debug.Log("<color=green>DODGE! No damage taken.</color>");
                 break;
 

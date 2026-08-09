@@ -51,9 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Null
   unitLevel: 0
-  damage: 10
-  maxHp: 125
-  currentHp: 125
+  damage: 18
+  maxHp: 180
+  currentHp: 180
   _energy: 0
   block: 0
   damageReduction: 0
@@ -95,7 +95,7 @@ MonoBehaviour:
   lastPlayerAttackDamage: 0
   combat: {fileID: 0}
   cardsToShuffle: 2
-  damagePerCard: 8
+  damagePerCard: 9
 --- !u!114 &-5072695203001635844
 MonoBehaviour:
   m_ObjectHideFlags: 0

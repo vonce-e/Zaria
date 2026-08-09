@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -34,7 +35,11 @@ public class ParryDodgeBar : MonoBehaviour
     [Tooltip("How long one full left-to-right sweep takes, in seconds.")]
     public float sweepDuration = 1.2f;
     [Tooltip("How long the bar stays up waiting for input, in seconds.")]
-    public float window = 1.2f;
+    public float window = 2f;
+
+    [Header("Randomized Parry bar speed")]
+    public List<float> possibleSweepDurations =
+    new List<float>() { 0.7f, 0.9f, 1f, 1.3f, 1.6f};
 
     [Header("Zone sizes (as fraction of track width, 0-1)")]
     [Range(0.05f, 0.9f)] public float dodgeZoneWidth = 0.30f;
@@ -60,6 +65,9 @@ public class ParryDodgeBar : MonoBehaviour
     [Tooltip("Smallest/largest the parry window can be.")]
     [Range(0.02f, 0.5f)] public float parryWidthMin = 0.06f;
     [Range(0.02f, 0.5f)] public float parryWidthMax = 0.14f;
+
+
+
 
     // The actual sizes used this attempt (randomized or the fixed defaults).
     private float _dodgeWidth = 0.30f;
@@ -108,6 +116,16 @@ public class ParryDodgeBar : MonoBehaviour
 
         if (barRoot != null) barRoot.SetActive(true);
 
+        float currentSweepDuration = sweepDuration;
+
+        if (possibleSweepDurations != null && 
+        possibleSweepDurations.Count >0)
+        {
+            int randomSweepIndex = UnityEngine.Random.Range(0, possibleSweepDurations.Count);
+
+            currentSweepDuration = possibleSweepDurations[randomSweepIndex];
+        }
+
         float trackWidth = track.rect.width;
         float halfTrack = trackWidth * 0.5f;
         float elapsed = 0f;
@@ -115,7 +133,7 @@ public class ParryDodgeBar : MonoBehaviour
         while (elapsed < window && !_resolved)
         {
             // Marker position: ping-pong 0..1 across the sweep
-            float t = Mathf.PingPong(elapsed / sweepDuration, 1f);
+            float t = Mathf.PingPong(elapsed / currentSweepDuration, 1f);
             float x = Mathf.Lerp(-halfTrack, halfTrack, t);
             marker.anchoredPosition = new Vector2(x, marker.anchoredPosition.y);
 

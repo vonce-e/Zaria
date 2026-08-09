@@ -106,7 +106,7 @@ public class BattleSystem : MonoBehaviour
         if (enemyTelegraph != null)
             enemyTelegraph.enemyAI = enemyGo.GetComponent<EnemyAI>();
         
-        yield return new WaitForSeconds(1f);  // brief beat before cards appear
+        yield return new WaitForSeconds(0.5f);  // brief beat before cards appear
 
         state = BattleState.PLAYERTURN;
         if (combatUIRoot != null) combatUIRoot.SetActive(true);

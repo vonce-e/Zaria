@@ -162,7 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChestInteraction
   minCards: 1
   maxCards: 3
-  baseCoins: 30
+  baseCoins: 20
   coinsPerDepth: 15
 --- !u!114 &1558038741049915525
 MonoBehaviour:
