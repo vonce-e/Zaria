@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8961272130371631505}
   - component: {fileID: -3915371733055153477}
   - component: {fileID: 3694866721216857286}
+  - component: {fileID: 8579567289671156086}
   m_Layer: 0
   m_Name: Suppressor
   m_TagString: Untagged
@@ -108,6 +109,19 @@ MonoBehaviour:
   modelRoot: {fileID: 8896228140019651142}
   flashMaterial: {fileID: 2100000, guid: 40bc58b417bca448dbcfaedf3e70a729, type: 2}
   flashDuration: 0.1
+--- !u!114 &8579567289671156086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5524024946768645980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e40cd62f2c1b2492b932d96edcb8e083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+  animator: {fileID: 0}
 --- !u!1001 &9007050986296571309
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -172,6 +186,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Suppressor
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 6b53147c2297c431f9bf043aaa1d877d, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 88c3e3c9f71bf4d51bf118e4deb35da2, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

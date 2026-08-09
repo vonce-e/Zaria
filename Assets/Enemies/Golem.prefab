@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8961272130371631505}
   - component: {fileID: 705507238897973091}
   - component: {fileID: 2305426111431151492}
+  - component: {fileID: 6889662619988618886}
   m_Layer: 0
   m_Name: Golem
   m_TagString: Untagged
@@ -108,6 +109,19 @@ MonoBehaviour:
   modelRoot: {fileID: 2622563046776666349}
   flashMaterial: {fileID: 2100000, guid: 40bc58b417bca448dbcfaedf3e70a729, type: 2}
   flashDuration: 0.1
+--- !u!114 &6889662619988618886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5524024946768645980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e40cd62f2c1b2492b932d96edcb8e083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+  animator: {fileID: 0}
 --- !u!1001 &2589444781965647622
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -172,6 +186,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Golem_Idle
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 02c2d6798f9964246a0e5b44d035de9c, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

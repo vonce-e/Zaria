@@ -312,6 +312,9 @@ public class CombatManager : MonoBehaviour
                 break;
 
             case ParryDodgeResult.Hit:
+                EnemyAnimator anim = _enemy.GetComponent<EnemyAnimator>();
+                if (anim != null) anim.PlayAttack(); // Plays enemy attack animation
+
                 _player.TakeDamage(incoming);
                 AudioManager.Instance.AttackHit();
                 Debug.Log($"Hit for {incoming} (after block).");
@@ -336,7 +339,17 @@ public class CombatManager : MonoBehaviour
     /// </summary>
     private void Win()
     {
-        if (_combatEnded) return;
+        if (_combatEnded)
+        {
+            return;
+        }
+
+        EnemyAnimator enemyAnim = _enemy.GetComponent<EnemyAnimator>();
+
+        if (enemyAnim != null)
+        {
+            enemyAnim.PlayDeath();
+        }
 
         // On-death effect (e.g. Blazeling's explosion). May kill the player.
         int deathDmg = enemyAI.OnDeath(_player);
@@ -354,6 +367,7 @@ public class CombatManager : MonoBehaviour
         }
         _combatEnded = true;
         AudioManager.Instance.Victory();
+
         // change scene
         Debug.Log("YOU WIN.");
 

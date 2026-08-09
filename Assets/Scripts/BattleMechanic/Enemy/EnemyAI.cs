@@ -35,13 +35,11 @@ public class EnemyAI : MonoBehaviour
     [Range(0f, 1f)] public float defendChance = 0.25f;
     [Range(0f, 1f)] public float signatureChance = 0.15f;
     public int defendAmount = 5;
- 
-    /// <summary>
-    /// The current plan. Read by the hint UI and ExecuteIntent.
-    /// </summary>
-    public EnemyIntent CurrentIntent { get; private set; }
 
- 
+    public EnemyIntent CurrentIntent { get; private set; } // The enemy's intent
+
+    private EnemyAnimator _animator; // Animator for enemies
+
     /// <summary>
     /// Multiplier applied to the NEXT basic attack, then reset to 1. Used by
     /// enemies like Golem whose signature buffs their following attack.
@@ -65,9 +63,13 @@ public class EnemyAI : MonoBehaviour
     /// Returns damage to apply directly to the player (0 = none). Used by Blazeling.
     /// </summary>
     /// <param name="player">The player unit.</param>
-    /// <returns>Damage to apply to the player on death.</returns>
     public virtual int OnDeath(Unit player) { return 0; }
 
+    void Awake()
+    {
+        _animator = GetComponent<EnemyAnimator>();
+    }
+    
     /// <summary>
     /// Called at the start of this enemy's turn, before it acts. Override for
     /// passive per-turn behaviour. Used by Undying Priest's regeneration.
