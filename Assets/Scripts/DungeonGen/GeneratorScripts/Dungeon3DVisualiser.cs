@@ -162,6 +162,67 @@ public class Dungeon3DVisualiser : MonoBehaviour
                 Quaternion rotation = Quaternion.Euler(0f, wallRotation, 0f);
                 Instantiate(innerWallPrefab, wallPos, rotation, GetDungeonParent());
             }
+
+            foreach (InnerDoorWayData innerDoor in room.InnerDoors)
+            {
+                if (innerDoor.Tiles == null || innerDoor.Tiles.Count == 0)
+                {
+                    continue;
+                }
+
+                // Retrieve a prefab from the list 
+                GameObject passagePrefab = null;
+
+                if (selectedVisualRule != null)
+                {
+                    passagePrefab = GetRandomPrefabWeight(selectedVisualRule.passagePrefabs, null);
+                }
+
+                if (passagePrefab == null)
+                {
+                    continue;
+                }
+
+                // Instantiate the door 
+                Vector2 doorwayCenter = Vector2.zero;
+
+                foreach (Vector2Int doorwayTile in innerDoor.Tiles)
+                {
+                    doorwayCenter += doorwayTile;
+                }
+
+                // Finds the middle position
+                doorwayCenter /= innerDoor.Tiles.Count;
+
+                // Convert doorwayCenter into world space coords
+                Vector3 passagePosition = new Vector3(doorwayCenter.x * cellSize, 0f, doorwayCenter.y * cellSize );
+                
+                passagePosition += new Vector3(innerDoor.Direction.x, 0f, innerDoor.Direction.y)
+                 * wallDistanceFromFloorCenter 
+                 * cellSize;
+                
+
+                // Calculate rotation
+                float passageRotation = 0f;
+
+                if (innerDoor.Direction == Vector2Int.right)
+                {
+                    passageRotation = 90f;
+                }
+                else if (innerDoor.Direction == Vector2Int.down)
+                {
+                    passageRotation = 180f;
+                }
+                else if (innerDoor.Direction == Vector2Int.left)
+                {
+                    passageRotation = 270f;
+                }
+
+                Quaternion rotation = Quaternion.Euler(0f, passageRotation, 0f);
+
+                Instantiate(passagePrefab, passagePosition, rotation, GetDungeonParent());
+                
+            }
         }
 
         foreach (Vector2Int position in floorPositions)
@@ -250,7 +311,7 @@ public class Dungeon3DVisualiser : MonoBehaviour
             return fallBackPrefab;
         }
 
-        int randomWeight = UnityEngine.Random.Range(0, 100);
+        int randomWeight = UnityEngine.Random.Range(0, totalWeight);
         int currentWeight = 0;
 
         foreach(RoomVisualisationPrefabWeight rule in prefabRules)

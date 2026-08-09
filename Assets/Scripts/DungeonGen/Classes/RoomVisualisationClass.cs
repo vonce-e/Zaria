@@ -14,4 +14,5 @@ public class RoomVisualisationClass
   public List<RoomVisualisationPrefabWeight> floorPrefabs; 
   public List<RoomVisualisationPrefabWeight> wallPrefabs;
   public List<RoomVisualisationPrefabWeight> ceilingPrefabs;
+  public List<RoomVisualisationPrefabWeight> passagePrefabs;
 }

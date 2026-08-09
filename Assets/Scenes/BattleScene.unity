@@ -3187,6 +3187,70 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: footstepSource
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: footstepVolume
+      value: 0.125
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: cameraBobTarget
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: walkBobAmount.x
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: walkBobAmount.y
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: sprintBobAmount.x
+      value: 0.045
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: sprintBobAmount.y
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: movementController
+      value: 
+      objectReference: {fileID: 2120317955}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: sprintStepDistance
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: characterController
+      value: 
+      objectReference: {fileID: 2120317952}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: sprintVolumeMultiplier
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: 'footstepClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 6fad5a74b5650494aa580f37888bd3b9, type: 3}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: 'footstepClips.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: b9657650c88b14f4f860f08291a3b825, type: 3}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: 'footstepClips.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 4c2f1bc0fbd874043b23f41ef359fde0, type: 3}
+    - target: {fileID: 2857473901124567890, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: 'footstepClips.Array.data[3]'
+      value: 
+      objectReference: {fileID: 8300000, guid: ec9e7936c80274fefa105133f8b00658, type: 3}
     - target: {fileID: 3332417522747960368, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
       propertyPath: m_LocalPosition.x
       value: -43.34998
@@ -3967,7 +4031,6 @@ MonoBehaviour:
     deck: []
     potions: []
   pendingEncounterPrefab: {fileID: 0}
-  pendingRoomPrefab: {fileID: 0}
   returnSceneName: 
   currentDepth: 1
   pendingIsBoss: 0
@@ -11617,6 +11680,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a302c5a1b311042de8304cc65d0c83b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneLoader
+  loadingScreen: {fileID: 0}
+  progressBar: {fileID: 0}
+  minimumLoadingTime: 1
 --- !u!4 &1702726404
 Transform:
   m_ObjectHideFlags: 0
@@ -14243,6 +14309,17 @@ MonoBehaviour:
   modelRoot: {fileID: 0}
   flashMaterial: {fileID: 2100000, guid: 40bc58b417bca448dbcfaedf3e70a729, type: 2}
   flashDuration: 0.1
+--- !u!114 &2120317955 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2699046750372345485, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+  m_PrefabInstance: {fileID: 590306578}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120317949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55919ac34a26952479f3fc91f777b2fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2141006844
 GameObject:
   m_ObjectHideFlags: 0

@@ -45,9 +45,4 @@ public class InternalRoomSettings
 
     [Min(1)]
     public int doorwayWidth = 2;
-
-    public List<GameObject> passagePrefabs;
-
-    [Range(0,100)]
-    public int passgeGenerationChance = 0;
 }

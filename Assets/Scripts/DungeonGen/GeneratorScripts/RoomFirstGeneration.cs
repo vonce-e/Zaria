@@ -2099,6 +2099,15 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     /// </summary>
     private void AddWidth(HashSet<Vector2Int> wideCorridor, Vector2Int position, Vector2Int direction)
     {
+        // if (direction == Vector2Int.down)
+        // {
+        //     direction = Vector2Int.up;
+        // }
+        // else if (direction == Vector2Int.left)
+        // {
+        //     direction = Vector2Int.right;
+        // }
+
         Vector2Int perpendicularDirection = new Vector2Int(-direction.y, direction.x);
 
         for (int widthOffset = 0; widthOffset < corridorWidth; widthOffset++)
