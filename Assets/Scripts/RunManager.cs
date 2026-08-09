@@ -56,6 +56,10 @@ public class RunManager : MonoBehaviour
         runState.deck.Add(new CardInstance(CardId.DiceRoll));
         runState.deck.Add(new CardInstance(CardId.Energize));
 
+    // Bind the reward service to this run so chest/combat rewards use the real deck.
+    if (CardRewardService.Instance != null)
+        CardRewardService.Instance.BindRun(runState);
+
         Debug.Log("New run started.");
     }
 

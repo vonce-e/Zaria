@@ -52,8 +52,8 @@ MonoBehaviour:
   unitName: Golem
   unitLevel: 0
   damage: 10
-  maxHp: 70
-  currentHp: 70
+  maxHp: 45
+  currentHp: 45
   _energy: 0
   block: 0
   damageReduction: 0
@@ -132,19 +132,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalScale.x
-      value: 100
+      value: 151.26999
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalScale.y
-      value: 100
+      value: 151.26999
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalScale.z
-      value: 100
+      value: 151.26999
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 1.01
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalPosition.y
@@ -152,23 +152,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5133714
+      value: -0.06429461
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.48626104
+      value: 0.10236706
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.5133714
+      value: 0.6996578
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.48626104
+      value: 0.7041777
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -180,7 +180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 103.541
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: dc14998b4931a4e3d89dda9978930cde, type: 3}
       propertyPath: m_Name

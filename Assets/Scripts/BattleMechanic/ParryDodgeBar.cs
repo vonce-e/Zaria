@@ -51,6 +51,19 @@ public class ParryDodgeBar : MonoBehaviour
     // Where the zone centre sits this attempt (0-1).
     private float _zoneCentre = 0.5f;
 
+    [Header("Randomized zone size")]
+    [Tooltip("If on, the zones get a random size each attempt within set range.")]
+    public bool randomizeZoneSize = true;
+    [Tooltip("Smallest/largest the dodge window can be.")]
+    [Range(0.05f, 0.9f)] public float dodgeWidthMin = 0.20f;
+    [Range(0.05f, 0.9f)] public float dodgeWidthMax = 0.40f;
+    [Tooltip("Smallest/largest the parry window can be.")]
+    [Range(0.02f, 0.5f)] public float parryWidthMin = 0.06f;
+    [Range(0.02f, 0.5f)] public float parryWidthMax = 0.14f;
+
+    // The actual sizes used this attempt (randomized or the fixed defaults).
+    private float _dodgeWidth = 0.30f;
+    private float _parryWidth = 0.10f;
     void Awake()
     {
         if (barRoot != null) barRoot.SetActive(false);
@@ -78,6 +91,18 @@ public class ParryDodgeBar : MonoBehaviour
             _zoneCentre = 0.5f + UnityEngine.Random.Range(-maxCentreOffset, maxCentreOffset);
         else
             _zoneCentre = 0.5f;
+
+        // Pick this attempt's zone sizes.
+        if (randomizeZoneSize)
+        {
+            _dodgeWidth = UnityEngine.Random.Range(dodgeWidthMin, dodgeWidthMax);
+            _parryWidth = UnityEngine.Random.Range(parryWidthMin, parryWidthMax);
+        }
+        else
+        {
+            _dodgeWidth = dodgeZoneWidth;
+            _parryWidth = parryZoneWidth;
+        }
 
         LayoutZones();
 
@@ -121,9 +146,9 @@ public class ParryDodgeBar : MonoBehaviour
         // Both zones are centred on the track (0.5). Compare distance.
         float distFromCentre = Mathf.Abs(markerT - _zoneCentre);
 
-        if (distFromCentre <= parryZoneWidth * 0.5f)
+        if (distFromCentre <= _parryWidth * 0.5f)
             return ParryDodgeResult.Parry;
-        if (distFromCentre <= dodgeZoneWidth * 0.5f)
+        if (distFromCentre <= _dodgeWidth * 0.5f)
             return ParryDodgeResult.Dodge;
         return ParryDodgeResult.Hit;
     }
@@ -139,13 +164,13 @@ public class ParryDodgeBar : MonoBehaviour
 
         if (dodgeZone != null)
         {
-            dodgeZone.sizeDelta = new Vector2(trackWidth * dodgeZoneWidth, dodgeZone.sizeDelta.y);
+            dodgeZone.sizeDelta = new Vector2(trackWidth * _dodgeWidth, dodgeZone.sizeDelta.y);
             dodgeZone.anchoredPosition = new Vector2(centreX, dodgeZone.anchoredPosition.y);
         }
 
         if (parryZone != null)
         {
-            parryZone.sizeDelta = new Vector2(trackWidth * parryZoneWidth, parryZone.sizeDelta.y);
+            parryZone.sizeDelta = new Vector2(trackWidth * _parryWidth, parryZone.sizeDelta.y);
             parryZone.anchoredPosition = new Vector2(centreX, parryZone.anchoredPosition.y);
         }
     }

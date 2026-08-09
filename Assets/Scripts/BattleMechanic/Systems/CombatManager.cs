@@ -377,9 +377,18 @@ public class CombatManager : MonoBehaviour
         {
             int xp = xpComponent.xpReward;
             _run.GrantXp(xp);
-            Debug.Log($"Gained {xp} XP. " +
-                    $"Now level {_run.playerLevel} ({_run.currentXp}/{_run.XpForNextLevel}).");
+            Debug.Log($"Gained {xp} XP. " + $"Now level {_run.playerLevel} ({_run.currentXp}/{_run.XpForNextLevel}).");
         }
+
+        // Show the XP bar now that battle is won.
+        if (BattleSystem.Instance != null && BattleSystem.Instance.xpBar != null)
+        {
+            BattleSystem.Instance.xpBar.gameObject.SetActive(true);
+        }
+
+        // Show the XP slider now that battle is won.
+        if (BattleSystem.Instance != null && BattleSystem.Instance.xpBarContainer != null)
+            BattleSystem.Instance.xpBarContainer.SetActive(true);
 
         // Card reward
         string cardPart = "";

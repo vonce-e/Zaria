@@ -46,6 +46,7 @@ public class BattleSystem : MonoBehaviour
     [Header("Run-dependent UI")]
     public PotionBarDisplay potionBar;
     public XpBarUI xpBar;
+    public GameObject xpBarContainer; // XP Bar Slider
 
     private Unit _playerUnit;
     private Unit _enemyUnit;
@@ -117,7 +118,17 @@ public class BattleSystem : MonoBehaviour
 
         // Wires the UI that needs run state
         if (potionBar != null) potionBar.run = RunManager.Instance.runState;
-        if (xpBar != null) xpBar.Bind(RunManager.Instance.runState);
+
+        if (xpBar != null) // hides xp text
+        {
+            xpBar.Bind(RunManager.Instance.runState);
+            xpBar.gameObject.SetActive(false);   // hidden during the fight
+        }
+
+        if (xpBarContainer != null) // hides xp slider
+        {
+            xpBarContainer.SetActive(false);
+        }
     }
 
     /// <summary>

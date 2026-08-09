@@ -52,8 +52,8 @@ MonoBehaviour:
   unitName: Mirror Warden
   unitLevel: 0
   damage: 8
-  maxHp: 85
-  currentHp: 85
+  maxHp: 55
+  currentHp: 55
   _energy: 0
   block: 0
   damageReduction: 0

@@ -3284,6 +3284,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4098099605158829050, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: maxHp
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 4098099605158829050, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      propertyPath: currentHp
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 4098099605158829050, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
       propertyPath: unitLevel
       value: 10
       objectReference: {fileID: 0}
@@ -5940,6 +5948,7 @@ MonoBehaviour:
   combatUIRoot: {fileID: 1264208239}
   potionBar: {fileID: 1507832142}
   xpBar: {fileID: 511997335}
+  xpBarContainer: {fileID: 1164720744}
   state: 0
   enemyTelegraph: {fileID: 1175433229}
 --- !u!4 &989045807
@@ -9941,6 +9950,11 @@ MonoBehaviour:
   parryZoneWidth: 0.0375
   randomizeZonePosition: 1
   maxCentreOffset: 0.25
+  randomizeZoneSize: 1
+  dodgeWidthMin: 0.1
+  dodgeWidthMax: 0.3
+  parryWidthMin: 0.05
+  parryWidthMax: 0.1
 --- !u!1 &1498429898
 GameObject:
   m_ObjectHideFlags: 0
@@ -11878,7 +11892,7 @@ RectTransform:
   m_GameObject: {fileID: 1723464527}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5699142, y: 0.5059921, z: 4.695441}
+  m_LocalScale: {x: 0.50442535, y: 0.44784856, z: 4.1558876}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1264208240}

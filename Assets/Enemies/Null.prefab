@@ -52,8 +52,8 @@ MonoBehaviour:
   unitName: Null
   unitLevel: 0
   damage: 10
-  maxHp: 250
-  currentHp: 250
+  maxHp: 125
+  currentHp: 125
   _energy: 0
   block: 0
   damageReduction: 0

@@ -35,7 +35,7 @@ public class CardRewardService : MonoBehaviour
                 LastGrantedCard = def;
                 Debug.Log($"<color=lime>+ {def.displayName} added to deck!</color>");
             }
-            
+
             else
                 LastGrantedCard = null;
                 Debug.Log($"<color=orange>Deck is full - {def.displayName} refused.</color>");
@@ -74,5 +74,14 @@ public class CardRewardService : MonoBehaviour
     public void GrantSpecificCard(CardId id)
     {
         _system.AddCard(id);
+    }
+
+    /// <summary>
+    /// Point the reward system at the given run state.
+    /// </summary>
+    public void BindRun(PlayerRunState currentRun)
+    {
+        run = currentRun;
+        _system = new CardRewardSystem(cardDatabase, run);
     }
 }
