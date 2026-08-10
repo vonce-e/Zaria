@@ -51,9 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Mirror Warden
   unitLevel: 0
-  damage: 15
-  maxHp: 100
-  currentHp: 100
+  damage: 14
+  maxHp: 105
+  currentHp: 105
   _energy: 0
   block: 0
   damageReduction: 0
@@ -89,7 +89,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MirrorWardenAI
   unit: {fileID: 7537200062239543717}
   defendChance: 0.25
-  signatureChance: 0.25
+  signatureChance: 0.3
   defendAmount: 5
   nextAttackMultiplier: 1
   lastPlayerAttackDamage: 0

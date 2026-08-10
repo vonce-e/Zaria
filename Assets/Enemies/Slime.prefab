@@ -89,8 +89,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlimeAI
   unit: {fileID: 7537200062239543717}
-  defendChance: 0.2
-  signatureChance: 0.3
+  defendChance: 0.25
+  signatureChance: 0.35
   defendAmount: 5
   nextAttackMultiplier: 1
   lastPlayerAttackDamage: 0

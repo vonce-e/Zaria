@@ -51,7 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Null
   unitLevel: 0
-  damage: 18
+  damage: 16
   maxHp: 180
   currentHp: 180
   _energy: 0
@@ -88,9 +88,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NullAI
   unit: {fileID: 7537200062239543717}
-  defendChance: 0.4
+  defendChance: 0.35
   signatureChance: 0.3
-  defendAmount: 8
+  defendAmount: 6
   nextAttackMultiplier: 1
   lastPlayerAttackDamage: 0
   combat: {fileID: 0}
