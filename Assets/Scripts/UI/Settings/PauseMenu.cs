@@ -11,12 +11,18 @@ public class PauseMenu : MonoBehaviour
 {
     [Tooltip("The settings panel to show/hide (the whole SettingsPanel).")]
     public GameObject settingsPanel;
+    [SerializeField] private GameObject endRunConfirmationPanel;
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private bool _isOpen = false;
 
     void Start()
     {
         if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (endRunConfirmationPanel != null)
+        {
+            endRunConfirmationPanel.SetActive(false);
+        }
     }
 
     void Update()
@@ -63,5 +69,29 @@ public class PauseMenu : MonoBehaviour
         Cursor.visible = false;
 
         UIState.PanelClosed();
+    }
+
+    public void CancelEndRun()
+    {
+        if (endRunConfirmationPanel != null)
+        {
+            endRunConfirmationPanel.SetActive(false);
+        }
+    }
+
+    public void ConfirmEndRun()
+    {
+        Time.timeScale = 1f;
+        UIState.PanelClosed();
+
+        if (RunManager.Instance != null)
+        {
+            Destroy(RunManager.Instance.gameObject);
+        }
+
+        if (SceneLoader.Instance != null)
+        {
+            SceneLoader.Instance.ChangeScene(mainMenuSceneName);
+        }
     }
 }

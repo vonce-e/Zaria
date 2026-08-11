@@ -117,3 +117,4 @@ Assets/Firebase/Plugins/x86_64/*.bundle
 Assets/Firebase/Plugins/x86_64/*.so
 
 .DS_Store
+**/.DS_Store

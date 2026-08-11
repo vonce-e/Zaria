@@ -67,6 +67,11 @@ public class DoorInteraction : MonoBehaviour
 
         targetRotation = openRotation;
         isOpen = true;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.DoorOpen();
+        }
     }
 
 

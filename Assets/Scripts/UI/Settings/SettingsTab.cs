@@ -11,6 +11,7 @@ public class SettingsTabs : MonoBehaviour
     public GameObject gamePanel;
     public GameObject controlsPanel;
     public GameObject audioPanel;
+    public GameObject endGamePanel;
 
     void Start()
     {
@@ -45,5 +46,13 @@ public class SettingsTabs : MonoBehaviour
         gamePanel.SetActive(false);
         controlsPanel.SetActive(false);
         audioPanel.SetActive(true);
+    }
+
+    public void ShowEndGamePanel()
+    {
+        gamePanel.SetActive(false);
+        controlsPanel.SetActive(false);
+        audioPanel.SetActive(false);
+        endGamePanel.SetActive(true);
     }
 }

@@ -32,6 +32,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip potionDrink;
     public AudioClip levelUp;
     public AudioClip cardAcquired;
+    public AudioClip doorOpening;
 
     [Header("Stingers")]
     public AudioClip victory;
@@ -111,6 +112,7 @@ public class AudioManager : MonoBehaviour
     public void CardAcquired() => PlaySfx(cardAcquired);
     public void Victory() => PlaySfx(victory);
     public void Defeat() => PlaySfx(defeat);
+    public void DoorOpen() => PlaySfx(doorOpening);
 
     public void PlayMenuMusic() => PlayMusic(menuMusic);
     public void PlayDungeonMusic() => PlayMusic(dungeonMusic);
