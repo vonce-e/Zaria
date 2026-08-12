@@ -42,7 +42,7 @@ public class RunManager : MonoBehaviour
     /// </summary>
     public void StartNewRun()
     {
-        runState = new PlayerRunState { playerLevel = 1 };
+        runState = new PlayerRunState { playerLevel = 1 }; // fresh run, empties deck
 
         // Starting deck
         runState.deck.Add(new CardInstance(CardId.Slash));
@@ -56,9 +56,9 @@ public class RunManager : MonoBehaviour
         runState.deck.Add(new CardInstance(CardId.DiceRoll));
         runState.deck.Add(new CardInstance(CardId.Energize));
 
-    // Bind the reward service to this run so chest/combat rewards use the real deck.
-    if (CardRewardService.Instance != null)
-        CardRewardService.Instance.BindRun(runState);
+        // Bind the reward service to this run so chest/combat rewards use the real deck.
+        if (CardRewardService.Instance != null)
+            CardRewardService.Instance.BindRun(runState);
 
         Debug.Log("New run started.");
     }

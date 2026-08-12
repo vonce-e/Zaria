@@ -23,10 +23,15 @@ public class CardRewardService : MonoBehaviour
     /// </summary>
     void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
 
         if (run == null) run = new PlayerRunState { playerLevel = 1 };
         _system = new CardRewardSystem(cardDatabase, run);
+
+        WireSystem();
 
         _system.OnCardOffered += (def, result) =>
         {
@@ -42,16 +47,26 @@ public class CardRewardService : MonoBehaviour
         };
     }
 
+    void Start()
+    {
+        if (RunManager.Instance != null)
+            BindRun(RunManager.Instance.runState);
+    }
+
     /// <summary>
     /// Called by a chest's onInteract event. Chests skew slightly toward
     /// rares vs an enemy drop.
     /// </summary>
     public void OpenChest()
-    {
-        _system.GrantRandomReward(
-            commonWeight: 55, rareWeight: 35,
-            mythicWeight: 10, legendaryWeight: 0);
-    }
+        {
+            // Always bind to the current run before granting.
+            if (RunManager.Instance != null)
+                BindRun(RunManager.Instance.runState);
+
+            _system.GrantRandomReward(
+                commonWeight: 55, rareWeight: 35,
+                mythicWeight: 10, legendaryWeight: 0);
+        }
 
     /// <summary>
     /// Called by CombatManager.Win. Each encounter passes its own rarity
@@ -83,5 +98,34 @@ public class CardRewardService : MonoBehaviour
     {
         run = currentRun;
         _system = new CardRewardSystem(cardDatabase, run);
+
+        WireSystem(); 
+
+        _system.OnCardOffered += (def, result) =>
+        {
+            if (result == CardRewardSystem.AddResult.Added)
+            {
+                LastGrantedCard = def;
+                Debug.Log($"<color=lime>+ {def.displayName} added!</color>");
+            }
+            else
+            {
+                LastGrantedCard = null;
+            }
+        };
+    }
+
+    /// <summary>
+    /// Attaches the card-offered handler to the current reward system
+    /// <summary>
+    private void WireSystem()
+    {
+        _system.OnCardOffered += (def, result) =>
+        {
+            if (result == CardRewardSystem.AddResult.Added)
+                LastGrantedCard = def;
+            else
+                LastGrantedCard = null;
+        };
     }
 }

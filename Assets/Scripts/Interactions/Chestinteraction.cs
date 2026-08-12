@@ -37,7 +37,7 @@ public class ChestInteraction : MonoBehaviour
 
         if (RunManager.Instance == null)
         {
-            Debug.LogWarning("ChestInteraction: no RunManager - is a run active?");
+            Debug.LogWarning("ChestInteraction: no RunManager, is a run active?");
             return;
         }
 
@@ -62,9 +62,13 @@ public class ChestInteraction : MonoBehaviour
             {
                 CardRewardService.Instance.OpenChest();
 
-                // Capture the card that was just granted.
+                // Capture the card that was just granted
                 CardData granted = CardRewardService.Instance.LastGrantedCard;
-                if (granted != null) cardNames.Add(granted.displayName);
+
+                if (granted != null)
+                {
+                    cardNames.Add(granted.displayName);
+                }
             }
         }
 
@@ -78,7 +82,7 @@ public class ChestInteraction : MonoBehaviour
 
         _opened = true;
         Debug.Log($"Chest opened (depth {depth}): +{coinReward} coins, +{cardCount} card(s).");
-
+        
         if (AudioManager.Instance != null)
             AudioManager.Instance.ChestOpen(); // Chest Opened Audio
 

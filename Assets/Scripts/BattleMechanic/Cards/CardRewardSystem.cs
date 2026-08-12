@@ -47,16 +47,14 @@ public class CardRewardSystem
         {
             CardData defFull = _database.Get(id);
             OnCardOffered?.Invoke(defFull, AddResult.DeckFull);
-            Debug.Log($"Deck full ({MaxDeckSize}/{MaxDeckSize}). " +
-                      $"{defFull.displayName} was refused.");
+            Debug.Log($"Deck full ({MaxDeckSize}/{MaxDeckSize}). " + $"{defFull.displayName} was refused.");
             return AddResult.DeckFull;
         }
 
         _run.deck.Add(new CardInstance(id));
         CardData def = _database.Get(id);
         OnCardOffered?.Invoke(def, AddResult.Added);
-        Debug.Log($"Added {def.displayName} to deck " +
-                  $"({_run.deck.Count}/{MaxDeckSize}).");
+        Debug.Log($"Added {def.displayName} to deck " + $"({_run.deck.Count}/{MaxDeckSize}).");
         return AddResult.Added;
     }
 
@@ -89,10 +87,7 @@ public class CardRewardSystem
     /// <param name="rareWeight">Relative chance of Rare.</param>
     /// <param name="mythicWeight">Relative chance of Mythic.</param>
     /// <param name="legendaryWeight">Relative chance of Legendary.</param>
-    public AddResult GrantRandomReward(int commonWeight = 70,
-                                       int rareWeight = 25,
-                                       int mythicWeight = 5,
-                                       int legendaryWeight = 0)
+    public AddResult GrantRandomReward(int commonWeight = 70, int rareWeight = 25, int mythicWeight = 5, int legendaryWeight = 0)
     {
         int total = commonWeight + rareWeight + mythicWeight + legendaryWeight;
         int roll = Random.Range(0, total);
