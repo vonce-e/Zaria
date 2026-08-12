@@ -162,8 +162,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChestInteraction
   minCards: 1
   maxCards: 3
-  baseCoins: 20
-  coinsPerDepth: 15
+  cardDropChance: 15
+  baseCoins: 5
+  lowCoinChance: 65
+  mediumCoinChance: 25
+  lowCoinRange: {x: 5, y: 20}
+  mediumCoinRange: {x: 21, y: 30}
+  highCoinRange: {x: 31, y: 50}
+  coinsPerDepth: 5
 --- !u!114 &1558038741049915525
 MonoBehaviour:
   m_ObjectHideFlags: 0

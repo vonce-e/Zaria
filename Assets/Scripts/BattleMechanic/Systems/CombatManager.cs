@@ -17,7 +17,6 @@ public class CombatManager : MonoBehaviour
     public EnemyAI enemyAI;
     public int handSize = 5;
     public int energyPerTurn = 5;
-    public int energyRecoveredPerTurn = 5;
 
     [Header("Reward weights for this encounter")]
     public int rewardCommon    = 70;
@@ -107,10 +106,8 @@ public class CombatManager : MonoBehaviour
         
         SetPlayerActionUI(true); // show hand + end turn on the player's turn
         
-        // Recovers energy by 3
-        _player.energy = Mathf.Min(
-            _player.energy + energyRecoveredPerTurn,
-            energyPerTurn);
+        // Reset energy to the maximum at the start of the turn.
+        _player.energy = energyPerTurn;
 
         _player.block = 0;
         _cardsPlayedThisTurn.Clear();
