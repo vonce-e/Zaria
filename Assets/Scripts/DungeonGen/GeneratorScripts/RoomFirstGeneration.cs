@@ -73,7 +73,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
     private void CreateRooms()
     {
 
-        int maxAttempts = 20;
+        int maxAttempts = 30;
         int currentAttempt = 0;
         bool validDungeonGenerated = false;
 
@@ -85,8 +85,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
         while (currentAttempt < maxAttempts && validDungeonGenerated == false)
         {
             currentAttempt++;
-
-            Debug.Log("Dungeon Generation Attempt: " + currentAttempt);
 
             floor = new HashSet<Vector2Int>();
             generatedRooms = new List<DungeonRoomData>();
@@ -1760,13 +1758,6 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
             {
                 roomsToSpawn = Random.Range(rule.mediumAmount + 1, rule.highAmount + 1);
             }
-
-            Debug.Log(
-               "Rule: " + rule.roomType +
-               " | Chance: " + randomChance +
-               " | Wants: " + roomsToSpawn +
-               " | Size Range: " + rule.minRoomSize + "-" + rule.maxRoomSize
-            );
 
             wantedRooms[rule.roomType] = roomsToSpawn;
 

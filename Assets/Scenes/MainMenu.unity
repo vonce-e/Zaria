@@ -7303,6 +7303,9 @@ MonoBehaviour:
   returnSceneName: 
   currentDepth: 1
   pendingIsBoss: 0
+  timePerDepth: 5
+  remainingDungeonTime: 0
+  dungeonTimerExpired: 0
 --- !u!4 &1362150056
 Transform:
   m_ObjectHideFlags: 0

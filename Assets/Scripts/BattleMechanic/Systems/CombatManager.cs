@@ -387,7 +387,7 @@ public class CombatManager : MonoBehaviour
                 
                 AudioManager.Instance.DodgeSuccess();
                 
-                Debug.Log("<color=green>DODGE! No damage taken.</color>");
+                Debug.Log($"<color=green>DODGE! Damage reduced to {reducedDmg}.</color>");
                 break;
 
             case ParryDodgeResult.Hit:
@@ -570,10 +570,20 @@ public class CombatManager : MonoBehaviour
     private void HandleLevelUp(int newLevel)
     {
         if (_player == null) return;
-
+        
+        _player.unitLevel = newLevel;
         _player.maxHp += hpGrowthPerLevel;
         _player.currentHp = _player.maxHp;  // full heal on level up
-        AudioManager.Instance.LevelUp();
+        
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.LevelUp();
+        }
+
+        if (BattleSystem.Instance != null && BattleSystem.Instance.playerHUD != null)
+        {
+            BattleSystem.Instance.playerHUD.SetHUD(_player);
+        }
 
         if (damageGrowthEveryNLevels > 0 && newLevel % damageGrowthEveryNLevels == 0)
             _player.damage += 1;

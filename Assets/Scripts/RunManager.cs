@@ -25,6 +25,12 @@ public class RunManager : MonoBehaviour
     [Tooltip("True if the pending battle is a boss fight (used to advance depth on win).")]
     public bool pendingIsBoss;
 
+    [Header("Dungeon Timer")] 
+    [SerializeField] private float timePerDepth = 480f;
+
+    public float remainingDungeonTime;
+    [HideInInspector] public bool dungeonTimerExpired;
+
     private void Awake()
     {
         // Singleton
@@ -62,6 +68,11 @@ public class RunManager : MonoBehaviour
         // Bind the reward service to this run so chest/combat rewards use the real deck.
         if (CardRewardService.Instance != null)
             CardRewardService.Instance.BindRun(runState);
+        
+        // Reset the player's timer & depth
+        currentDepth = 1;
+        remainingDungeonTime = timePerDepth;
+        dungeonTimerExpired = false;
 
         Debug.Log("New run started.");
     }
@@ -75,6 +86,10 @@ public class RunManager : MonoBehaviour
 
         // Reset the blacksmith enchant budget for the new map.
         runState.enchantSpent = 0;
+
+        // Reset the timer for the new depth
+        remainingDungeonTime = timePerDepth;
+        dungeonTimerExpired = false;
         
         Debug.Log($"Advanced to depth {currentDepth}.");
     }

@@ -51,9 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Null
   unitLevel: 0
-  damage: 16
-  maxHp: 180
-  currentHp: 180
+  damage: 12
+  maxHp: 140
+  currentHp: 140
   _energy: 0
   block: 0
   damageReduction: 0

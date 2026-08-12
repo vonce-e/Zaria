@@ -16,8 +16,8 @@ MonoBehaviour:
   displayName: Energize
   cardType: 2
   rarity: 0
-  energyCost: 0
-  description: If dice >= 3, gain 2 energy.
+  energyCost: 1
+  description: If dice >= 3, gain 2 energy. Else lose 1
   artwork: {fileID: 21300000, guid: ec68ecd8b70dd4193b67bf432f9faa58, type: 3}
   baseDamage: 0
   baseDefense: 0

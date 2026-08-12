@@ -51,9 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Golem
   unitLevel: 0
-  damage: 12
-  maxHp: 115
-  currentHp: 115
+  damage: 8
+  maxHp: 95
+  currentHp: 95
   _energy: 0
   block: 0
   damageReduction: 0
@@ -90,7 +90,7 @@ MonoBehaviour:
   unit: {fileID: 7537200062239543717}
   defendChance: 0.15
   signatureChance: 0.3
-  defendAmount: 7
+  defendAmount: 6
   nextAttackMultiplier: 1
   lastPlayerAttackDamage: 0
   combat: {fileID: 0}

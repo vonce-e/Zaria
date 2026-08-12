@@ -77,7 +77,6 @@ public class ShopUI : MonoBehaviour
 
         var inputs = FindObjectOfType<StarterAssets.StarterAssetsInputs>();
         if (inputs != null) inputs.cursorLocked = true;
-
         UIState.PanelClosed();
     }
 

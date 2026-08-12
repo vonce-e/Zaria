@@ -52,9 +52,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Leech
   unitLevel: 0
-  damage: 14
-  maxHp: 90
-  currentHp: 90
+  damage: 9
+  maxHp: 75
+  currentHp: 75
   _energy: 0
   block: 0
   damageReduction: 0

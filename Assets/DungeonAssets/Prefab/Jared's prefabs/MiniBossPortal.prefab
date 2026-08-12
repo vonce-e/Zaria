@@ -143,6 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b986e7a3e3ef943069a75d43916587a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPortal
+  isMiniBossPortal: 0
   enemyPool: {fileID: 11400000, guid: bbc5cafa91848498793c066f24ea300b, type: 2}
   roomPrefab: {fileID: 0}
   battleSceneName: BattleScene
@@ -164,7 +165,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1756908843524528335}
         m_TargetAssemblyTypeName: EnemyPortal, Assembly-CSharp
-        m_MethodName: StartBattle
+        m_MethodName: StartNotForcedBattle
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -16,11 +16,30 @@ public class EnemyPortal : MonoBehaviour
 
     [Tooltip("Name of the battle scene to load.")]
     public string battleSceneName = "BattleScene";
+    
+    /// <summary>
+    /// This method calls the start battle if the system could find a boss portal prefab
+    /// </summary>
+    public void StartNotForcedBattle()
+    {
+        StartBattle(false);
+    }
+    
+
+    /// <summary>
+    /// This method is called to start the battle by force if there was no boss portal prefab
+    /// And only a miniboss portal prefab, so that the depth and rewards are given and the timer is resetted
+    /// </summary>
+    public void StartForcedDepthBattle()
+    {
+        StartBattle(true);
+    }
+
 
     /// <summary>
     /// Pick a random enemy and start the battle.
     /// </summary>
-    public void StartBattle()
+    public void StartBattle(bool countsAsBoss)
     {
         if (enemyPool == null)
         {
@@ -40,6 +59,6 @@ public class EnemyPortal : MonoBehaviour
         string returnScene = UnityEngine.SceneManagement
             .SceneManager.GetActiveScene().name;
 
-        RunManager.Instance.LoadBattle(enemy, battleSceneName, returnScene, false);
+        RunManager.Instance.LoadBattle(enemy, battleSceneName, returnScene, countsAsBoss);
     }
 }

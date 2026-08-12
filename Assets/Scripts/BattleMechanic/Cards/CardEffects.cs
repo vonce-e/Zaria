@@ -165,7 +165,7 @@ public class EnergizeEffect : ICardEffect
     {
         if (ctx.diceValue >= 3)
             ctx.caster.energy = Mathf.Min(
-            ctx.caster.energy + 2,
+            ctx.caster.energy + 3,
             ctx.combat.energyPerTurn);
 
         DefenseFlash defenseFlash =

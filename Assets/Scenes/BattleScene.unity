@@ -4767,6 +4767,9 @@ MonoBehaviour:
   returnSceneName: 
   currentDepth: 1
   pendingIsBoss: 0
+  timePerDepth: 480
+  remainingDungeonTime: 0
+  dungeonTimerExpired: 0
 --- !u!4 &709192526
 Transform:
   m_ObjectHideFlags: 0
@@ -7097,6 +7100,8 @@ MonoBehaviour:
   xpBarContainer: {fileID: 1164720744}
   state: 0
   enemyTelegraph: {fileID: 1175433229}
+  basePlayerMaxHp: 75
+  hpGrowthPerLevel: 5
 --- !u!4 &989045807
 Transform:
   m_ObjectHideFlags: 0
@@ -9692,9 +9697,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17828eccd0f7e4f9d804e586f4f67364, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HUDController
-  crosshair: {fileID: 1138320207}
-  battleHUD: {fileID: 0}
+  playerHUD: {fileID: 0}
+  depthText: {fileID: 0}
+  coinsText: {fileID: 0}
+  timerText: {fileID: 0}
+  useDungeonInformation: 0
+  warningTime: 120
+  dangerTime: 30
+  normalTimerColor: {r: 1, g: 1, b: 1, a: 1}
+  warningTimerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  dangerTimerColor: {r: 1, g: 0, b: 0, a: 1}
+  forcedBossDelay: 2
+  timerExpiredMessage: Time has expired. The boss awaits...
+  interactionParent: {fileID: 0}
   interactionText: {fileID: 0}
+  crosshair: {fileID: 1138320207}
 --- !u!1 &1249866830
 GameObject:
   m_ObjectHideFlags: 0
@@ -11416,23 +11433,23 @@ MonoBehaviour:
   track: {fileID: 1500751766}
   dodgeZone: {fileID: 373905425}
   parryZone: {fileID: 868015476}
-  sweepDuration: 2
+  sweepDuration: 2.2
   window: 1.7
   possibleSweepDurations:
-  - 0.7
-  - 0.9
+  - 0.8
   - 1
-  - 1.3
+  - 1.2
+  - 1.4
   - 1.6
-  dodgeZoneWidth: 0.125
-  parryZoneWidth: 0.0375
+  dodgeZoneWidth: 0.15
+  parryZoneWidth: 0.04
   randomizeZonePosition: 1
   maxCentreOffset: 0.25
   randomizeZoneSize: 1
-  dodgeWidthMin: 0.1
-  dodgeWidthMax: 0.3
-  parryWidthMin: 0.05
-  parryWidthMax: 0.1
+  dodgeWidthMin: 0.15
+  dodgeWidthMax: 0.35
+  parryWidthMin: 0.06
+  parryWidthMax: 0.11
 --- !u!1 &1498429898
 GameObject:
   m_ObjectHideFlags: 0

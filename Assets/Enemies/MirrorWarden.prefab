@@ -51,9 +51,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   unitName: Mirror Warden
   unitLevel: 0
-  damage: 14
-  maxHp: 105
-  currentHp: 105
+  damage: 9
+  maxHp: 85
+  currentHp: 85
   _energy: 0
   block: 0
   damageReduction: 0

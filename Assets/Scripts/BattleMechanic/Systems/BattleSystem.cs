@@ -55,6 +55,10 @@ public class BattleSystem : MonoBehaviour
 
     private GameObject _enemyGo;   // the spawned enemy, created on scene load
 
+    [Header("Player Level Scaling")]
+    [SerializeField] private int basePlayerMaxHp = 75;
+    [SerializeField] private int hpGrowthPerLevel = 5;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -125,12 +129,21 @@ public class BattleSystem : MonoBehaviour
 
         _enemyUnit.currentHp = _enemyUnit.maxHp;
 
-        // Set up the player HUD.
-        playerHUD.SetHUD(_playerUnit);
-
         if (RunManager.Instance != null)
-            _playerUnit.unitLevel = RunManager.Instance.runState.playerLevel;
-            EnemyScaling.Apply(_enemyUnit, RunManager.Instance.currentDepth); // Scales enemies based off of depth of run
+        {
+            int savedLevel = RunManager.Instance.runState.playerLevel;
+
+            _playerUnit.unitLevel = savedLevel;
+
+            _playerUnit.maxHp = basePlayerMaxHp + (savedLevel - 1) * hpGrowthPerLevel;
+
+            _playerUnit.currentHp = _playerUnit.maxHp;
+        }
+
+        if (playerHUD != null)
+        {
+            playerHUD.SetHUD(_playerUnit);
+        }
 
         // point CombatManager at boss's AI, then start combat
         combatManager.enemyAI = _enemyGo.GetComponent<EnemyAI>();
