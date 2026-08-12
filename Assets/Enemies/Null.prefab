@@ -110,6 +110,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HitFlash
   modelRoot: {fileID: 7102390637113083638}
   flashMaterial: {fileID: 2100000, guid: 40bc58b417bca448dbcfaedf3e70a729, type: 2}
+  defendFlashMaterial: {fileID: 2100000, guid: 03a3d8ccc84a34383ac121c75de7027d, type: 2}
   flashDuration: 0.1
 --- !u!114 &7886606223771677218
 MonoBehaviour:
@@ -154,7 +155,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 193447a1bbe6f4c69815704b2dd8f99c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 1.56
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 193447a1bbe6f4c69815704b2dd8f99c, type: 3}
       propertyPath: m_LocalRotation.w

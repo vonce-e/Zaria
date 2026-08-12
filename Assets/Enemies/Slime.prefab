@@ -110,6 +110,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HitFlash
   modelRoot: {fileID: 5206501367478331438}
   flashMaterial: {fileID: 2100000, guid: 40bc58b417bca448dbcfaedf3e70a729, type: 2}
+  defendFlashMaterial: {fileID: 2100000, guid: 03a3d8ccc84a34383ac121c75de7027d, type: 2}
   flashDuration: 0.1
 --- !u!114 &8162897021637569637
 MonoBehaviour:

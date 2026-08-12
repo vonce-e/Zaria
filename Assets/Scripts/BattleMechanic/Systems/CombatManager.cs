@@ -53,6 +53,12 @@ public class CombatManager : MonoBehaviour
 
     private CardInstance _lastPlayedCard;
 
+    [Header("Player action UI (hidden during enemy turn)")]
+    [Tooltip("The hand row of cards.")]
+    public GameObject handRow;
+    [Tooltip("The End Turn button.")]
+    public GameObject endTurnButton;
+
     /// <summary>
     /// Called by BattleSystem or CombatTest once everything is staged.
     /// Sets up the card piles, draws the opening hand, asks the enemy
@@ -98,6 +104,8 @@ public class CombatManager : MonoBehaviour
     private void StartPlayerTurn()
     {
         if (_combatEnded) return;
+        
+        SetPlayerActionUI(true); // show hand + end turn on the player's turn
         
         // Recovers energy by 3
         _player.energy = Mathf.Min(
@@ -270,6 +278,8 @@ public class CombatManager : MonoBehaviour
     {
         if (_combatEnded) yield break;
 
+        SetPlayerActionUI(false); // hide hand + end turn button during the enemy's turn
+
         _enemy.block = 0;
         OnTurnChanged?.Invoke(false);
         Debug.Log("Enemy turn.");
@@ -285,6 +295,10 @@ public class CombatManager : MonoBehaviour
         }
         else
         {
+            // Remember what the enemy is doing before executing (for the defend beat).
+            bool isDefending = enemyAI.CurrentIntent != null
+                               && enemyAI.CurrentIntent.type == EnemyActionType.Defend;
+
             // Passive checks
             enemyAI.OnEnemyTurnStart();
 
@@ -296,12 +310,38 @@ public class CombatManager : MonoBehaviour
                 // Damaging move, route it through the timing bar.
                 yield return StartCoroutine(ResolveAttackWithBar(incoming));
             }
+            else if (isDefending)
+            {
+                // Defend beat: blue flash + block sound, UI stays hidden for 2s.
+                yield return StartCoroutine(ResolveEnemyDefend());
+            }
 
             if (_player.IsDead) { Lose(); yield break; }
         }
 
         enemyAI.DecideNextIntent();
         StartPlayerTurn();
+    }
+
+    /// <summary>
+    /// The enemy's defend beat: flashes the enemy blue, plays the block sound,
+    /// and holds for a fixed time so the player watches before acting again.
+    /// </summary>
+    private IEnumerator ResolveEnemyDefend()
+    {
+        const float defendBeatTime = 2f;   // how long the defend beat lasts
+
+        // Blue flash on the enemy for the whole beat.
+        HitFlash flash = _enemy.GetComponent<HitFlash>();
+        if (flash != null) flash.FlashDefend(defendBeatTime);
+
+        // Defend sound.
+        AudioManager.Instance.BlockGain();
+
+        Debug.Log($"{_enemy.unitName} defends - holding for {defendBeatTime}s.");
+
+        // Hold so the player can't act until the beat is over.
+        yield return new WaitForSeconds(defendBeatTime);
     }
 
     /// <summary>
@@ -355,8 +395,21 @@ public class CombatManager : MonoBehaviour
 
             case ParryDodgeResult.Hit:
                 EnemyAnimator anim = _enemy.GetComponent<EnemyAnimator>();
-                if (anim != null) anim.PlayAttack(); // Plays enemy attack animation
 
+                float attackLength = 0f;
+                if (anim != null)
+                {
+                    anim.PlayAttack(); // start the attack animation
+
+                    // Let the animator enter the attack state, then read its length.
+                    yield return null;
+                    attackLength = anim.GetCurrentStateLength();
+
+                    // Wait until halfway through the animation (the "impact" point).
+                    yield return new WaitForSeconds(attackLength * 0.5f);
+                }
+
+                // Apply the hit at the impact point, flash + audio land with the strike.
                 _player.TakeDamage(incoming);
                 AudioManager.Instance.AttackHit();
                 Debug.Log($"Hit for {incoming} (after block).");
@@ -371,6 +424,11 @@ public class CombatManager : MonoBehaviour
                         break;
                     }
                 }
+
+                // Wait out the remaining half of the animation before the UI returns.
+                if (anim != null)
+                    yield return new WaitForSeconds(attackLength * 0.5f);
+
                 break;
         }
     }
@@ -688,5 +746,15 @@ public class CombatManager : MonoBehaviour
         }
 
         Debug.Log("<color=orange>Time Warp: bonus turn! You'll skip your next turn.</color>");
+    }
+
+    /// <summary>
+    /// Show or hide the player's action UI (handrow + end turn button).
+    /// Hidden during the enemy's turn so the player watches the attack.
+    /// </summary>
+    private void SetPlayerActionUI(bool visible)
+    {
+        if (handRow != null) handRow.SetActive(visible);
+        if (endTurnButton != null) endTurnButton.SetActive(visible);
     }
 }

@@ -17,8 +17,10 @@ MonoBehaviour:
   cardType: 2
   rarity: 2
   energyCost: 4
-  description: Store your current dice value, use it anytime in the next 3 turns.
-  artwork: {fileID: 21300000, guid: 39c9f2d53d98b42879a808de55a89542, type: 3}
+  description: Store your current dice value, stores it as the lowest value your
+    dice can be for the next turn (E.g. roll 4 now and use fatebank, next turn you
+    have to roll at least a 4).
+  artwork: {fileID: 21300000, guid: 404b26d30231e4eeda213b46c5b34d26, type: 3}
   baseDamage: 0
   baseDefense: 0
   upgradeTiers: []

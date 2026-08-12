@@ -38,4 +38,13 @@ public class EnemyAnimator : MonoBehaviour
         if (animator != null)
             animator.SetTrigger(DieTrigger);
     }
+
+    /// <summary>
+    /// How long the currently-playing animation is, in seconds.
+    /// </summary>
+    public float GetCurrentStateLength()
+    {
+        if (animator == null) return 0f;
+        return animator.GetCurrentAnimatorStateInfo(0).length;
+    }
 }

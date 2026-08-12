@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 5524024946768645980}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.9950483, z: -0, w: -0.09939281}
-  m_LocalPosition: {x: -5.68, y: -2.05, z: 39.65}
+  m_LocalPosition: {x: -5.68, y: -2.05, z: 8.56}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -108,6 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HitFlash
   modelRoot: {fileID: 2622563046776666349}
   flashMaterial: {fileID: 2100000, guid: 40bc58b417bca448dbcfaedf3e70a729, type: 2}
+  defendFlashMaterial: {fileID: 2100000, guid: 03a3d8ccc84a34383ac121c75de7027d, type: 2}
   flashDuration: 0.1
 --- !u!114 &6889662619988618886
 MonoBehaviour:
@@ -147,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 7960337668809250727}
   serializedVersion: 2
   m_LocalRotation: {x: -0.0000000021459219, y: -0.70060194, z: 0.0000000017892143, w: -0.71355236}
-  m_LocalPosition: {x: -0.52, y: -1.22, z: 0.42}
+  m_LocalPosition: {x: -0.95, y: -1.22, z: 2.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
