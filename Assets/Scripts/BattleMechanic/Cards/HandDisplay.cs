@@ -86,7 +86,8 @@ public class HandDisplay : MonoBehaviour
             if (_visible[card] != null)
             {
                 _visible[card].OnClicked -= HandleCardClicked;
-                StartCoroutine(_visible[card].FadeAndDestroy());
+                _visible[card].transform.SetParent(null);   // detach so it leaves handRow immediately
+                Destroy(_visible[card].gameObject);
             }
             _visible.Remove(card);
         }

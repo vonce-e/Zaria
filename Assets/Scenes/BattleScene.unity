@@ -1721,7 +1721,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.18431373}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.5294118}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2581,6 +2581,7 @@ MonoBehaviour:
   parryDodgeBar: {fileID: 1494753002}
   handRow: {fileID: 1723464527}
   endTurnButton: {fileID: 1873142243}
+  potionRow: {fileID: 1131362144}
 --- !u!4 &417478172
 Transform:
   m_ObjectHideFlags: 0
@@ -12802,15 +12803,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.05208206
+      value: 0.052
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.06
+      value: -0.158
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.49146843
+      value: 0.179
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
       propertyPath: m_LocalRotation.w
@@ -13214,8 +13215,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4289891839
-  m_fontColor: {r: 1, g: 0.5518868, b: 0.6999507, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -15048,7 +15049,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1952657538
 RectTransform:
   m_ObjectHideFlags: 0

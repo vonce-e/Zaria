@@ -57,6 +57,8 @@ public class CombatManager : MonoBehaviour
     public GameObject handRow;
     [Tooltip("The End Turn button.")]
     public GameObject endTurnButton;
+    [Tooltip("The potion row (hidden during the enemy turn).")]
+    public GameObject potionRow;
 
     /// <summary>
     /// Called by BattleSystem or CombatTest once everything is staged.
@@ -400,7 +402,16 @@ public class CombatManager : MonoBehaviour
 
                     // Let the animator enter the attack state, then read its length.
                     yield return null;
+
+                    float safety = 0f;
+                    while (anim.IsInTransition() && safety < 0.5f)
+                    {
+                        safety += Time.deltaTime;
+                        yield return null;
+                    }
+
                     attackLength = anim.GetCurrentStateLength();
+                    Debug.Log($"Enemy: {_enemy.unitName}, attack state length read as: {attackLength}");
 
                     // Wait until halfway through the animation (the "impact" point).
                     yield return new WaitForSeconds(attackLength * 0.5f);
@@ -769,5 +780,6 @@ public class CombatManager : MonoBehaviour
     {
         if (handRow != null) handRow.SetActive(visible);
         if (endTurnButton != null) endTurnButton.SetActive(visible);
+        if (potionRow != null) potionRow.SetActive(visible);
     }
 }

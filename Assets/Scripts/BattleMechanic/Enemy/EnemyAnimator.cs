@@ -47,4 +47,13 @@ public class EnemyAnimator : MonoBehaviour
         if (animator == null) return 0f;
         return animator.GetCurrentAnimatorStateInfo(0).length;
     }
+
+    /// <summary>
+    /// True while the animator is mid-transition between states.
+    /// </summary>
+    public bool IsInTransition()
+    {
+        if (animator == null) return false;
+        return animator.IsInTransition(0);
+    }
 }
