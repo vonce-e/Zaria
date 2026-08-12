@@ -210,6 +210,30 @@ public class CombatManager : MonoBehaviour
             Debug.Log($"<color=magenta>Double Down: {def.displayName} played twice!</color>");
         }
 
+        switch (def.id)
+        {
+            case CardId.Slash:
+            case CardId.DeepCut:
+            case CardId.BloodSlash:
+            case CardId.ExecutionStrike:
+                AudioManager.Instance.SwordHit();
+                break;
+
+            case CardId.QuickJab:
+            case CardId.TwinStrike:
+                AudioManager.Instance.AttackHit();
+                break;
+
+            case CardId.Guard:
+            case CardId.Brace:
+            case CardId.AdaptiveShield:
+            case CardId.RollingBarrier:
+            case CardId.TemporalGuard:
+            case CardId.Energize:
+                AudioManager.Instance.BlockGain();
+                break;
+        }
+
         _cardsPlayedThisTurn.Add(card.definitionId);
         _piles.PlayCard(card);
         AudioManager.Instance.CardPlay();

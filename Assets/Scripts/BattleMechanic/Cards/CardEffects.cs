@@ -40,6 +40,15 @@ public class GuardEffect : ICardEffect
         if (ctx.diceValue % 2 == 1) def_ += 2;
         ctx.caster.block += def_;
 
+
+        DefenseFlash defenseFlash =
+            ctx.caster.GetComponent<DefenseFlash>();
+
+        if (defenseFlash != null)
+        {
+            defenseFlash.ShowDefenseEffect();
+        }
+
         // Synergy with Parry played the same turn: deal 5 back, gain 3 defense.
         if (ctx.cardsPlayedThisTurn.Contains(CardId.Parry))
         {
@@ -120,7 +129,16 @@ public class AdaptiveShieldEffect : ICardEffect
         int def_ = def.GetDefense(ctx.cardUpgradeLevel);
         if (ctx.diceValue % 2 == 0) def_ *= 2;
         ctx.caster.block += def_;
+
+        DefenseFlash defenseFlash =
+        ctx.caster.GetComponent<DefenseFlash>();
+
+        if (defenseFlash != null)
+        {
+            defenseFlash.ShowDefenseEffect();
+        }
     }
+    
 }
 
 /// <summary>
@@ -149,7 +167,17 @@ public class EnergizeEffect : ICardEffect
             ctx.caster.energy = Mathf.Min(
             ctx.caster.energy + 2,
             ctx.combat.energyPerTurn);
+
+        DefenseFlash defenseFlash =
+        ctx.caster.GetComponent<DefenseFlash>();
+
+        if (defenseFlash != null)
+        {
+            defenseFlash.ShowDefenseEffect();
+        }
     }
+
+
 }
 
 /// <summary>
@@ -245,6 +273,14 @@ public class TemporalGuardEffect : ICardEffect
 
         if (ctx.diceValue >= 4)
             ctx.caster.block += 999;  // effectively immune this round
+
+        DefenseFlash defenseFlash =
+        ctx.caster.GetComponent<DefenseFlash>();
+
+        if (defenseFlash != null)
+        {
+            defenseFlash.ShowDefenseEffect();
+        }
     }
 }
 
@@ -324,6 +360,14 @@ public class RollingBarrierEffect : ICardEffect
     {
         int block = def.GetDefense(ctx.cardUpgradeLevel) * ctx.diceValue;
         ctx.caster.block += block;
+
+        DefenseFlash defenseFlash =
+        ctx.caster.GetComponent<DefenseFlash>();
+
+        if (defenseFlash != null)
+        {
+            defenseFlash.ShowDefenseEffect();
+        }
     }
 }
 

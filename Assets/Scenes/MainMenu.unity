@@ -4203,8 +4203,9 @@ MonoBehaviour:
   musicGroup: {fileID: -6960560447777383846, guid: ad9d9724474ce4a15b4f93dc9ca8a39e, type: 2}
   cardPlay: {fileID: 8300000, guid: b68ed2d6b8b4340c1a4a24cb3b6305b6, type: 3}
   attackHit: {fileID: 8300000, guid: 722cace5bdecd4429a4bf15b4013deb8, type: 3}
+  swordHit: {fileID: 8300000, guid: 65a692a93569a463a8a04843d14b8268, type: 3}
   diceRoll: {fileID: 8300000, guid: aa3c82b786c1e4970a689093acd7dd5a, type: 3}
-  blockGain: {fileID: 8300000, guid: 0e740909b44414c12965165ff6925dfc, type: 3}
+  blockGain: {fileID: 8300000, guid: db2e672de3d90414cbee2c10098c787a, type: 3}
   parrySuccess: {fileID: 8300000, guid: 0dabf25a581a146b69a5caa7307c6898, type: 3}
   dodgeSuccess: {fileID: 8300000, guid: 88336bb2820214af49735b2447e13157, type: 3}
   enemyHit: {fileID: 8300000, guid: 53e093ab58fdc4c258aed36f8fa8108f, type: 3}

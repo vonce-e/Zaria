@@ -18,6 +18,7 @@ public class AudioManager : MonoBehaviour
     [Header("Combat SFX")]
     public AudioClip cardPlay;
     public AudioClip attackHit;
+    public AudioClip swordHit;
     public AudioClip diceRoll;
     public AudioClip blockGain;
     public AudioClip parrySuccess;
@@ -98,6 +99,7 @@ public class AudioManager : MonoBehaviour
 
     public void CardPlay() => PlaySfx(cardPlay);
     public void AttackHit() => PlaySfx(attackHit);
+    public void SwordHit() => PlaySfx(swordHit);
     public void DiceRoll() => PlaySfx(diceRoll);
     public void BlockGain() => PlaySfx(blockGain);
     public void ParrySuccess() => PlaySfx(parrySuccess);

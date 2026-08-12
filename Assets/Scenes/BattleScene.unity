@@ -3884,6 +3884,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2699046750372345482, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2120317954}
+    - targetCorrespondingSourceObject: {fileID: 2699046750372345482, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2120317956}
   m_SourcePrefab: {fileID: 100100000, guid: 015d8c5a56eb14569bb927dbcd3d7409, type: 3}
 --- !u!4 &590306580 stripped
 Transform:
@@ -12578,6 +12581,7 @@ MonoBehaviour:
   musicGroup: {fileID: -6960560447777383846, guid: ad9d9724474ce4a15b4f93dc9ca8a39e, type: 2}
   cardPlay: {fileID: 8300000, guid: b68ed2d6b8b4340c1a4a24cb3b6305b6, type: 3}
   attackHit: {fileID: 8300000, guid: 722cace5bdecd4429a4bf15b4013deb8, type: 3}
+  swordHit: {fileID: 0}
   diceRoll: {fileID: 8300000, guid: aa3c82b786c1e4970a689093acd7dd5a, type: 3}
   blockGain: {fileID: 8300000, guid: 0e740909b44414c12965165ff6925dfc, type: 3}
   parrySuccess: {fileID: 8300000, guid: 0dabf25a581a146b69a5caa7307c6898, type: 3}
@@ -15827,6 +15831,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55919ac34a26952479f3fc91f777b2fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2120317956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120317949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31676204688df4576a640c84b526e263, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DefenseFlash
+  modelRoot: {fileID: 0}
+  defenseMaterial: {fileID: 2100000, guid: 03a3d8ccc84a34383ac121c75de7027d, type: 2}
+  effectDuration: 0.25
 --- !u!1 &2141006844
 GameObject:
   m_ObjectHideFlags: 0
