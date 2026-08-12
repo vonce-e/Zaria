@@ -72,6 +72,10 @@ public class RunManager : MonoBehaviour
     public void AdvanceDepth()
     {
         currentDepth++;
+
+        // Reset the blacksmith enchant budget for the new map.
+        runState.enchantSpent = 0;
+        
         Debug.Log($"Advanced to depth {currentDepth}.");
     }
 

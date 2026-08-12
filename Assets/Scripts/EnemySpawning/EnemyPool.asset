@@ -14,5 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPool
   normalEnemies:
   - {fileID: 5524024946768645980, guid: e6400eca7c40b4ce1bb86c9ad8cd1c48, type: 3}
+  - {fileID: 5524024946768645980, guid: 61219b4384309470c8c8d884aab19aed, type: 3}
+  - {fileID: 5524024946768645980, guid: 3e08c9f8e1354481888d47af0b8673d2, type: 3}
+  - {fileID: 5524024946768645980, guid: 469ee2fcfa8da4edc9ff957fadc1abd8, type: 3}
+  - {fileID: 5524024946768645980, guid: 758fcf60653b54f87bb184526578e223, type: 3}
   bosses:
   - {fileID: 5524024946768645980, guid: 3e08c9f8e1354481888d47af0b8673d2, type: 3}

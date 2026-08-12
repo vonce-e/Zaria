@@ -64,8 +64,8 @@ public class CardRewardService : MonoBehaviour
                 BindRun(RunManager.Instance.runState);
 
             _system.GrantRandomReward(
-                commonWeight: 55, rareWeight: 35,
-                mythicWeight: 10, legendaryWeight: 0);
+                commonWeight: 50, rareWeight: 33,
+                mythicWeight: 14, legendaryWeight: 3);
         }
 
     /// <summary>

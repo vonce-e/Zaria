@@ -15,6 +15,7 @@ public class BattleHudManager : MonoBehaviour
     public TMP_Text nameText;
     public TMP_Text levelText;
     public Slider healthSlider;
+    public TMP_Text hpText;
 
     private Unit _trackedUnit;
 
@@ -40,6 +41,7 @@ public class BattleHudManager : MonoBehaviour
 
         healthSlider.maxValue = unit.maxHp;
         healthSlider.value = unit.currentHp;
+        if (hpText != null) hpText.text = $"{unit.currentHp} / {unit.maxHp}";
 
         unit.OnHpChanged += HandleHpChanged;
     }
@@ -51,6 +53,8 @@ public class BattleHudManager : MonoBehaviour
     public void SetHp(int hp)
     {
         healthSlider.value = hp;
+        if (hpText != null && _trackedUnit != null)
+            hpText.text = $"{hp} / {_trackedUnit.maxHp}";
     }
 
     /// <summary>

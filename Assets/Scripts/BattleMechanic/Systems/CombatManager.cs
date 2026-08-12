@@ -487,12 +487,18 @@ public class CombatManager : MonoBehaviour
         if (BattleSystem.Instance != null && BattleSystem.Instance.xpBarContainer != null)
             BattleSystem.Instance.xpBarContainer.SetActive(true);
 
-        // Card reward
+        // Card reward - bosses drop much better cards.
         string cardPart = "";
         if (CardRewardService.Instance != null)
         {
-            CardRewardService.Instance.GrantCombatReward(
-                rewardCommon, rewardRare, rewardMythic, rewardLegendary);
+            bool wasBoss = RunManager.Instance != null && RunManager.Instance.pendingIsBoss;
+
+            if (wasBoss)
+                // Boss: big mythic/legendary chance
+                CardRewardService.Instance.GrantCombatReward(20, 35, 30, 15);
+            else
+                // Normal enemy: mostly common/rare, small mythic, tiny legendary.
+                CardRewardService.Instance.GrantCombatReward(55, 32, 11, 2);
 
             CardData won = CardRewardService.Instance.LastGrantedCard;
             if (won != null) cardPart = $"Got {won.displayName}! ";
