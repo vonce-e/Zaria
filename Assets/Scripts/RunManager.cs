@@ -55,6 +55,9 @@ public class RunManager : MonoBehaviour
         runState.deck.Add(new CardInstance(CardId.Brace));
         runState.deck.Add(new CardInstance(CardId.DiceRoll));
         runState.deck.Add(new CardInstance(CardId.Energize));
+        
+        // Starting potion
+        runState.potions.Add(new PotionInstance(PotionId.Recharge));
 
         // Bind the reward service to this run so chest/combat rewards use the real deck.
         if (CardRewardService.Instance != null)

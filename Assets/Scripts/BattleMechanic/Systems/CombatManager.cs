@@ -326,7 +326,7 @@ public class CombatManager : MonoBehaviour
     /// </summary>
     private IEnumerator ResolveEnemyDefend()
     {
-        const float defendBeatTime = 2f;   // how long the defend beat lasts
+        const float defendBeatTime = 1f;   // how long the defend beat lasts
 
         // Blue flash on the enemy for the whole beat.
         HitFlash flash = _enemy.GetComponent<HitFlash>();

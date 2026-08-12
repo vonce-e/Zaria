@@ -97,8 +97,8 @@ public class PotionBarDisplay : MonoBehaviour
     /// </summary>
     private void HandleClicked(PotionView view)
     {
+        HandleHoverExit();
         combatManager.TryUsePotion(view.PotionInstance);
-        // The inventory change is picked up next LateUpdate, grey-out too.
     }
 
     /// <summary>

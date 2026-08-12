@@ -53,11 +53,46 @@ public class BattleSystem : MonoBehaviour
     public BattleState state;
     public EnemyTelegraphUI enemyTelegraph;
 
+    private GameObject _enemyGo;   // the spawned enemy, created on scene load
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
         if (combatUIRoot != null) combatUIRoot.SetActive(false);
         
+    }
+
+    private void Start()
+    {
+        SpawnEnemy();
+    }
+
+    /// <summary>
+    /// Spawns the queued enemy at its point when the scene loads, so the
+    /// player sees it standing there before walking into the battle trigger.
+    /// </summary>
+    private void SpawnEnemy()
+    {
+        GameObject prefab = (RunManager.Instance != null)
+            ? RunManager.Instance.pendingEncounterPrefab
+            : null;
+
+        if (prefab == null)
+        {
+            Debug.LogError("BattleSystem: no enemy prefab in RunManager.");
+            return;
+        }
+
+        _enemyGo = Instantiate(prefab, enemyPoint.position, enemyPoint.rotation);
+        _enemyUnit = _enemyGo.GetComponent<Unit>();
+        _enemyUnit.currentHp = _enemyUnit.maxHp;
+
+        // Apply depth scaling now, at spawn.
+        if (RunManager.Instance != null)
+            EnemyScaling.Apply(_enemyUnit, RunManager.Instance.currentDepth);
+
+        // Set the enemy HUD so its info shows
+        if (enemyHUD != null) enemyHUD.SetHUD(_enemyUnit);
     }
 
     /// <summary>
@@ -88,23 +123,20 @@ public class BattleSystem : MonoBehaviour
             yield break;
         }
 
-        GameObject enemyGo = Instantiate(bossPrefab, enemyPoint.position, enemyPoint.rotation);
-        _enemyUnit = enemyGo.GetComponent<Unit>();
         _enemyUnit.currentHp = _enemyUnit.maxHp;
+
+        // Set up the player HUD.
+        playerHUD.SetHUD(_playerUnit);
 
         if (RunManager.Instance != null)
             _playerUnit.unitLevel = RunManager.Instance.runState.playerLevel;
             EnemyScaling.Apply(_enemyUnit, RunManager.Instance.currentDepth); // Scales enemies based off of depth of run
 
-        // HUDs
-        playerHUD.SetHUD(_playerUnit);
-        enemyHUD.SetHUD(_enemyUnit);
-
         // point CombatManager at boss's AI, then start combat
-        combatManager.enemyAI = enemyGo.GetComponent<EnemyAI>();
+        combatManager.enemyAI = _enemyGo.GetComponent<EnemyAI>();
 
         if (enemyTelegraph != null)
-            enemyTelegraph.enemyAI = enemyGo.GetComponent<EnemyAI>();
+            enemyTelegraph.enemyAI = _enemyGo.GetComponent<EnemyAI>();
         
         yield return new WaitForSeconds(0.5f);  // brief beat before cards appear
 

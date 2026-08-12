@@ -15,4 +15,4 @@ MonoBehaviour:
   id: 3
   displayName: New Beginning
   description: Discard your hand and draw a new one.
-  artwork: {fileID: 21300000, guid: 2b0166dbf473442779684da9e6d6778a, type: 3}
+  artwork: {fileID: 21300000, guid: 44c76c0e46d6240339ce239868a8365e, type: 3}

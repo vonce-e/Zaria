@@ -15,4 +15,4 @@ MonoBehaviour:
   id: 6
   displayName: Sacrifice
   description: Lose 10% HP, gain +2 energy for 2 turns.
-  artwork: {fileID: 21300000, guid: d81d6b759e619461ea4dedb9b0c8c99f, type: 3}
+  artwork: {fileID: 21300000, guid: 24f2b55b3539146c99aadb33f02c9ce3, type: 3}
