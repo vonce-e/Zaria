@@ -1014,7 +1014,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -764.5568, y: -180}
+  m_AnchoredPosition: {x: -764.5568, y: -144.69397}
   m_SizeDelta: {x: 298.8866, y: 94.6121}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &176572178
@@ -2157,7 +2157,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -764.5568, y: -463}
+  m_AnchoredPosition: {x: -764.5568, y: -427.69397}
   m_SizeDelta: {x: 298.8866, y: 94.6121}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &277969777
@@ -2891,7 +2891,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -764.5568, y: -47.30603}
+  m_AnchoredPosition: {x: -764.5568, y: -12}
   m_SizeDelta: {x: 298.8866, y: 94.6121}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &456281154
@@ -3720,7 +3720,7 @@ GameObject:
   - component: {fileID: 608623738}
   - component: {fileID: 608623737}
   m_Layer: 5
-  m_Name: Socials
+  m_Name: Tutorial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3744,7 +3744,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -764.5568, y: -324}
+  m_AnchoredPosition: {x: -764.5568, y: -288.69397}
   m_SizeDelta: {x: 298.8866, y: 94.6121}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &608623737
@@ -5749,7 +5749,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Socials
+  m_text: Tutorial
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d806ccf03c96b4b9280834c432588223, type: 2}
   m_sharedMaterial: {fileID: 5172299197239363609, guid: d806ccf03c96b4b9280834c432588223, type: 2}
@@ -7303,7 +7303,7 @@ MonoBehaviour:
   returnSceneName: 
   currentDepth: 1
   pendingIsBoss: 0
-  timePerDepth: 5
+  timePerDepth: 360
   remainingDungeonTime: 0
   dungeonTimerExpired: 0
 --- !u!4 &1362150056
@@ -7593,8 +7593,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuManager
   playButton: {fileID: 456281154}
   settingsButton: {fileID: 176572178}
-  socialsButton: {fileID: 608623737}
-  logOutButton: {fileID: 0}
+  tutorialButton: {fileID: 0}
   quitButton: {fileID: 277969777}
 --- !u!1 &1450866609
 GameObject:

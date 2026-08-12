@@ -6,8 +6,7 @@ public class MainMenuManager : MonoBehaviour
 {
    [SerializeField] private Button playButton;
    [SerializeField] private Button settingsButton;
-   [SerializeField] private Button socialsButton;
-   [SerializeField] private Button logOutButton;
+   [SerializeField] private Button tutorialButton;
    [SerializeField] private Button quitButton;
    
    void Update()
