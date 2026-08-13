@@ -1,6 +1,7 @@
 // This script handles the Blacksmith shop UI Logic.
 // Made by Vonce Chew
 
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -12,7 +13,16 @@ public class Blacksmith : MonoBehaviour
     public CardDatabase cardDatabase;
 
     // Smallest deck size a discard may leave behind
-    public int minimumDeckSize = 10;
+    public int minimumDeckSize = 8;
+
+    [Header("Blacksmith upgrades")]
+    [SerializeField] private int baseUpgradeCost = 20;
+    [SerializeField] private int costPerLevelUpgrade = 5;
+    [SerializeField] private int costPerDepth = 5;
+    [SerializeField] private int commonRarityCost = 0;
+    [SerializeField] private int rareRarityCost = 10;
+    [SerializeField] private int mythicRarityCost = 20;
+    [SerializeField] private int legendaryRarityCost = 35;
 
     /// <summary>
     /// The outcome of a blacksmith action, tells the UI what happened.
@@ -20,7 +30,7 @@ public class Blacksmith : MonoBehaviour
     public enum Result
     {
         Success,
-        NoBudgetLeft,
+        NotEnoughCoins,
         AlreadyMaxLevel,
         DeckTooSmall
     }
@@ -38,11 +48,14 @@ public class Blacksmith : MonoBehaviour
         if (card.upgradeLevel >= def.MaxUpgradeLevel)
             return Result.AlreadyMaxLevel;
 
-        if (run.EnchantRemaining <= 0)
-            return Result.NoBudgetLeft;
+        int upgradeCost = GetUpgradeCost(card);
 
+        if (run.coins < upgradeCost)
+            return Result.NotEnoughCoins;
+        
+        // Deducts the coins from the player & upgrades the card
+        run.coins -= upgradeCost;
         card.upgradeLevel++;
-        run.enchantSpent++;
 
         if (AudioManager.Instance != null)
             AudioManager.Instance.CardAcquired(); // Upgrade Audio
@@ -85,5 +98,50 @@ public class Blacksmith : MonoBehaviour
             case Rarity.Legendary: return 100;
             default:               return 10;
         }
+    }
+
+    public int GetUpgradeCost(CardInstance card)
+    {
+        if (card == null)
+        {
+            return 0;
+        }
+
+        int currentDepth = 1;
+
+        if (RunManager.Instance != null)
+        {
+            currentDepth = RunManager.Instance.currentDepth;
+        }
+
+        CardData cardData = cardDatabase.Get(card.definitionId);
+        int rarityCost = 0;
+
+        if (cardData != null)
+        {
+            switch(cardData.rarity)
+            {
+                case Rarity.Common:
+                    rarityCost = commonRarityCost;
+                    break;
+                
+                case Rarity.Rare:
+                    rarityCost = rareRarityCost;
+                    break;
+                
+                case Rarity.Legendary:
+                    rarityCost = legendaryRarityCost;
+                    break;
+
+                case Rarity.Mythic:
+                    rarityCost = mythicRarityCost;
+                    break;
+            }
+        }
+
+        int levelCost = card.upgradeLevel * costPerLevelUpgrade;
+        int depthCost = (currentDepth - 1) * costPerDepth;
+
+        return baseUpgradeCost + levelCost + depthCost + rarityCost;
     }
 }

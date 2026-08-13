@@ -24,6 +24,10 @@ public class HUDController : MonoBehaviour
     [SerializeField] private float forcedBossDelay = 2f;
     [SerializeField] private string timerExpiredMessage =
     "Time has expired. The boss awaits...";
+    
+    [Header("Boss battle enemy")]
+    [SerializeField] private EnemyPool fallbackEnemyPool;
+    [SerializeField] private string battleSceneName = "BattleScene";
 
     private int previouslyDisplayedCoins = -1;
     private int previouslyDisplayedDepth = -1;
@@ -72,7 +76,7 @@ public class HUDController : MonoBehaviour
 
             if (depthText != null && runManager.currentDepth != previouslyDisplayedDepth)
             {
-                depthText.text = $"Depth: {runManager.currentDepth}";
+                depthText.text = $"Level: {runManager.currentDepth}";
                 previouslyDisplayedDepth = runManager.currentDepth;
             }
 
@@ -100,6 +104,7 @@ public class HUDController : MonoBehaviour
         }
     }
 
+    // TODO: Move forced encounter logic into RunManager after presentation.
     private IEnumerator ForceBossEncounter()
     {   
         // This is to reuse the reward popup text broadcast because it has a fade than creating a new script
@@ -111,27 +116,51 @@ public class HUDController : MonoBehaviour
         yield return new WaitForSeconds(forcedBossDelay);
 
         BossRoomTrigger bossTrigger = FindFirstObjectByType<BossRoomTrigger>();
+        EnemyPortal enemyPortal = FindFirstObjectByType<EnemyPortal>();
 
+        // Sends them to a boss room if a boss portal was found
         if (bossTrigger != null)
         {
             Debug.Log("Normal boss portal was chosen.");
             bossTrigger.TeleportPlayer();
             yield break;
         }
-
-        EnemyPortal enemyPortal = FindFirstObjectByType<EnemyPortal>();
-
-        if (enemyPortal != null)
+         // Send them to a miniboss room if a miniboss portal was found
+        else if (enemyPortal != null)
         {
             Debug.Log("Mini boss portal was chosen.");
             enemyPortal.StartForcedDepthBattle();
             yield break;
         }
-
-        if (bossTrigger == null)
+        // If no miniboss or boss portal exists, just force a teleport
+        else
         {
-            Debug.LogWarning("Timer expired, but no boss room trigger was found. ");
-            yield break;
+            Debug.Log("No boss or miniboss portal found. Starting fallback boss battle.");
+
+            if (RunManager.Instance == null || fallbackEnemyPool == null)
+            {
+                Debug.LogWarning("Cannot start fallback boss battle.");
+                yield break;
+            }
+
+            int currentDepth = RunManager.Instance.currentDepth;
+            GameObject boss = fallbackEnemyPool.GetRandomBoss(currentDepth);
+
+            if (boss == null)
+            {
+                Debug.LogWarning("No fallback boss was found in the EnemyPool.");
+                yield break;
+            }
+
+            string returnScene = UnityEngine.SceneManagement
+                .SceneManager.GetActiveScene().name;
+
+            RunManager.Instance.LoadBattle(
+                boss,
+                battleSceneName,
+                returnScene,
+                true
+            );
         }
     }
 

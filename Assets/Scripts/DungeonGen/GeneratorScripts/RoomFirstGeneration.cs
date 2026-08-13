@@ -1244,37 +1244,7 @@ public class RoomFirstGeneration : SimpleRandomWalkGenerator
 
         return false;
     }
-
-    // <--------- Boss room Tile checking & Veil spawning Methods --------->
-    /// <summary>
-    /// Returns the centre tile used to position the boss portal.
-    /// </summary>
-    private Vector2Int BossRoomCenter(DungeonRoomData bossRoom)
-    {
-        return bossRoom.CenterPoint;
-    }
-
-    /// <summary>
-    /// Finds and returns the generated room assigned the boss room type.
-    /// </summary>
-    private DungeonRoomData GetBossRooms(List<DungeonRoomData> bossRoom)
-    {
-        if (bossRoom == null)
-        {
-            return null;
-        }
-
-        foreach (DungeonRoomData roomData in bossRoom)
-        {
-            if (roomData.TypeOfRoom == RoomType.Boss)
-            {
-                return roomData;
-            }
-        }
-
-        return null;
-    }
-
+    
     #endregion
 
     #region Room Data

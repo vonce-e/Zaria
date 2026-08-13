@@ -22,7 +22,7 @@ MonoBehaviour:
     Execution
     Strike (Rare), Deal 6 damage, if dice >= 4 and enemy HP < 50%, deal 10 extra
     damage. If used with Twin Strike in the same turn, deal double damage.'
-  artwork: {fileID: 21300000, guid: 75a976159da9448ca869eb9090d76050, type: 3}
+  artwork: {fileID: 21300000, guid: af5f69985ee15408497fae6dc70932f3, type: 3}
   baseDamage: 5
   baseDefense: 0
   upgradeTiers:

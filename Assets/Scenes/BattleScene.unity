@@ -7626,7 +7626,7 @@ Transform:
   m_GameObject: {fileID: 1083208743}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.1113276, y: 0.5909801, z: 57.865845}
+  m_LocalPosition: {x: -5.1113276, y: 0.5909801, z: 59.63}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11434,9 +11434,10 @@ MonoBehaviour:
   track: {fileID: 1500751766}
   dodgeZone: {fileID: 373905425}
   parryZone: {fileID: 868015476}
-  sweepDuration: 2.2
+  sweepDuration: 3.1
   window: 1.7
   possibleSweepDurations:
+  - 0.6
   - 0.8
   - 1
   - 1.2
@@ -11445,12 +11446,12 @@ MonoBehaviour:
   dodgeZoneWidth: 0.15
   parryZoneWidth: 0.04
   randomizeZonePosition: 1
-  maxCentreOffset: 0.25
+  maxCentreOffset: 0.225
   randomizeZoneSize: 1
   dodgeWidthMin: 0.15
   dodgeWidthMax: 0.35
-  parryWidthMin: 0.06
-  parryWidthMax: 0.11
+  parryWidthMin: 0.065
+  parryWidthMax: 0.115
 --- !u!1 &1498429898
 GameObject:
   m_ObjectHideFlags: 0
@@ -12889,7 +12890,9 @@ MonoBehaviour:
   cardPlay: {fileID: 8300000, guid: b68ed2d6b8b4340c1a4a24cb3b6305b6, type: 3}
   attackHit: {fileID: 8300000, guid: 722cace5bdecd4429a4bf15b4013deb8, type: 3}
   swordHit: {fileID: 0}
+  swordHard: {fileID: 0}
   diceRoll: {fileID: 8300000, guid: aa3c82b786c1e4970a689093acd7dd5a, type: 3}
+  blockImpact: {fileID: 0}
   blockGain: {fileID: 8300000, guid: 0e740909b44414c12965165ff6925dfc, type: 3}
   parrySuccess: {fileID: 8300000, guid: 0dabf25a581a146b69a5caa7307c6898, type: 3}
   dodgeSuccess: {fileID: 8300000, guid: 88336bb2820214af49735b2447e13157, type: 3}

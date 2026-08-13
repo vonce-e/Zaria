@@ -84,9 +84,6 @@ public class RunManager : MonoBehaviour
     {
         currentDepth++;
 
-        // Reset the blacksmith enchant budget for the new map.
-        runState.enchantSpent = 0;
-
         // Reset the timer for the new depth
         remainingDungeonTime = timePerDepth;
         dungeonTimerExpired = false;

@@ -219,18 +219,25 @@ public class CombatManager : MonoBehaviour
 
         switch (def.id)
         {
-            case CardId.Slash:
-            case CardId.DeepCut:
-            case CardId.BloodSlash:
-            case CardId.ExecutionStrike:
-                AudioManager.Instance.SwordHit();
-                break;
-
+            // Plays a thud sound
             case CardId.QuickJab:
             case CardId.TwinStrike:
                 AudioManager.Instance.AttackHit();
                 break;
 
+            // Plays a soft slash
+            case CardId.Slash:
+            case CardId.BloodSlash:
+                AudioManager.Instance.SwordHit();
+                break;
+
+            // Plays a deep slash
+            case CardId.DeepCut:
+            case CardId.ExecutionStrike:
+                AudioManager.Instance.SwordHardHit();
+                break;
+
+            // Plays a defense gained sound
             case CardId.Guard:
             case CardId.Brace:
             case CardId.AdaptiveShield:
@@ -345,7 +352,7 @@ public class CombatManager : MonoBehaviour
 
     /// <summary>
     /// Shows the parry/dodge bar for an incoming hit and applies the outcome:
-    /// Parry = no damage + 50% reflected, Dodge = no damage, Hit = full damage,
+    /// Parry = no damage + 25-50% reflected, Dodge = reduced damage by 50%, Hit = full damage,
     /// block from cards still plays out.
     /// </summary>
     /// <param name="incoming">The raw incoming damage before mitigation.</param>

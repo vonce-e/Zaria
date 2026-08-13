@@ -119,6 +119,7 @@ public class BlacksmithUI : MonoBehaviour
         SetMessage($"Selected {cardDatabase.Get(_selected.definitionId).displayName}.");
         RefreshButtons();
         HighlightSelected();
+        RefreshInfo();
     }
 
     /// <summary>
@@ -132,7 +133,7 @@ public class BlacksmithUI : MonoBehaviour
         switch (result)
         {
             case Blacksmith.Result.Success:        SetMessage("Upgraded!"); break;
-            case Blacksmith.Result.NoBudgetLeft:   SetMessage("No enchant budget left."); break;
+            case Blacksmith.Result.NotEnoughCoins:   SetMessage("Not enough coins left."); break;
             case Blacksmith.Result.AlreadyMaxLevel:SetMessage("That card is already maxed."); break;
         }
         RefreshInfo();
@@ -167,8 +168,24 @@ public class BlacksmithUI : MonoBehaviour
     private void RefreshInfo()
     {
         if (run == null) return;
-        if (budgetText != null) budgetText.text = $"Enchants left: {run.EnchantRemaining}";
-        if (coinsText != null)  coinsText.text = $"Coins: {run.coins}";
+        
+        if(coinsText != null)
+        {
+            coinsText.text = $"Coins: {run.coins}";
+        }
+
+        if (budgetText != null)
+        {
+            if (_selected == null)
+            {
+                budgetText.text = $"Select a card to view its upgrade cost";
+            }
+            else
+            {
+                int upgradeCost = blacksmith.GetUpgradeCost(_selected);
+                budgetText.text = $"Upgrade Cost: {upgradeCost} coins";
+            }
+        }
     }
 
     /// <summary>

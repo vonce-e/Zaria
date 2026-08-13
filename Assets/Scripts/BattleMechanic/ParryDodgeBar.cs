@@ -137,8 +137,11 @@ public class ParryDodgeBar : MonoBehaviour
             float x = Mathf.Lerp(-halfTrack, halfTrack, t);
             marker.anchoredPosition = new Vector2(x, marker.anchoredPosition.y);
 
+            bool spacePressed = Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame;
+            bool leftMousePressed = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+
             // Check for the press
-            if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
+            if (spacePressed || leftMousePressed)
             {
                 _result = EvaluatePress(t);
                 _resolved = true;

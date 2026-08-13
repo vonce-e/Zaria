@@ -91,6 +91,7 @@ public class Unit : MonoBehaviour
         if (damageReduction > 0f)
             amount = Mathf.RoundToInt(amount * (1f - damageReduction));
 
+        int blockBeforeAttack = block;
         int afterBlock = amount - block;
         block = Mathf.Max(0, block - amount);
 
@@ -98,6 +99,21 @@ public class Unit : MonoBehaviour
         {
             lastDamageTaken = afterBlock;
             SetHp(currentHp - afterBlock);
+        }
+
+        if (blockBeforeAttack > 0)
+        {
+            HitFlash flash = GetComponent<HitFlash>();
+
+            if (flash != null)
+            {
+                flash.FlashDefend(0.2f);
+            }
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.BlockImpact();
+            }
         }
     }
 

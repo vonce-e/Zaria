@@ -15,6 +15,8 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private bool _isOpen = false;
+    private CursorLockMode previousCursorLockMode;
+    private bool previousCursorVisible;
 
     void Start()
     {
@@ -46,6 +48,9 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void Open()
     {
+        previousCursorLockMode = Cursor.lockState;
+        previousCursorVisible = Cursor.visible;
+
         _isOpen = true;
         if (settingsPanel != null) settingsPanel.SetActive(true);
 
@@ -65,8 +70,8 @@ public class PauseMenu : MonoBehaviour
         if (settingsPanel != null) settingsPanel.SetActive(false);
 
         Time.timeScale = 1f; // resume the game
-        Cursor.lockState = CursorLockMode.Locked; // re-lock for first-person
-        Cursor.visible = false;
+        Cursor.lockState = previousCursorLockMode; // re-lock for first-person
+        Cursor.visible = previousCursorVisible;
 
         UIState.PanelClosed();
     }
