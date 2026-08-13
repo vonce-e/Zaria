@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Phantom Guard
   description: Gain defense equal to your missing health.
   artwork: {fileID: 21300000, guid: 3cd2c7e2b1e1d49388b50c2d39bba6f8, type: 3}
+  fullImage: {fileID: 21300000, guid: 0a4b2f077e69c4068b2ed9e4aa638207, type: 3}

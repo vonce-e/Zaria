@@ -60,6 +60,9 @@ public class CombatManager : MonoBehaviour
     [Tooltip("The potion row (hidden during the enemy turn).")]
     public GameObject potionRow;
 
+    [Header("Player animation")]
+    public PlayerAnimator playerAnimator;
+
     /// <summary>
     /// Called by BattleSystem or CombatTest once everything is staged.
     /// Sets up the card piles, draws the opening hand, asks the enemy
@@ -199,6 +202,10 @@ public class CombatManager : MonoBehaviour
         ICardEffect effect = CardEffectRegistry.Get(card.definitionId);
 
         int enemyHpBefore = _enemy.currentHp;   // measures damage dealt
+        
+        // Play the player's attack swing for attack cards.
+        if (def.cardType == CardType.Attack && playerAnimator != null)
+            playerAnimator.PlayAttack();
 
         if (effect != null)
             effect.Apply(ctx, def);

@@ -2582,6 +2582,7 @@ MonoBehaviour:
   handRow: {fileID: 1723464527}
   endTurnButton: {fileID: 1873142243}
   potionRow: {fileID: 1131362144}
+  playerAnimator: {fileID: 1646312362}
 --- !u!4 &417478172
 Transform:
   m_ObjectHideFlags: 0
@@ -9710,6 +9711,8 @@ MonoBehaviour:
   dangerTimerColor: {r: 1, g: 0, b: 0, a: 1}
   forcedBossDelay: 2
   timerExpiredMessage: Time has expired. The boss awaits...
+  fallbackEnemyPool: {fileID: 0}
+  battleSceneName: BattleScene
   interactionParent: {fileID: 0}
   interactionText: {fileID: 0}
   crosshair: {fileID: 1138320207}
@@ -12846,16 +12849,41 @@ PrefabInstance:
       propertyPath: m_Name
       value: MC4Unity
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: df44fc524d7b03c4589ac3945629b198, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1646312362}
   m_SourcePrefab: {fileID: 100100000, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
 --- !u!4 &1646312360 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
   m_PrefabInstance: {fileID: 1646312359}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1646312361 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 19b9b6c9e4db7b84288796515b0c1d61, type: 3}
+  m_PrefabInstance: {fileID: 1646312359}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1646312362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1646312361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e2b26e0c718c8a44b6fab8094f1d1b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
+  animator: {fileID: 0}
 --- !u!1 &1652962676
 GameObject:
   m_ObjectHideFlags: 0
@@ -15052,7 +15080,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1952657538
 RectTransform:
   m_ObjectHideFlags: 0

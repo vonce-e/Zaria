@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 /// <summary>
 /// The view layer for one card. The hand display creates one of these per
@@ -35,6 +36,11 @@ public class CardView : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
     /// Fires when this card is clicked. Passes itself so the listener knows which card.
     /// </summary>
     public event Action<CardView> OnClicked;
+
+    [Tooltip("The badge background (circle). Holds the level text as a child.")]
+    public GameObject upgradeBadgeRoot;
+    [Tooltip("The '+N' text on the badge.")]
+    public TMP_Text upgradeBadgeText;
 
     private bool _interactable = true;
 
@@ -76,6 +82,21 @@ public class CardView : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 
         if (borderImage != null)
             borderImage.color = GetRarityColor(data.rarity);
+
+        // Show the upgrade badge (circle + text) only if upgraded.
+        if (upgradeBadgeRoot != null)
+        {
+            if (instance.upgradeLevel > 0)
+            {
+                if (upgradeBadgeText != null)
+                    upgradeBadgeText.text = "+" + instance.upgradeLevel;
+                upgradeBadgeRoot.SetActive(true);
+            }
+            else
+            {
+                upgradeBadgeRoot.SetActive(false);
+            }
+        }
     }
 
     /// <summary>

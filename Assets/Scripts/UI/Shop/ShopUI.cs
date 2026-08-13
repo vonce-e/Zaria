@@ -112,7 +112,7 @@ public class ShopUI : MonoBehaviour
             return d != null ? d.artwork : null;
         }
         PotionData pd = potionDatabase.Get(item.potionId);
-        return pd != null ? pd.artwork : null;
+        return pd != null ? pd.fullImage : null; // shop shows the full card image
     }
 
     /// <summary>

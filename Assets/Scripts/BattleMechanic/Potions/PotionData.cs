@@ -21,7 +21,8 @@ public class PotionData : ScriptableObject
     public PotionId id;
     public string displayName;
     [TextArea] public string description;
-    public Sprite artwork;
+    public Sprite artwork; // plain icon (used in combat)
+    public Sprite fullImage; // full card with icon + description (used in shop)
 }
 
 /// <summary>
