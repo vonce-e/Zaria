@@ -18,6 +18,8 @@ public class HitFlash : MonoBehaviour
     [Tooltip("A material to flash to for DEFENSE (e.g. plain blue URP/Lit).")]
     public Material defendFlashMaterial;
 
+    public Material energizeFlashMaterial;
+
     [Tooltip("How long the flash lasts, in seconds.")]
     public float flashDuration = 0.1f;
 
@@ -98,6 +100,28 @@ public class HitFlash : MonoBehaviour
             RestoreMaterials();
         }
         _flashing = StartCoroutine(DoFlashMaterial(defendFlashMaterial, duration));
+    }
+
+    public void FlashEnergize()
+    {
+        if (_renderers == null || _renderers.Length == 0)
+        {
+            return;
+        }
+
+        if (energizeFlashMaterial == null)
+        {
+            Debug.LogWarning("EnergizeFlash Mat has not been assigned");
+            return;
+        }
+
+        if (_flashing != null)
+        {
+            StopCoroutine(_flashing);
+            RestoreMaterials();
+        }
+
+        _flashing = StartCoroutine(DoFlashMaterial(energizeFlashMaterial, flashDuration));
     }
 
     /// <summary>

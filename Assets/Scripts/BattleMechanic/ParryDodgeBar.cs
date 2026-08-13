@@ -50,6 +50,9 @@ public class ParryDodgeBar : MonoBehaviour
     public bool randomizeZonePosition = true;
     [Range(0f, 0.4f)] public float maxCentreOffset = 0.25f;
 
+    [Header("Input")]
+    public InputActionReference parryAction;
+
     private bool _resolved;
     private ParryDodgeResult _result;
 
@@ -84,6 +87,11 @@ public class ParryDodgeBar : MonoBehaviour
     /// <param name="onComplete">Called with Hit, Dodge, or Parry.</param>
     public void Show(Action<ParryDodgeResult> onComplete)
     {
+        if (parryAction != null)
+        {
+            parryAction.action.Enable();
+        }
+
         StartCoroutine(RunBar(onComplete));
     }
 
@@ -136,12 +144,11 @@ public class ParryDodgeBar : MonoBehaviour
             float t = Mathf.PingPong(elapsed / currentSweepDuration, 1f);
             float x = Mathf.Lerp(-halfTrack, halfTrack, t);
             marker.anchoredPosition = new Vector2(x, marker.anchoredPosition.y);
-
-            bool spacePressed = Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame;
-            bool leftMousePressed = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+            
+            bool parryPressed = parryAction != null && parryAction.action.WasPressedThisFrame();
 
             // Check for the press
-            if (spacePressed || leftMousePressed)
+            if (parryPressed)
             {
                 _result = EvaluatePress(t);
                 _resolved = true;

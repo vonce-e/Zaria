@@ -90,7 +90,7 @@ public class HUDController : MonoBehaviour
             // Same for depth - only update when it changes.
             if (depthText != null && runManager.currentDepth != previouslyDisplayedDepth)
             {
-                depthText.text = $"Level: {runManager.currentDepth}";
+                depthText.text = $"Depth: {runManager.currentDepth}";
                 previouslyDisplayedDepth = runManager.currentDepth;
             }
 

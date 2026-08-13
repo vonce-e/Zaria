@@ -41,12 +41,11 @@ public class GuardEffect : ICardEffect
         ctx.caster.block += def_;
 
 
-        DefenseFlash defenseFlash =
-            ctx.caster.GetComponent<DefenseFlash>();
+        HitFlash hitFlash = ctx.caster.GetComponent<HitFlash>();
 
-        if (defenseFlash != null)
+        if (hitFlash != null)
         {
-            defenseFlash.ShowDefenseEffect();
+            hitFlash.FlashDefend(0.1f);
         }
 
         // Synergy with Parry played the same turn: deal 5 back, gain 3 defense.
@@ -115,6 +114,13 @@ public class BraceEffect : ICardEffect
         int def_ = def.GetDefense(ctx.cardUpgradeLevel);
         if (ctx.diceValue >= 4) def_ += 4;
         ctx.caster.block += def_;
+
+        HitFlash hitFlash = ctx.caster.GetComponent<HitFlash>();
+
+        if (hitFlash != null)
+        {
+            hitFlash.FlashDefend(0.1f);
+        }
     }
 }
 
@@ -130,12 +136,11 @@ public class AdaptiveShieldEffect : ICardEffect
         if (ctx.diceValue % 2 == 0) def_ *= 2;
         ctx.caster.block += def_;
 
-        DefenseFlash defenseFlash =
-        ctx.caster.GetComponent<DefenseFlash>();
+        HitFlash hitFlash = ctx.caster.GetComponent<HitFlash>();
 
-        if (defenseFlash != null)
+        if (hitFlash != null)
         {
-            defenseFlash.ShowDefenseEffect();
+            hitFlash.FlashDefend(0.1f);
         }
     }
     
@@ -149,7 +154,7 @@ public class ChaosRendEffect : ICardEffect
 {
     public void Apply(BattleContext ctx, CardData def)
     {
-        if (ctx.diceValue <= 3) return;  // whiffs on a low roll
+        if (ctx.diceValue < 3) return;  // whiffs on a low roll
         int dmg = def.GetDamage(ctx.cardUpgradeLevel) * ctx.diceValue;
         ctx.target.TakeDamage(dmg);
     }
@@ -168,16 +173,14 @@ public class EnergizeEffect : ICardEffect
             ctx.caster.energy + 3,
             ctx.combat.energyPerTurn);
 
-        DefenseFlash defenseFlash =
-        ctx.caster.GetComponent<DefenseFlash>();
+        HitFlash hitflash =
+        ctx.caster.GetComponent<HitFlash>();
 
-        if (defenseFlash != null)
+        if (hitflash != null)
         {
-            defenseFlash.ShowDefenseEffect();
+            hitflash.FlashEnergize();
         }
     }
-
-
 }
 
 /// <summary>
@@ -258,6 +261,13 @@ public class ParryEffect : ICardEffect
             ctx.target.TakeDamage(5);
             ctx.caster.block += 3;
         }
+
+        HitFlash hitFlash = ctx.caster.GetComponent<HitFlash>();
+
+        if (hitFlash != null)
+        {
+            hitFlash.FlashDefend(0.1f);
+        }
     }
 }
 
@@ -274,12 +284,11 @@ public class TemporalGuardEffect : ICardEffect
         if (ctx.diceValue >= 4)
             ctx.caster.block += 999;  // effectively immune this round
 
-        DefenseFlash defenseFlash =
-        ctx.caster.GetComponent<DefenseFlash>();
+        HitFlash hitFlash = ctx.caster.GetComponent<HitFlash>();
 
-        if (defenseFlash != null)
+        if (hitFlash != null)
         {
-            defenseFlash.ShowDefenseEffect();
+            hitFlash.FlashDefend(0.1f);
         }
     }
 }
@@ -361,12 +370,11 @@ public class RollingBarrierEffect : ICardEffect
         int block = def.GetDefense(ctx.cardUpgradeLevel) * ctx.diceValue;
         ctx.caster.block += block;
 
-        DefenseFlash defenseFlash =
-        ctx.caster.GetComponent<DefenseFlash>();
+        HitFlash hitFlash = ctx.caster.GetComponent<HitFlash>();
 
-        if (defenseFlash != null)
+        if (hitFlash != null)
         {
-            defenseFlash.ShowDefenseEffect();
+            hitFlash.FlashDefend(0.1f);
         }
     }
 }

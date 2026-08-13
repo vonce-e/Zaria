@@ -202,10 +202,6 @@ public class CombatManager : MonoBehaviour
         ICardEffect effect = CardEffectRegistry.Get(card.definitionId);
 
         int enemyHpBefore = _enemy.currentHp;   // measures damage dealt
-        
-        // Play the player's attack swing for attack cards.
-        if (def.cardType == CardType.Attack && playerAnimator != null)
-            playerAnimator.PlayAttack();
 
         if (effect != null)
             effect.Apply(ctx, def);
@@ -241,6 +237,7 @@ public class CombatManager : MonoBehaviour
             // Plays a deep slash
             case CardId.DeepCut:
             case CardId.ExecutionStrike:
+            case CardId.ChaosRend:
                 AudioManager.Instance.SwordHardHit();
                 break;
 
@@ -250,8 +247,13 @@ public class CombatManager : MonoBehaviour
             case CardId.AdaptiveShield:
             case CardId.RollingBarrier:
             case CardId.TemporalGuard:
-            case CardId.Energize:
+            case CardId.Parry:
                 AudioManager.Instance.BlockGain();
+                break;
+            
+            // Plays an energized sound
+            case CardId.Energize:
+                AudioManager.Instance.Energized();
                 break;
         }
 

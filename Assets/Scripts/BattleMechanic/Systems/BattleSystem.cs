@@ -158,6 +158,7 @@ public class BattleSystem : MonoBehaviour
 
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayBattleMusic(); // Plays battle music
+            AudioManager.Instance.CardShuffle(); // Plays the card shuffle sound
 
         combatManager.BeginCombat(RunManager.Instance.runState, _playerUnit, _enemyUnit);
 

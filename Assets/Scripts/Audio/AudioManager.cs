@@ -20,13 +20,18 @@ public class AudioManager : MonoBehaviour
     public AudioClip attackHit;
     public AudioClip swordHit;
     public AudioClip swordHard;
-    public AudioClip diceRoll;
     public AudioClip blockImpact;
     public AudioClip blockGain;
+    public AudioClip energized;
     public AudioClip parrySuccess;
     public AudioClip dodgeSuccess;
     public AudioClip enemyHit;
     public AudioClip enemyDeath;
+
+    [Header("Card & Dice Feedback SFX")]
+    public AudioClip cardShuffle;
+    public AudioClip diceRoll;
+
 
     [Header("UI / Feedback SFX")]
     public AudioClip buttonClick;
@@ -99,26 +104,35 @@ public class AudioManager : MonoBehaviour
         if (_musicSource != null) _musicSource.Stop();
     }
 
+    // Combat
     public void CardPlay() => PlaySfx(cardPlay);
     public void AttackHit() => PlaySfx(attackHit);
     public void SwordHit() => PlaySfx(swordHit);
     public void SwordHardHit() => PlaySfx(swordHard);
-    public void DiceRoll() => PlaySfx(diceRoll);
     public void BlockImpact() => PlaySfx(blockImpact);
     public void BlockGain() => PlaySfx(blockGain);
+    public void Energized() => PlaySfx(energized);
     public void ParrySuccess() => PlaySfx(parrySuccess);
     public void DodgeSuccess() => PlaySfx(dodgeSuccess);
     public void EnemyHit() => PlaySfx(enemyHit);
     public void EnemyDeath() => PlaySfx(enemyDeath);
+    public void Victory() => PlaySfx(victory);
+    public void Defeat() => PlaySfx(defeat);
+
+    // Card & Dice 
+    public void CardShuffle() => PlaySfx(cardShuffle);
+    public void DiceRoll() => PlaySfx(diceRoll);
+
+    // Feedback
     public void ButtonClick() => PlaySfx(buttonClick);
     public void Purchase() => PlaySfx(purchase);
     public void ChestOpen() => PlaySfx(chestOpen);
     public void PotionDrink() => PlaySfx(potionDrink);
     public void LevelUp() => PlaySfx(levelUp);
     public void CardAcquired() => PlaySfx(cardAcquired);
-    public void Victory() => PlaySfx(victory);
-    public void Defeat() => PlaySfx(defeat);
     public void DoorOpen() => PlaySfx(doorOpening);
+
+    // For Main menu, game and battle music
 
     public void PlayMenuMusic() => PlayMusic(menuMusic);
     public void PlayDungeonMusic() => PlayMusic(dungeonMusic);

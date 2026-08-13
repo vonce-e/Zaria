@@ -23,12 +23,17 @@ public class MainMenuManager : MonoBehaviour
    /// </summary>
    public void PlayGame()
    {
-      if (RunManager.Instance != null)
+      if (RunManager.Instance != null && RunManager.Instance.hasPlayedTutorial)
+      {
          RunManager.Instance.StartNewRun();
+         SceneLoader.Instance.ChangeScene("DungeonGenScene");
+      }
       else
-         Debug.LogWarning("No RunManager found - run state won't persist.");
+      {
+         TutorialUIManager.Instance.StartCoroutine(TutorialUIManager.Instance.ShowTutorialWarning());
+         Debug.LogWarning("No RunManager found - run state won't persist or player hasn't played tutorial!");
+      }
 
-      SceneLoader.Instance.ChangeScene("DungeonGenScene");
    }
    
    /// <summary>

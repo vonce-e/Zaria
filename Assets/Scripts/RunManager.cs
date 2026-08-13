@@ -31,6 +31,10 @@ public class RunManager : MonoBehaviour
     public float remainingDungeonTime;
     [HideInInspector] public bool dungeonTimerExpired;
 
+    [Header("Tutorial Check")]
+    // Checks if they have done the tutorial
+    public bool hasPlayedTutorial;
+
     private void Awake()
     {
         // Singleton

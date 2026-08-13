@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
+using System.Collections;
 
 
 public class TutorialUIManager : MonoBehaviour
@@ -14,6 +15,8 @@ public class TutorialUIManager : MonoBehaviour
     [Header("Tutorial UI Panels")]
     [SerializeField] private GameObject tutorialPanel;
     [SerializeField] private List<GameObject> tutorialPages;
+    [SerializeField] private List<RectTransform> pageHeaders;
+    [SerializeField] private GameObject tutorialWarningPanel;
 
     [Header("Navigation")]
     [SerializeField] private Button previousBTN;
@@ -21,7 +24,28 @@ public class TutorialUIManager : MonoBehaviour
     [SerializeField] private TMP_Text pageNumber;
 
     private int currentPageIndex;
+    private int pagesDone;
 
+    public static TutorialUIManager Instance;
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,6 +53,26 @@ public class TutorialUIManager : MonoBehaviour
         if (tutorialPanel != null)
         {
             tutorialPanel.SetActive(false);
+        }
+
+        if (tutorialWarningPanel != null)
+        {
+            tutorialWarningPanel.SetActive(false);
+        }
+    }
+
+    void Update()
+    {
+        for (int i = 0; i < pageHeaders.Count; i++)
+        {
+            if (pageHeaders[i] == null)
+            {
+                continue;
+            }
+
+            Vector3 targetScale = i == currentPageIndex ? Vector3.one * 1.1f : Vector3.one;
+
+            pageHeaders[i].localScale = Vector3.Lerp(pageHeaders[i].localScale, targetScale, 10f * Time.unscaledDeltaTime);
         }
     }
     
@@ -38,6 +82,12 @@ public class TutorialUIManager : MonoBehaviour
         {
             tutorialPanel.SetActive(true);
             ShowPage(0);
+
+            // Enables that they have at least done the tutorial
+            if (RunManager.Instance != null)
+            { 
+                RunManager.Instance.hasPlayedTutorial = true;
+            }
         }
     }
 
@@ -47,6 +97,20 @@ public class TutorialUIManager : MonoBehaviour
         {
             tutorialPanel.SetActive(false);
         }
+    }
+
+    public IEnumerator ShowTutorialWarning()
+    {
+        if (tutorialWarningPanel == null)
+        {
+            yield break;
+        }
+        
+        tutorialWarningPanel.SetActive(true);
+
+        yield return new WaitForSeconds(2f);
+
+        tutorialWarningPanel.SetActive(false);
     }
 
     public void NextTutorialPage()
@@ -81,7 +145,7 @@ public class TutorialUIManager : MonoBehaviour
 
         if (pageNumber != null)
         {
-            pageNumber.text = $"{currentPageIndex + 1} / {tutorialPages.Count}";
+            pageNumber.text = $"{currentPageIndex + 1}";
         }
     }
 }

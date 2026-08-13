@@ -62,6 +62,11 @@ public class CardView : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
     {
         if (!_interactable) return;
         OnClicked?.Invoke(this);
+
+         if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.ButtonClick();
+        }
     }
 
     /// <summary>
